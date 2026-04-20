@@ -486,7 +486,7 @@ _______________||________________</pre>
         </div>
         <div class="art-progress">
           <span class="art-bar" id="artBar">[                                    ]</span>
-          <button type="button" class="art-toggle" id="artToggle" aria-label="Pause rotation">[ ❚❚ ]</button>
+          <button type="button" class="art-toggle" id="artToggle" aria-label="Pause rotation">[ PAUSE ]</button>
         </div>
       </div>
       <!-- BANNER -->
@@ -840,11 +840,11 @@ _______________||________________</pre>
         paused = !paused;
         if (paused) {
           pausedElapsed = performance.now() - cycleStart;
-          toggle.textContent = '[ ▶ ]';
+          toggle.textContent = '[ PLAY ]';
           toggle.setAttribute('aria-label', 'Resume rotation');
         } else {
           cycleStart = performance.now() - pausedElapsed;
-          toggle.textContent = '[ ❚❚ ]';
+          toggle.textContent = '[ PAUSE ]';
           toggle.setAttribute('aria-label', 'Pause rotation');
         }
       });
