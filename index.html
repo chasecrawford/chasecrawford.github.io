@@ -112,13 +112,21 @@
   }
   .art.is-active{opacity:.6}
   .art-progress{
-    margin-top:14px;display:flex;align-items:center;justify-content:center;
+    margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;
   }
   .art-bar{
     color:var(--green);text-shadow:0 0 4px rgba(0,255,136,.45);
     font-size:14px;letter-spacing:0;line-height:1;
     font-family:inherit;white-space:pre;margin:0;
   }
+  .art-toggle{
+    pointer-events:auto;cursor:pointer;background:transparent;
+    border:0;color:var(--green);
+    font:inherit;font-size:14px;letter-spacing:0;
+    padding:0;line-height:1;
+    text-shadow:0 0 4px rgba(0,255,136,.45);
+  }
+  .art-toggle:hover{color:var(--green);text-shadow:0 0 6px rgba(0,255,136,.7)}
   @media (max-width:1400px){.pika-wrap{display:none}}
 
   /* ============ LOADER ============ */
@@ -477,6 +485,7 @@ _______________||________________</pre>
 -~--~                   ~---|,--~'                  ~~----_____-~'   `~----~~</pre>
         </div>
         <div class="art-progress">
+          <button type="button" class="art-toggle" id="artToggle" aria-label="Pause rotation">[ ❚❚ ]</button>
           <span class="art-bar" id="artBar">[                                    ]</span>
         </div>
       </div>
@@ -781,6 +790,7 @@ _______________||________________</pre>
   (function rotateArt() {
     const arts = document.querySelectorAll('.pika-wrap .art');
     const bar = document.getElementById('artBar');
+    const toggle = document.getElementById('artToggle');
     if (!arts.length || !bar) return;
 
     const ROTATE_MS = 8000;
@@ -796,6 +806,8 @@ _______________||________________</pre>
     let pos = 0;
     let cycleStart = performance.now();
     let lastFilled = -1;
+    let paused = false;
+    let pausedElapsed = 0;
 
     function show(i) {
       arts.forEach((a, j) => a.classList.toggle('is-active', j === i));
@@ -809,6 +821,7 @@ _______________||________________</pre>
     }
 
     function tick(t) {
+      if (paused) { requestAnimationFrame(tick); return; }
       const elapsed = t - cycleStart;
       if (elapsed >= ROTATE_MS) {
         pos = (pos + 1) % order.length;
@@ -820,6 +833,21 @@ _______________||________________</pre>
         renderBar(elapsed / ROTATE_MS);
       }
       requestAnimationFrame(tick);
+    }
+
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        paused = !paused;
+        if (paused) {
+          pausedElapsed = performance.now() - cycleStart;
+          toggle.textContent = '[ ▶ ]';
+          toggle.setAttribute('aria-label', 'Resume rotation');
+        } else {
+          cycleStart = performance.now() - pausedElapsed;
+          toggle.textContent = '[ ❚❚ ]';
+          toggle.setAttribute('aria-label', 'Pause rotation');
+        }
+      });
     }
 
     show(order[pos]);
