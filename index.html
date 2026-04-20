@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>chasecrawford.dev // tty</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Chase Crawford — Lead Backend Developer at Hatfield Media. Louisville, KY. PHP/Laravel, Vue, PostgreSQL, AWS. Shipping since 2008.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --bg2:#0f0f0f;
+    --ink:#d8e4d8;
+    --ink2:#6a7a6a;
+    --line:#1d2a1d;
+    --green:#00ff88;
+    --cyan:#00d4ff;
+    --yellow:#ffd60a;
+    --magenta:#ff4db8;
+    --red:#ff5c5c;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;line-height:1.6;overflow-x:hidden}
+  a{color:var(--cyan);text-decoration:none;border-bottom:1px dashed transparent}
+  a:hover{border-bottom-color:var(--cyan)}
+  ::selection{background:var(--green);color:#000}
+
+  /* ============ CRT SHELL ============ */
+  .shell{
+    min-height:100vh;
+    padding:16px;
+    background:
+      linear-gradient(180deg, transparent 50%, rgba(0,255,136,.015) 50%),
+      var(--bg);
+    background-size: 100% 4px, 100% 100%;
+  }
+  .window{
+    border:1px solid var(--line);
+    background:var(--bg2);
+    box-shadow: 0 0 0 1px #000 inset, 0 40px 80px -40px rgba(0,255,136,.08);
+    min-height:calc(100vh - 32px);
+    display:flex;flex-direction:column;
+  }
+  .titlebar{
+    display:flex;align-items:center;gap:12px;
+    padding:0 0 0 14px;border-bottom:1px solid var(--line);
+    background:#060606;min-height:32px;
+    font-size:11px;letter-spacing:.15em;color:var(--ink2);text-transform:uppercase;
+  }
+  .tb-left{display:flex;gap:14px;align-items:center}
+  .tb-center{flex:1;text-align:center}
+  .tb-right{display:flex;gap:14px;align-items:center;margin-right:14px}
+  /* Windows-style window controls */
+  .wcontrols{display:flex;align-items:stretch;height:32px}
+  .wctl{
+    display:flex;align-items:center;justify-content:center;
+    width:40px;height:100%;color:var(--ink2);font-size:12px;
+    cursor:pointer;user-select:none;
+    transition:background .12s, color .12s;
+    background:transparent;border:0;font-family:inherit;
+  }
+  .wctl:hover{background:#151515;color:var(--ink)}
+  .wctl.close:hover{background:#c42b1c;color:#fff}
+  .wctl:focus{outline:none}
+  .wctl:focus-visible{outline:1px dashed var(--green);outline-offset:-3px}
+
+  /* Minimized window state */
+  body.minimized .ticker,
+  body.minimized .body,
+  body.minimized .statusbar{display:none}
+  body.minimized .shell{min-height:auto}
+  body.minimized .window{min-height:0}
+  body.minimized .titlebar .tb-center::after{content:' · (minimized)';color:var(--ink2);opacity:.6}
+
+  /* Close / disconnect overlay */
+  #closeOverlay{
+    position:fixed;inset:0;background:#000;z-index:200;
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px;text-align:center;
+  }
+  #closeOverlay.active{display:flex;animation:fadein .25s forwards}
+  #closeOverlay .xtitle{color:var(--red);font-size:18px;letter-spacing:.3em;margin-bottom:24px;text-shadow:0 0 12px rgba(255,92,92,.4)}
+  #closeOverlay .xmsg{color:var(--ink2);font-size:13px;line-height:1.8;margin-bottom:32px;max-width:560px}
+  #closeOverlay .xmsg .code{color:var(--green)}
+  #closeOverlay .xbtn{
+    background:transparent;border:1px solid var(--green);color:var(--green);
+    padding:10px 20px;font-family:inherit;font-size:11px;letter-spacing:.25em;
+    cursor:pointer;text-transform:uppercase;transition:all .15s;
+  }
+  #closeOverlay .xbtn:hover{background:var(--green);color:#000;box-shadow:0 0 16px rgba(0,255,136,.4)}
+
+  .body{padding:24px;flex:1;position:relative}
+
+  /* hero-side ASCII rotator — centered in the empty space beside the banner */
+  .pika-wrap{
+    position:absolute;top:24px;right:24px;left:45%;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    pointer-events:none;
+  }
+  .art-stage{
+    position:relative;width:100%;height:300px;
+  }
+  .art{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    color:var(--green);text-shadow:0 0 6px rgba(0,255,136,.2);
+    line-height:1;white-space:pre;margin:0;
+    opacity:0;transition:opacity .5s ease;
+  }
+  .art.is-active{opacity:.6}
+  .art-progress{
+    margin-top:14px;display:flex;align-items:center;justify-content:center;
+  }
+  .art-bar{
+    color:var(--green);text-shadow:0 0 4px rgba(0,255,136,.45);
+    font-size:14px;letter-spacing:0;line-height:1;
+    font-family:inherit;white-space:pre;margin:0;
+  }
+  @media (max-width:1400px){.pika-wrap{display:none}}
+
+  /* ============ LOADER ============ */
+  #loader{
+    position:fixed;inset:0;background:var(--bg);z-index:100;
+    padding:48px 32px;transition:opacity .5s;
+    display:flex;flex-direction:column;
+  }
+  #loader.gone{opacity:0;pointer-events:none}
+  .boot-head{display:flex;justify-content:space-between;font-size:11px;color:var(--ink2);letter-spacing:.15em;text-transform:uppercase;margin-bottom:48px}
+  .boot-log{flex:1;font-size:13px;line-height:1.8;max-width:900px;margin:0 auto;width:100%}
+  .boot-log .line{display:flex;gap:12px;opacity:0;animation:fadein .3s forwards}
+  .boot-log .line.pad{margin-top:16px}
+  .boot-log .ok{color:var(--green)}
+  .boot-log .warn{color:var(--yellow)}
+  .boot-log .info{color:var(--cyan)}
+  .boot-log .dim{color:var(--ink2)}
+  .boot-log .ts{color:var(--ink2);flex-shrink:0;width:88px}
+  @keyframes fadein{to{opacity:1}}
+  .boot-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+  .boot-pct{font-size:88px;font-weight:800;letter-spacing:-.04em;color:var(--green);font-variant-numeric:tabular-nums;line-height:1;text-shadow:0 0 24px rgba(0,255,136,.3)}
+  .boot-bar{flex:1;margin:0 24px;height:2px;background:#111;position:relative}
+  .boot-bar i{position:absolute;inset:0;background:var(--green);width:0;box-shadow:0 0 12px var(--green)}
+  .skip{background:transparent;border:1px solid var(--line);color:var(--ink);padding:8px 14px;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:.2em}
+  .skip:hover{border-color:var(--green);color:var(--green)}
+
+  /* ============ PROMPT / CMD / OUT ============ */
+  .cmd{display:flex;align-items:baseline;gap:8px;margin:16px 0 8px;flex-wrap:wrap}
+  .cmd .user{color:var(--green)}
+  .cmd .at{color:var(--ink2)}
+  .cmd .host{color:var(--cyan)}
+  .cmd .sep{color:var(--ink2)}
+  .cmd .path{color:var(--yellow)}
+  .cmd .arrow{color:var(--magenta)}
+  .cmd .c{color:var(--ink);font-weight:500}
+  .cmd .c .flag{color:var(--cyan)}
+
+  .out{padding:4px 0 8px 0;color:var(--ink)}
+  .out.dim{color:var(--ink2)}
+  .out pre{margin:0;font:inherit;white-space:pre;overflow-x:auto;padding:0 0 8px}
+  .out .success{color:var(--green)}
+  .out .warn{color:var(--yellow)}
+  .out .info{color:var(--cyan)}
+  .out .key{color:var(--magenta)}
+
+  /* banner ascii — scales with viewport so it always fits */
+  .banner{color:var(--green);text-shadow:0 0 10px rgba(0,255,136,.28);font-size:clamp(3px, 0.82vw, 9px);line-height:1.15;margin:0;white-space:pre;overflow:hidden}
+  .banner-sub{color:var(--ink2);font-size:12px;margin-top:6px}
+
+  /* kv list */
+  .kv{display:grid;grid-template-columns:160px 1fr;row-gap:4px;column-gap:16px;padding:8px 0 12px}
+  .kv .k{color:var(--ink2)}
+  .kv .v{color:var(--ink)}
+  .kv .v .chip{display:inline-block;padding:1px 6px;border:1px solid var(--line);font-size:11px;margin-right:4px;color:var(--ink2)}
+  .kv .v .ok{color:var(--green)}
+  .kv .v a{color:var(--cyan)}
+
+  /* ============ project cards ============ */
+  .projects{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:12px 0 16px}
+  .proj{
+    border:1px solid var(--line);padding:16px;background:rgba(0,255,136,.02);
+    position:relative;transition:all .15s;cursor:pointer;
+  }
+  .proj:hover{border-color:var(--green);background:rgba(0,255,136,.06)}
+  .proj:hover .proj-go{color:var(--green)}
+  .proj-head{display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;color:var(--ink2);letter-spacing:.1em;text-transform:uppercase}
+  .proj-head .id{color:var(--cyan)}
+  .proj-name{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .proj-name .nm{font-size:17px;color:var(--ink);font-weight:700}
+  .proj-go{color:var(--ink2);transition:color .15s}
+  .proj-desc{color:var(--ink2);font-size:12px;line-height:1.6;margin-bottom:12px}
+  .proj-stack{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+  .proj-stack span{font-size:10px;padding:2px 6px;border:1px solid var(--line);color:var(--ink);letter-spacing:.1em}
+  .proj-stats{display:flex;gap:16px;font-size:11px;color:var(--ink2);border-top:1px dashed var(--line);padding-top:10px}
+  .proj-stats b{color:var(--cyan);font-weight:700}
+
+  /* ============ experience table ============ */
+  table.exp{width:100%;border-collapse:collapse;margin:8px 0 16px;font-size:12px}
+  table.exp th, table.exp td{padding:10px 12px;text-align:left;border-bottom:1px dashed var(--line);vertical-align:top}
+  table.exp th{color:var(--ink2);font-weight:400;letter-spacing:.15em;font-size:10px;text-transform:uppercase;padding-top:0;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  table.exp tr:hover td{background:rgba(0,255,136,.03)}
+  table.exp td .role{color:var(--ink);font-weight:600}
+  table.exp td .co{color:var(--cyan);font-size:11px;display:block;margin-top:2px}
+  table.exp td .co a{color:var(--cyan)}
+  table.exp td.status{color:var(--green);font-size:10px;letter-spacing:.2em;white-space:nowrap}
+
+  /* ============ gallery ============ */
+  .gal{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 12px}
+  .gframe{
+    aspect-ratio:1;border:1px solid var(--line);background:#060606;
+    position:relative;display:flex;flex-direction:column;justify-content:space-between;
+    padding:8px;transition:all .15s;overflow:hidden;
+  }
+  .gframe:hover{border-color:var(--magenta)}
+  .gframe-label{font-size:9px;color:var(--ink2);letter-spacing:.1em;text-transform:uppercase;position:relative;z-index:2}
+  .gframe-id{font-size:9px;color:var(--ink2);position:relative;z-index:2}
+  .gframe-viz{position:absolute;inset:20%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .gframe .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(0,255,136,.04) 3px, rgba(0,255,136,.04) 4px);pointer-events:none;z-index:1}
+  /* Photo frames: image fills via cover, overlay gradient is inline; chrome sits on top via z-index.
+     Default state is a duotone tint (greyscale + sepia + hue-rotate to the --hue palette color).
+     On hover, filters zero out and the real-color photo pops. */
+  .gframe-photo{
+    --hue:287deg;
+    background-size:100% 100%, cover;background-position:center;background-repeat:no-repeat;
+    filter:grayscale(1) sepia(.6) saturate(2) hue-rotate(var(--hue));
+    transition:filter .4s ease, border-color .15s;
+  }
+  .gframe-photo:hover{filter:grayscale(0) sepia(0) saturate(1) hue-rotate(0deg)}
+  .gframe-photo .gframe-id, .gframe-photo .gframe-label{color:#e6e6e6;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+
+  /* ============ contact ============ */
+  .contact-links{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:8px 0 12px}
+  .clink{display:flex;justify-content:space-between;padding:10px 12px;border:1px solid var(--line);font-size:12px;transition:all .15s;color:var(--ink)}
+  .clink:hover{border-color:var(--cyan);background:rgba(0,212,255,.05)}
+  .clink .k{color:var(--ink2);letter-spacing:.1em;text-transform:uppercase;font-size:11px}
+  .clink .v{color:var(--ink)}
+  button.clink{background:transparent;font-family:inherit;text-align:left;cursor:pointer;width:100%}
+  button.clink.copied{border-color:var(--green);background:rgba(0,255,136,.06)}
+  button.clink.copied .v::after{content:" · copied";color:var(--green);font-size:11px;margin-left:6px}
+
+  /* ============ blinking cursor ============ */
+  .caret{display:inline-block;width:8px;height:14px;background:var(--green);vertical-align:middle;margin-left:4px;animation:blink 1s steps(2) infinite;box-shadow:0 0 6px var(--green)}
+  @keyframes blink{50%{opacity:0}}
+
+  /* ============ marquee (ticker) — seamless infinite ============ */
+  .ticker{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:#060606;padding:6px 0;overflow:hidden;
+    font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);
+  }
+  /* Track holds 2 identical groups side-by-side; animating to -50% shifts
+     the track exactly one group-width, so on loop the 2nd group lands where
+     the 1st was — zero visible seam. */
+  .ticker-track{display:flex;width:max-content;animation:tk 50s linear infinite;will-change:transform}
+  .ticker-group{display:flex;flex:none}
+  .ticker-group > span{padding:0 24px;white-space:nowrap}
+  @keyframes tk{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media (prefers-reduced-motion: reduce){.ticker-track{animation:none}}
+
+  /* status bar at bottom */
+  .statusbar{
+    border-top:1px solid var(--line);background:#060606;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:8px 14px;font-size:10px;letter-spacing:.15em;color:var(--ink2);text-transform:uppercase;
+  }
+  .statusbar .g{color:var(--green)}
+
+  /* ============ responsive ============ */
+  @media (max-width:860px){
+    .shell{padding:8px}
+    .body{padding:16px}
+    .projects{grid-template-columns:1fr}
+    .gal{grid-template-columns:repeat(2,1fr)}
+    .contact-links{grid-template-columns:1fr}
+    /* banner font-size is handled by clamp() above; no override needed */
+    .kv{grid-template-columns:1fr;row-gap:0}
+    .kv .k{margin-top:8px;font-size:10px}
+    .statusbar{flex-wrap:wrap;gap:8px;font-size:9px}
+    /* Drop the STATUS column on mobile — the "● CURRENT" marker is
+       redundant with the 2022 — now date in the first row. */
+    table.exp th:nth-child(4),
+    table.exp td.status{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== CLOSE / DISCONNECT OVERLAY ========== -->
+<div id="closeOverlay">
+  <div class="xtitle">CONNECTION TERMINATED</div>
+  <div class="xmsg">
+    session ended · <span class="code">[127.0.0.1]</span> closed by user<br>
+    <span style="color:var(--ink2)">press <span class="code">RECONNECT</span> to re-establish tty</span>
+  </div>
+  <button class="xbtn" id="reconnectBtn">RECONNECT &nbsp;[ENTER]</button>
+</div>
+
+<!-- ========== LOADER ========== -->
+<div id="loader">
+  <div class="boot-head">
+    <span>chasecrawford.dev // boot sequence</span>
+    <span id="bootStamp"></span>
+  </div>
+  <div class="boot-log" id="bootLog"></div>
+  <div class="boot-bottom">
+    <div class="boot-pct" id="bpct">000</div>
+    <div class="boot-bar"><i id="bbar"></i></div>
+    <button class="skip" id="bskip">SKIP [esc]</button>
+  </div>
+</div>
+
+<!-- ========== SHELL ========== -->
+<div class="shell">
+  <div class="window">
+
+    <div class="titlebar">
+      <div class="tb-left">
+        <span style="color:var(--green)">● LIVE</span>
+      </div>
+      <div class="tb-center">chase@louisville · Windows PowerShell</div>
+      <div class="wcontrols">
+        <button type="button" class="wctl" id="wctlMin" title="Minimize" aria-label="Minimize">&#xFF3F;</button>
+        <button type="button" class="wctl" id="wctlMax" title="Maximize" aria-label="Maximize">&#x25A1;</button>
+        <button type="button" class="wctl close" id="wctlClose" title="Close" aria-label="Close">&times;</button>
+      </div>
+    </div>
+
+    <div class="ticker">
+      <div class="ticker-track">
+        <!-- Single source of truth — JS clones this group once on load for seamless looping. -->
+        <div class="ticker-group">
+          <span>LEAD BACKEND DEVELOPER • HATFIELD MEDIA • LOUISVILLE KY</span>
+          <span>//</span>
+          <span>CUSTOM SOLUTIONS IN PHP SINCE 2008</span>
+          <span>//</span>
+          <span>WANNABE INDIE GAME DEV</span>
+          <span>//</span>
+          <span>REAL HUMAN</span>
+          <span>//</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body">
+      <!-- decorative ASCII rotator centered in the empty space beside the banner -->
+      <div class="pika-wrap" aria-hidden="true">
+        <div class="art-stage">
+          <pre class="art" data-name="pikachu" style="font-size:7px">quu..___
+ $$$b  `---.___
+  "$$b        `--.                          ___.---uuudP
+   `$$b           `.__.------.___     ___.---'      $$$$"              .
+     "$b          -'            `.-.'            $$$"              .'|
+       ".                                       d$"             _.'  |
+         `.   /                              ..."             .'     |
+           `./                           ..::-'            _.'       |
+            /                         .:::-'            .-'         .'
+           :                          ::''\          _.'            |
+          .' .-.             .-.           `.      .'               |
+          : /'$$|           .@"$\           `.   .'              _.-'
+         .'|$u$$|          |$$,$$|           |  &lt;            _.-'
+         | `:$$:'          :$$$$$:           `.  `.       .-'
+         :                  `"--'             |    `-.     \
+        :##.       ==             .###.       `.      `.    `\
+        |##:                      :###:        |        &gt;     &gt;
+        |#'     `..'..'          `###'        x:      /     /
+         \                                   xXX|     /    ./
+          \                                xXXX'|    /   ./
+          /`-.                                  `.  /   /
+         :    `-  ...........,                   | /  .'
+         |         ``:::::::'       .            |&lt;    `.
+         |             ```          |           x| \ `.:```.
+         |                         .'    /'   xXX|  `:` M`M':.
+         |    |                    ;    /:' xXXX'|  -'MMMMM:'
+         `.  .'                   :    /:'       |-'MMMM.-'
+          |  |                   .'   /'        .'MMM.-'
+          `'`'                   :  ,'          |MMM&lt;
+            |                     `'            |tbap\
+             \                                  :MM.-'
+              \                 |              .''
+               \.               `.            /
+                /     .:::::::.. :           /
+               |     .::::::::::`.         /
+               |   .:::------------\       /
+              /   .''               &gt;::'  /
+              `',:                 :    .'
+                                   `:.:'</pre>
+          <pre class="art" data-name="fishing" style="font-size:18px">            ________
+    o      |   __   |
+      \_ O |  |__|  |
+   ____/ \ |___WW___|
+   __/   /     ||
+               ||
+               ||
+_______________||________________</pre>
+          <pre class="art" data-name="r2d2" style="font-size:11px">             ______
+          ,-'//__\\`-.
+        ,'  ____      `.
+       /   / ,-.-.      \
+      (/# /__`-'_| || || )
+      ||# []/()] O || || |
+    __`------------------'__
+   |--| |&lt;=={_______}=|| |--|
+   |  | |-------------|| |  |
+   |  | |={_______}==&gt;|| |  |
+   |  | |   |: _ :|   || |  |
+   &gt; _| |___|:===:|   || |__&lt;
+   :| | __| |: - :|   || | |:
+   :| | ==| |: _ :|   || | |:
+   :| | ==|_|:===:|___||_| |:
+   :| |___|_|:___:|___||_| |:
+   :| |||   ||/_\|| ||| -| |:
+   ;I_|||[]_||\_/|| ||| -|_I;
+   |_ |__________________| _|
+   | `\\\___|____|____/_//' |
+   J : |     \____/     | : L
+  _|_: |      |__|      | :_|_
+-/ _-_.'    -/    \-    `.-_- \-
+/______\    /______\    /______\</pre>
+          <pre class="art" data-name="plane" style="font-size:18px">            ____
+  |        | ___\          /~~~|
+ _:_______|/'(..)`\_______/  | |
+&lt;_|``````  \__~~__/       ___|_|
+  :\_____(=========,   ,--\__|_/
+  |       \       /---'
+            |     /
+            |____/</pre>
+          <pre class="art" data-name="castle" style="font-size:13px">                                  |&gt;&gt;&gt;
+                                  |
+                    |&gt;&gt;&gt;      _  _|_  _         |&gt;&gt;&gt;
+                    |        |;| |;| |;|        |
+                _  _|_  _    \.    .  /    _  _|_  _
+               |;|_|;|_|;|    \:. ,  /    |;|_|;|_|;|
+               \..      /    ||;   . |    \.    .  /
+                \.  ,  /     ||:  .  |     \:  .  /
+                 ||:   |_   _ ||_ . _ | _   _||:   |
+                 ||:  .|||_|;|_|;|_|;|_|;|_|;||:.  |
+                 ||:   ||.    .     .      . ||:  .|
+                 ||: . || .     . .   .  ,   ||:   |       \,/
+                 ||:   ||:  ,  _______   .   ||: , |            /`\
+                 ||:   || .   /+++++++\    . ||:   |
+                 ||:   ||.    |+++++++| .    ||: . |
+              __ ||: . ||: ,  |+++++++|.  . _||_   |
+     ____--`~    '--~~__|.    |+++++__|----~    ~`---,              ___
+-~--~                   ~---|,--~'                  ~~----_____-~'   `~----~~</pre>
+        </div>
+        <div class="art-progress">
+          <span class="art-bar" id="artBar">[                                    ]</span>
+        </div>
+      </div>
+      <!-- BANNER -->
+      <pre class="banner"> ██████╗██╗  ██╗ █████╗ ███████╗███████╗ ██████╗██████╗  █████╗ ██╗    ██╗███████╗ ██████╗ ██████╗ ██████╗     ██████╗ ███████╗██╗   ██╗
+██╔════╝██║  ██║██╔══██╗██╔════╝██╔════╝██╔════╝██╔══██╗██╔══██╗██║    ██║██╔════╝██╔═══██╗██╔══██╗██╔══██╗    ██╔══██╗██╔════╝██║   ██║
+██║     ███████║███████║███████╗█████╗  ██║     ██████╔╝███████║██║ █╗ ██║█████╗  ██║   ██║██████╔╝██║  ██║    ██║  ██║█████╗  ██║   ██║
+██║     ██╔══██║██╔══██║╚════██║██╔══╝  ██║     ██╔══██╗██╔══██║██║███╗██║██╔══╝  ██║   ██║██╔══██╗██║  ██║    ██║  ██║██╔══╝  ╚██╗ ██╔╝
+╚██████╗██║  ██║██║  ██║███████║███████╗╚██████╗██║  ██║██║  ██║╚███╔███╔╝██║     ╚██████╔╝██║  ██║██████╔╝    ██████╔╝███████╗ ╚████╔╝
+ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═════╝     ╚═════╝ ╚══════╝  ╚═══╝</pre>
+      <div class="banner-sub">// personal site v3.0 — lead backend developer @ hatfield media, louisville ky —
+<span style="color:var(--green)">● online</span></div>
+
+      <!-- whoami -->
+      <div class="cmd">
+        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span>
+        <span class="arrow">❯</span>
+        <span class="c">whoami <span class="flag">--verbose</span></span>
+      </div>
+      <div class="out">
+        <div class="kv">
+          <div class="k">name</div><div class="v">Chase Crawford</div>
+          <div class="k">role</div><div class="v">Lead Backend Developer</div>
+          <div class="k">employer</div><div class="v"><a href="https://hatfieldmedia.com" target="_blank" rel="noopener">Hatfield Media</a></div>
+          <div class="k">location</div><div class="v">Louisville, Kentucky</div>
+          <div class="k">skills</div><div class="v">
+            <span class="chip">PHP</span><span class="chip">LARAVEL</span><span class="chip">VUE</span>
+            <span class="chip">MYSQL</span><span class="chip">POSTGRES</span><span class="chip">AWS</span>
+            <span class="chip">NGINX</span><span class="chip">APACHE</span>
+          </div>
+          <div class="k">status</div><div class="v"><span class="ok">● employed full-time</span></div>
+          <div class="k">pronouns</div><div class="v">he/him</div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- PROJECTS SECTION — hidden until polished. Remove the outer -->
+      <!-- comment wrapper below (the two lines marked === UNCOMMENT  -->
+      <!-- ===) to restore. Also update the boot-log line in the JS   -->
+      <!-- (search for "3 projects") when re-enabling.                -->
+      <!-- ========================================================= -->
+      <!-- === UNCOMMENT ===
+      <div class="cmd">
+        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~/work</span>
+        <span class="arrow">❯</span>
+        <span class="c">ls <span class="flag">--long --featured</span></span>
+      </div>
+      <div class="out dim">total 3 · side projects · sorted by recency</div>
+
+      <div class="projects">
+        <a class="proj" href="/projects/untitled-basketball-game">
+          <div class="proj-head"><span class="id">001</span><span>SIDE</span></div>
+          <div class="proj-name"><span class="nm">untitled-basketball-game</span><span class="proj-go">&rarr;</span></div>
+          <div class="proj-desc">A turn-based grand strategy basketball game. Build a franchise, scout, draft, set schemes, play out seasons.</div>
+          <div class="proj-stack"><span>PHP</span><span>LARAVEL</span><span>VUE</span></div>
+          <div class="proj-stats"><div>main</div><div>WIP</div><div>&starf; &mdash;</div></div>
+        </a>
+
+        <a class="proj" href="/projects/louisville-civic-dashboard">
+          <div class="proj-head"><span class="id">002</span><span>SIDE</span></div>
+          <div class="proj-name"><span class="nm">louisville-civic-dashboard</span><span class="proj-go">&rarr;</span></div>
+          <div class="proj-desc">Civic-data dashboard surfacing Louisville Metro open-data feeds &mdash; calls for service, permits, budgets &mdash; in one place.</div>
+          <div class="proj-stack"><span>VUE</span><span>LARAVEL</span><span>POSTGRES</span></div>
+          <div class="proj-stats"><div>main</div><div>nightly</div><div>local</div></div>
+        </a>
+
+        <a class="proj" href="/projects/pokeone-lab">
+          <div class="proj-head"><span class="id">003</span><span>SIDE</span></div>
+          <div class="proj-name"><span class="nm">pokeone-lab</span><span class="proj-go">&rarr;</span></div>
+          <div class="proj-desc">Companion tools for the PokéOne MMO &mdash; team builder, encounter tables, route planner, damage calc.</div>
+          <div class="proj-stack"><span>VUE</span><span>NODE</span><span>JSON</span></div>
+          <div class="proj-stats"><div>main</div><div>tools</div><div>&starf; &mdash;</div></div>
+        </a>
+      </div>
+      === UNCOMMENT === -->
+
+      <!-- cat experience -->
+      <div class="cmd">
+        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span>
+        <span class="arrow">❯</span>
+        <span class="c">cat experience.log <span class="flag">| sort -r</span></span>
+      </div>
+      <div class="out">
+        <table class="exp">
+          <thead>
+            <tr><th>DATES</th><th>ROLE</th><th>NOTES</th><th>STATUS</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2022 — now</td>
+              <td><span class="role">Lead Backend Developer</span><span class="co"><a href="https://hatfieldmedia.com" target="_blank" rel="noopener">Hatfield Media</a></span></td>
+              <td>Same responsibilities as before with the addition of eCommerce, dev ops, and infrastructure management.</td>
+              <td class="status">● CURRENT</td>
+            </tr>
+            <tr>
+              <td>2019 — 2022</td>
+              <td><span class="role">Backend Developer</span><span class="co"><a href="https://hatfieldmedia.com" target="_blank" rel="noopener">Hatfield Media</a></span></td>
+              <td>Backend development for client deliverables — Laravel, custom PHP, database work, third-party integrations.</td>
+              <td class="status" style="color:var(--ink2)">CLOSED</td>
+            </tr>
+            <tr>
+              <td>2015 — 2019</td>
+              <td><span class="role">Digital Application Developer</span><span class="co"><a href="https://priceweber.com" target="_blank" rel="noopener">PriceWeber Advertising</a></span></td>
+              <td>Full-stack agency work. Responsive WordPress themes from Photoshop/XD. Laravel &amp; custom PHP/MySQL apps. Third-party API integrations (XML/JSON). LAMP server management. HTML emails compliant across mail clients.</td>
+              <td class="status" style="color:var(--ink2)">CLOSED</td>
+            </tr>
+            <tr>
+              <td>2013 — 2015</td>
+              <td><span class="role">Web Developer</span><span class="co"><a href="https://customweb.com" target="_blank" rel="noopener">CustomWeb</a></span></td>
+              <td>Fast-paced full-stack on responsive WordPress &amp; eCommerce builds (WooCommerce, OpenCart) from Photoshop comps. cPanel reseller admin. Maintained hundreds of client sites.</td>
+              <td class="status" style="color:var(--ink2)">CLOSED</td>
+            </tr>
+            <tr>
+              <td>2011 — 2013</td>
+              <td><span class="role">Web Developer</span><span class="co"><a href="https://dbswebsite.com" target="_blank" rel="noopener">DBS&gt;Interactive</a></span></td>
+              <td>Custom, responsive WordPress and Drupal themes. Heavy PHP and JavaScript work. LAMP hosting server management.</td>
+              <td class="status" style="color:var(--ink2)">CLOSED</td>
+            </tr>
+            <tr>
+              <td>2008 — 2009</td>
+              <td><span class="role">Frontend Web Developer</span><span class="co"><a href="https://dbswebsite.com" target="_blank" rel="noopener">DBS&gt;Interactive</a></span></td>
+              <td>First dev role out of high school. Frontend work at a digital agency working with WordPress &amp; Drupal.</td>
+              <td class="status" style="color:var(--ink2)">CLOSED</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- gallery -->
+      <div class="cmd">
+        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~/photos</span>
+        <span class="arrow">❯</span>
+        <span class="c">open <span class="flag">--grid=4</span> *.jpg</span>
+      </div>
+      <div class="out dim">4 frames</div>
+
+      <div class="gal">
+        <div class="gframe gframe-photo" style="--hue:315deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('xmas-25.jpg')">
+          <div class="gframe-id">01</div>
+          <div class="gframe-label">XMAS &#8217;25</div>
+          <div class="scan"></div>
+        </div>
+        <div class="gframe gframe-photo" style="--hue:107deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('halloween-25.jpg')">
+          <div class="gframe-id">02</div>
+          <div class="gframe-label">HALLOWEEN &#8217;25</div>
+          <div class="scan"></div>
+        </div>
+        <div class="gframe gframe-photo" style="--hue:287deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('nox-25.jpg')">
+          <div class="gframe-id">03</div>
+          <div class="gframe-label">NOX &#8217;25</div>
+          <div class="scan"></div>
+        </div>
+        <div class="gframe gframe-photo" style="--hue:15deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('lilo-25.jpg')">
+          <div class="gframe-id">04</div>
+          <div class="gframe-label">LILO &#8217;25</div>
+          <div class="scan"></div>
+        </div>
+      </div>
+
+      <!-- contact -->
+      <div class="cmd">
+        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span>
+        <span class="arrow">❯</span>
+        <span class="c">contact <span class="flag">--all</span></span>
+      </div>
+      <div class="out dim">6 endpoints · reply time ~24h</div>
+
+      <div class="contact-links">
+        <a class="clink" href="mailto:chase@ch4ze.com" id="emailLink"><span class="k">EMAIL</span><span class="v">chase@ch4ze.com</span></a>
+        <a class="clink" href="tel:+15024388129"><span class="k">PHONE</span><span class="v">502-438-8129</span></a>
+        <a class="clink" href="https://www.linkedin.com/in/chasecrawford" target="_blank" rel="noopener"><span class="k">LINKEDIN</span><span class="v">/in/chasecrawford</span></a>
+        <a class="clink" href="resume.pdf" target="_blank" rel="noopener"><span class="k">RESUME</span><span class="v">resume.pdf</span></a>
+        <a class="clink" href="https://bsky.app/profile/chasecrawford.dev" target="_blank" rel="noopener"><span class="k">BLUESKY</span><span class="v">@chasecrawford.dev</span></a>
+        <a class="clink" href="https://steamcommunity.com/id/ch4ze/" target="_blank" rel="noopener"><span class="k">STEAM</span><span class="v">/id/ch4ze</span></a>
+        <a class="clink" href="https://live.xbox.com/Profile?Gamertag=Adalius" target="_blank" rel="noopener"><span class="k">XBOX</span><span class="v">Adalius</span></a>
+        <button type="button" class="clink" id="discordLink" data-handle="chase_22" title="Click to copy"><span class="k">DISCORD</span><span class="v">chase_22</span></button>
+      </div>
+
+      <!-- final prompt -->
+      <div class="cmd">
+        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span>
+        <span class="arrow">❯</span>
+        <span class="c" id="typedCmd">contact --provider=bs</span><span class="caret"></span>
+      </div>
+
+    </div><!-- /body -->
+
+    <div class="statusbar">
+      <div>NORMAL · UTF-8 · LF · <span class="g">READY</span></div>
+      <div>&copy; <span id="copyYear">2026</span> CHASE CRAWFORD</div>
+      <div>LOUISVILLE, KY · <span class="g" id="clock">00:00:00</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // =========== LOADER ===========
+  const bootLog = document.getElementById('bootLog');
+  const bpct = document.getElementById('bpct');
+  const bbar = document.getElementById('bbar');
+  const bskip = document.getElementById('bskip');
+  const loader = document.getElementById('loader');
+  const bootStamp = document.getElementById('bootStamp');
+
+  const now = new Date();
+  bootStamp.textContent = now.toISOString().replace('T',' ').slice(0,19) + ' UTC';
+
+  const pad = n => String(n).padStart(3,'0');
+
+  const lines = [
+    {t:'[0.000]', cls:'dim',  txt:'BIOS init · chasecrawford.dev v3.0.0'},
+    {t:'[0.018]', cls:'ok',   txt:'> DNS resolved · tls 1.3 handshake ok'},
+    {t:'[0.071]', cls:'info', txt:'> fetching manifest … ok'},
+    {t:'[0.120]', cls:'warn', txt:'> /home/chase/work: projects hidden · polish in progress'},
+    {t:'[0.154]', cls:'ok',   txt:'> mount /home/chase/photos (8 frames)'},
+    {t:'[0.201]', cls:'info', txt:'> hydrate experience.log (6 entries · since 2008)'},
+    {t:'[0.248]', cls:'warn', txt:'> WARN: nox on the keyboard · purring at 18 hz'},
+    {t:'[0.302]', cls:'dim',  txt:'> load fonts: JetBrainsMono[400,500,700,800]'},
+    {t:'[0.388]', cls:'ok',   txt:'> render tree: 412 nodes'},
+    {t:'[0.441]', cls:'info', txt:'> mysql.primary · postgres.replica · ok'},
+    {t:'[0.512]', cls:'ok',   txt:'> laravel queue workers: warm'},
+    {t:'[0.571]', cls:'dim',  txt:'> ticker: started'},
+    {t:'[0.622]', cls:'ok',   txt:'> visit counter +1 (you) · total 248,131'},
+    {t:'[0.684]', cls:'info', txt:'> ready for input'},
+    {t:'[0.700]', cls:'ok',   txt:'> login: chase · welcome in.'},
+  ];
+
+  let i = 0, pct = 0;
+  function step() {
+    if (i >= lines.length) { finish(); return; }
+    const L = lines[i];
+    const row = document.createElement('div');
+    row.className = 'line';
+    row.innerHTML = `<span class="ts">${L.t}</span><span class="${L.cls}">${L.txt}</span>`;
+    bootLog.appendChild(row);
+    i++;
+    const target = Math.floor((i / lines.length) * 100);
+    const tick = setInterval(() => {
+      pct += 1 + Math.random() * 2;
+      if (pct >= target) { pct = target; clearInterval(tick); setTimeout(step, 90); }
+      bpct.textContent = pad(Math.floor(pct));
+      bbar.style.width = pct + '%';
+    }, 24);
+  }
+
+  function finish() {
+    bpct.textContent = '100';
+    bbar.style.width = '100%';
+    setTimeout(() => {
+      loader.classList.add('gone');
+      setTimeout(() => { loader.remove(); startTyping(); }, 500);
+    }, 350);
+  }
+
+  bskip.addEventListener('click', () => { i = lines.length; pct = 100; finish(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !loader.classList.contains('gone')) {
+      i = lines.length; pct = 100; finish();
+    }
+  });
+  requestAnimationFrame(() => setTimeout(step, 200));
+
+  // =========== FINAL TYPED PROMPT ===========
+  const typedEl = document.getElementById('typedCmd');
+  const cmds = [
+    'contact --provider=bsky',
+    'open resume.pdf',
+    'cat ~/animals/nox.txt',
+    'cat ~/animals/lilo.txt',
+    'git merge feat-directive-7',
+    'while [ $focus -lt 50 ]; do play games; done',
+  ];
+  let ci = 0, chi = 0, deleting = false;
+  function startTyping() {
+    if (!typedEl) return;
+    typedEl.textContent = '';
+    function tick() {
+      const cur = cmds[ci];
+      if (!deleting) {
+        chi++;
+        typedEl.textContent = cur.slice(0, chi);
+        if (chi >= cur.length) { deleting = true; setTimeout(tick, 1800); return; }
+      } else {
+        chi--;
+        typedEl.textContent = cur.slice(0, chi);
+        if (chi <= 0) { deleting = false; ci = (ci + 1) % cmds.length; }
+      }
+      setTimeout(tick, deleting ? 30 : 70);
+    }
+    tick();
+  }
+
+  // =========== ASCII ART ROTATOR ===========
+  (function rotateArt() {
+    const arts = document.querySelectorAll('.pika-wrap .art');
+    const bar = document.getElementById('artBar');
+    if (!arts.length || !bar) return;
+
+    const ROTATE_MS = 8000;
+    const BAR_LENGTH = 36;
+
+    let idx = Math.floor(Math.random() * arts.length);
+    let cycleStart = performance.now();
+    let lastFilled = -1;
+
+    function show(i) {
+      arts.forEach((a, j) => a.classList.toggle('is-active', j === i));
+    }
+
+    function nextIdx() {
+      if (arts.length <= 1) return 0;
+      let n;
+      do { n = Math.floor(Math.random() * arts.length); } while (n === idx);
+      return n;
+    }
+
+    function renderBar(progress) {
+      const filled = Math.max(0, Math.min(BAR_LENGTH, Math.floor(progress * BAR_LENGTH)));
+      if (filled === lastFilled) return; // only repaint when the block count actually changes
+      lastFilled = filled;
+      bar.textContent = '[' + '█'.repeat(filled) + '░'.repeat(BAR_LENGTH - filled) + ']';
+    }
+
+    function tick(t) {
+      const elapsed = t - cycleStart;
+      if (elapsed >= ROTATE_MS) {
+        idx = nextIdx();
+        show(idx);
+        cycleStart = t;
+        lastFilled = -1;
+        renderBar(0);
+      } else {
+        renderBar(elapsed / ROTATE_MS);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    show(idx);
+    renderBar(0);
+    requestAnimationFrame(tick);
+  })();
+
+  // =========== DISCORD CLICK-TO-COPY ===========
+  const discordBtn = document.getElementById('discordLink');
+  if (discordBtn) {
+    discordBtn.addEventListener('click', async () => {
+      const handle = discordBtn.dataset.handle || '';
+      try { await navigator.clipboard.writeText(handle); } catch (e) {}
+      discordBtn.classList.add('copied');
+      setTimeout(() => discordBtn.classList.remove('copied'), 1500);
+    });
+  }
+
+  // =========== TICKER (clone group for seamless infinite loop) ===========
+  // The CSS animation translates the track by -50%, which equals exactly one
+  // group's width, so the 2nd clone lands where the 1st was at loop reset.
+  (function cloneTickerGroup() {
+    const track = document.querySelector('.ticker-track');
+    const group = track && track.querySelector('.ticker-group');
+    if (!track || !group) return;
+    const clone = group.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    track.appendChild(clone);
+  })();
+
+  // =========== CLOCK ===========
+  const clock = document.getElementById('clock');
+  function tickClock() {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mm = String(d.getMinutes()).padStart(2,'0');
+    const ss = String(d.getSeconds()).padStart(2,'0');
+    clock.textContent = `${hh}:${mm}:${ss}`;
+  }
+  setInterval(tickClock, 1000); tickClock();
+
+  // =========== COPYRIGHT YEAR ===========
+  const copyYear = document.getElementById('copyYear');
+  if (copyYear) copyYear.textContent = new Date().getFullYear();
+
+  // =========== WINDOW CONTROLS ===========
+  const wMin   = document.getElementById('wctlMin');
+  const wMax   = document.getElementById('wctlMax');
+  const wClose = document.getElementById('wctlClose');
+  const closeOverlay = document.getElementById('closeOverlay');
+  const reconnectBtn = document.getElementById('reconnectBtn');
+
+  // Minimize: collapse to just the title bar. Click the title bar to restore.
+  wMin.addEventListener('click', () => {
+    document.body.classList.toggle('minimized');
+  });
+  document.querySelector('.titlebar').addEventListener('dblclick', () => {
+    document.body.classList.remove('minimized');
+  });
+
+  // Maximize: toggle browser fullscreen.
+  wMax.addEventListener('click', async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (_) { /* user-gesture / unsupported — silently ignore */ }
+  });
+
+  // Close: show the disconnect overlay.
+  wClose.addEventListener('click', () => {
+    closeOverlay.classList.add('active');
+    reconnectBtn.focus();
+  });
+
+  // Reconnect: reload to replay the boot sequence.
+  function reconnect() {
+    closeOverlay.classList.remove('active');
+    window.location.reload();
+  }
+  reconnectBtn.addEventListener('click', reconnect);
+  document.addEventListener('keydown', (e) => {
+    if (closeOverlay.classList.contains('active') && (e.key === 'Enter' || e.key === 'Escape')) {
+      e.preventDefault();
+      reconnect();
+    }
+  });
+
+  // =========== CLICK-TO-COPY EMAIL ===========
+  const emailLink = document.getElementById('emailLink');
+  emailLink.addEventListener('click', (e) => {
+    // Let mailto fire, but also copy to clipboard as a convenience.
+    try { navigator.clipboard?.writeText('chase@ch4ze.com'); } catch (_) {}
+    const v = emailLink.querySelector('.v');
+    const o = v.textContent;
+    v.textContent = 'copied ✓';
+    v.style.color = 'var(--green)';
+    setTimeout(() => { v.textContent = o; v.style.color = ''; }, 1400);
+  });
+})();
+</script>
+
+</body>
+</html>
