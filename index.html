@@ -277,7 +277,13 @@
     .projects{grid-template-columns:1fr}
     .gal{grid-template-columns:repeat(2,1fr)}
     .contact-links{grid-template-columns:1fr}
-    /* banner font-size is handled by clamp() above; no override needed */
+    /* swap long banner for short one — subpixel widths misalign box-drawing chars */
+    .banner{display:none}
+    .banner-sm{
+      display:block;color:var(--green);text-shadow:0 0 10px rgba(0,255,136,.28);
+      font-size:clamp(7px, 2.4vw, 12px);line-height:1.15;margin:0;
+      white-space:pre;overflow:hidden;
+    }
     .kv{grid-template-columns:1fr;row-gap:0}
   }
   @media (max-width:720px){
