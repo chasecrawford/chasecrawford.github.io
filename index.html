@@ -121,12 +121,12 @@
   }
   .art-toggle{
     pointer-events:auto;cursor:pointer;background:transparent;
-    border:1px solid var(--line);color:var(--green);
-    font:inherit;font-size:11px;letter-spacing:.1em;
-    padding:2px 8px;line-height:1.4;
+    border:0;color:var(--green);
+    font:inherit;font-size:14px;letter-spacing:0;
+    padding:0;line-height:1;
     text-shadow:0 0 4px rgba(0,255,136,.45);
   }
-  .art-toggle:hover{border-color:var(--green);background:rgba(0,255,136,.06)}
+  .art-toggle:hover{color:var(--green);text-shadow:0 0 6px rgba(0,255,136,.7)}
   @media (max-width:1400px){.pika-wrap{display:none}}
 
   /* ============ LOADER ============ */
@@ -485,8 +485,8 @@ _______________||________________</pre>
 -~--~                   ~---|,--~'                  ~~----_____-~'   `~----~~</pre>
         </div>
         <div class="art-progress">
-          <span class="art-bar" id="artBar">[                                    ]</span>
           <button type="button" class="art-toggle" id="artToggle" aria-label="Pause rotation">[ ❚❚ ]</button>
+          <span class="art-bar" id="artBar">[                                    ]</span>
         </div>
       </div>
       <!-- BANNER -->
