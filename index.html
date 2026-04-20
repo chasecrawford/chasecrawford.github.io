@@ -5,6 +5,8 @@
 <title>chasecrawford.dev // tty</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Chase Crawford — Lead Backend Developer at Hatfield Media. Louisville, KY. PHP/Laravel, Vue, PostgreSQL, AWS. Shipping since 2008.">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -145,6 +147,7 @@
 
   /* ============ PROMPT / CMD / OUT ============ */
   .cmd{display:flex;align-items:baseline;gap:8px;margin:16px 0 8px;flex-wrap:wrap}
+  .cmd .cmd-pre{white-space:nowrap}
   .cmd .user{color:var(--green)}
   .cmd .at{color:var(--ink2)}
   .cmd .host{color:var(--cyan)}
@@ -164,6 +167,7 @@
 
   /* banner ascii — scales with viewport so it always fits */
   .banner{color:var(--green);text-shadow:0 0 10px rgba(0,255,136,.28);font-size:clamp(3px, 0.82vw, 9px);line-height:1.15;margin:0;white-space:pre;overflow:hidden}
+  .banner-sm{display:none}
   .banner-sub{color:var(--ink2);font-size:12px;margin-top:6px}
 
   /* kv list */
@@ -273,6 +277,16 @@
     .contact-links{grid-template-columns:1fr}
     /* banner font-size is handled by clamp() above; no override needed */
     .kv{grid-template-columns:1fr;row-gap:0}
+  }
+  @media (max-width:720px){
+    .cmd .cmd-pre{flex-basis:100%}
+    .cmd .c{min-width:0;word-break:break-word}
+    .banner{display:none}
+    .banner-sm{
+      display:block;color:var(--green);text-shadow:0 0 10px rgba(0,255,136,.28);
+      font-size:clamp(7px, 2.4vw, 12px);line-height:1.15;margin:0;
+      white-space:pre;overflow:hidden;
+    }
     .kv .k{margin-top:8px;font-size:10px}
     .statusbar{flex-wrap:wrap;gap:8px;font-size:9px}
     /* Drop the STATUS column on mobile — the "● CURRENT" marker is
@@ -453,12 +467,18 @@ _______________||________________</pre>
 ██║     ██╔══██║██╔══██║╚════██║██╔══╝  ██║     ██╔══██╗██╔══██║██║███╗██║██╔══╝  ██║   ██║██╔══██╗██║  ██║    ██║  ██║██╔══╝  ╚██╗ ██╔╝
 ╚██████╗██║  ██║██║  ██║███████║███████╗╚██████╗██║  ██║██║  ██║╚███╔███╔╝██║     ╚██████╔╝██║  ██║██████╔╝    ██████╔╝███████╗ ╚████╔╝
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═════╝     ╚═════╝ ╚══════╝  ╚═══╝</pre>
+      <pre class="banner-sm"> ██████╗██╗  ██╗ █████╗ ███████╗███████╗
+██╔════╝██║  ██║██╔══██╗██╔════╝██╔════╝
+██║     ███████║███████║███████╗█████╗
+██║     ██╔══██║██╔══██║╚════██║██╔══╝
+╚██████╗██║  ██║██║  ██║███████║███████╗
+ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝</pre>
       <div class="banner-sub">// personal site v3.0 — lead backend developer @ hatfield media, louisville ky —
 <span style="color:var(--green)">● online</span></div>
 
       <!-- whoami -->
       <div class="cmd">
-        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span>
+        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span></span>
         <span class="arrow">❯</span>
         <span class="c">whoami <span class="flag">--verbose</span></span>
       </div>
@@ -486,7 +506,7 @@ _______________||________________</pre>
       <!-- ========================================================= -->
       <!-- === UNCOMMENT ===
       <div class="cmd">
-        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~/work</span>
+        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~/work</span></span>
         <span class="arrow">❯</span>
         <span class="c">ls <span class="flag">--long --featured</span></span>
       </div>
@@ -521,7 +541,7 @@ _______________||________________</pre>
 
       <!-- cat experience -->
       <div class="cmd">
-        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span>
+        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span></span>
         <span class="arrow">❯</span>
         <span class="c">cat experience.log <span class="flag">| sort -r</span></span>
       </div>
@@ -573,7 +593,7 @@ _______________||________________</pre>
 
       <!-- gallery -->
       <div class="cmd">
-        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~/photos</span>
+        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~/photos</span></span>
         <span class="arrow">❯</span>
         <span class="c">open <span class="flag">--grid=4</span> *.jpg</span>
       </div>
@@ -604,7 +624,7 @@ _______________||________________</pre>
 
       <!-- contact -->
       <div class="cmd">
-        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span>
+        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span></span>
         <span class="arrow">❯</span>
         <span class="c">contact <span class="flag">--all</span></span>
       </div>
@@ -623,7 +643,7 @@ _______________||________________</pre>
 
       <!-- final prompt -->
       <div class="cmd">
-        <span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span>
+        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span></span>
         <span class="arrow">❯</span>
         <span class="c" id="typedCmd">contact --provider=bs</span><span class="caret"></span>
       </div>
@@ -745,19 +765,19 @@ _______________||________________</pre>
     const ROTATE_MS = 8000;
     const BAR_LENGTH = 36;
 
-    let idx = Math.floor(Math.random() * arts.length);
+    // Fisher-Yates shuffle once on load, then loop through the shuffled order.
+    const order = Array.from({length: arts.length}, (_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+
+    let pos = 0;
     let cycleStart = performance.now();
     let lastFilled = -1;
 
     function show(i) {
       arts.forEach((a, j) => a.classList.toggle('is-active', j === i));
-    }
-
-    function nextIdx() {
-      if (arts.length <= 1) return 0;
-      let n;
-      do { n = Math.floor(Math.random() * arts.length); } while (n === idx);
-      return n;
     }
 
     function renderBar(progress) {
@@ -770,8 +790,8 @@ _______________||________________</pre>
     function tick(t) {
       const elapsed = t - cycleStart;
       if (elapsed >= ROTATE_MS) {
-        idx = nextIdx();
-        show(idx);
+        pos = (pos + 1) % order.length;
+        show(order[pos]);
         cycleStart = t;
         lastFilled = -1;
         renderBar(0);
@@ -781,7 +801,7 @@ _______________||________________</pre>
       requestAnimationFrame(tick);
     }
 
-    show(idx);
+    show(order[pos]);
     renderBar(0);
     requestAnimationFrame(tick);
   })();
