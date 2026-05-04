@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Chase Crawford — Lead Backend Developer at Hatfield Media. Louisville, KY. PHP/Laravel, Vue, PostgreSQL, AWS. Shipping since 2008.">
 <meta name="theme-color" content="#0a0a0a">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="images/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -154,7 +154,7 @@
   .skip:hover{border-color:var(--green);color:var(--green)}
 
   /* ============ PROMPT / CMD / OUT ============ */
-  .cmd{display:flex;align-items:baseline;gap:8px;margin:16px 0 8px;flex-wrap:wrap}
+  .cmd{display:flex;align-items:baseline;gap:8px;margin:28px 0 8px;flex-wrap:wrap}
   .cmd .cmd-pre{white-space:nowrap}
   .cmd .user{color:var(--green)}
   .cmd .at{color:var(--ink2)}
@@ -202,13 +202,87 @@
   .proj-name .nm{font-size:17px;color:var(--ink);font-weight:700}
   .proj-go{color:var(--ink2);transition:color .15s}
   .proj-desc{color:var(--ink2);font-size:12px;line-height:1.6;margin-bottom:12px}
+  .proj-desc b{color:var(--ink)}     /* lift bolded numbers/labels above the dim description text */
+
+  /* thesis callout — visually separates the project's goal/result from the description */
+  .proj-thesis{
+    border:1px solid var(--line);border-left:2px solid var(--green);
+    background:rgba(0,255,136,.04);
+    padding:10px 12px;margin:0 0 12px;
+    font-size:12px;line-height:1.5;color:var(--ink);
+  }
+  .proj-thesis .thesis-label{
+    color:var(--cyan);font-size:10px;letter-spacing:.15em;
+    text-transform:uppercase;margin-bottom:4px;
+  }
+  .proj-thesis b{color:var(--green);font-weight:700}
+  .proj-thesis b.vs{color:var(--cyan)}
+
+  /* "detail" project card — flex-col so the thesis can pin to the bottom,
+     plus larger text throughout to fill the card height now that goal sits
+     at the bottom rather than mid-card. */
+  .proj-detail{display:flex;flex-direction:column}
+  .proj-detail .proj-thesis{margin-top:auto;margin-bottom:0}
+  .proj-detail .proj-head{font-size:14px}
+  .proj-detail .proj-desc{font-size:14px}
+  .proj-detail .proj-thesis{font-size:14px}
+  .proj-detail .proj-thesis .thesis-label{font-size:14px}
+  .proj-detail .proj-stack span{font-size:14px}
+  .proj-detail .proj-stats{font-size:14px}
   .proj-stack{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
-  .proj-stack span{font-size:10px;padding:2px 6px;border:1px solid var(--line);color:var(--ink);letter-spacing:.1em}
+  .proj-stack span{font-size:12px;padding:3px 8px;border:1px solid var(--line);color:var(--ink);letter-spacing:.1em}
   .proj-stats{display:flex;gap:16px;font-size:11px;color:var(--ink2);border-top:1px dashed var(--line);padding-top:10px}
   .proj-stats b{color:var(--cyan);font-weight:700}
 
+  /* equity sparkline card — sibling of project cards in .projects grid */
+  .proj-chart{cursor:default;display:flex;flex-direction:column}
+  .proj-chart:hover{border-color:var(--line);background:rgba(0,255,136,.02)}
+  .equity-frame{display:flex;gap:8px;flex:1;margin:8px 0 4px;min-height:100px}
+  .equity-yaxis{
+    position:relative;width:54px;flex-shrink:0;
+    font-size:9px;color:var(--ink2);letter-spacing:.05em;
+  }
+  .equity-yaxis span{position:absolute;right:0;line-height:1}
+  .equity-yaxis .ymax{top:8%}      /* matches SVG padY=8 */
+  .equity-yaxis .ymin{bottom:8%}
+  /* .ystart's top is set inline by JS to match the reference line.
+     translateY(-50%) centers the text on that y position. */
+  .equity-yaxis .ystart{transform:translateY(-50%);color:var(--ink2);opacity:.7}
+  .equity-spark{flex:1;min-width:0;display:block;color:var(--green)}
+  .equity-spark .ref{stroke:var(--ink2);stroke-dasharray:3 4;stroke-width:1;opacity:.4}
+  .equity-spark .line{stroke:var(--green);stroke-width:1.5;fill:none;
+                      filter:drop-shadow(0 0 3px rgba(0,255,136,.4))}
+  .equity-spark .area{fill:url(#equityGradient);opacity:.6}
+  .equity-xaxis{
+    display:flex;justify-content:space-between;
+    padding-left:62px;        /* yaxis width (54) + gap (8) keeps it under the chart */
+    font-size:9px;color:var(--ink2);letter-spacing:.05em;margin-bottom:8px;
+  }
+  .equity-xaxis span{white-space:nowrap}
+  .equity-empty{color:var(--ink2);font-size:12px;text-align:center;padding:24px 0;
+                border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);
+                margin:8px 0 12px;flex:1;display:flex;align-items:center;
+                justify-content:center}
+  /* footer wraps to a 2nd row only on viewports where the caption doesn't fit
+     alongside the stats (mobile single-column at ~328px content width). */
+  .proj-chart .proj-stats{flex-wrap:wrap}
+  /* push the caption to the right edge of the footer */
+  .proj-chart .proj-stats .equity-caption{margin-left:auto}
+
+  /* currently-held positions list — sits below the footer stats */
+  .equity-positions{
+    display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+    border-top:1px dashed var(--line);
+    padding-top:10px;margin-top:10px;
+    font-size:11px;color:var(--ink2);letter-spacing:.05em;
+  }
+  .equity-positions .label{color:var(--ink2);text-transform:uppercase;letter-spacing:.15em;font-size:10px}
+  .equity-positions .symbol{color:var(--cyan)}
+  .equity-positions .sep{color:var(--ink2);opacity:.4}
+  .equity-positions .empty{color:var(--ink2);opacity:.6;font-style:italic}
+
   /* ============ experience table ============ */
-  table.exp{width:100%;border-collapse:collapse;margin:8px 0 16px;font-size:12px}
+  table.exp{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:12px}
   table.exp th, table.exp td{padding:10px 12px;text-align:left;border-bottom:1px dashed var(--line);vertical-align:top}
   table.exp th{color:var(--ink2);font-weight:400;letter-spacing:.15em;font-size:10px;text-transform:uppercase;padding-top:0;padding-bottom:8px;border-bottom:1px solid var(--line)}
   table.exp tr:hover td{background:rgba(0,255,136,.03)}
@@ -293,6 +367,33 @@
       white-space:pre;overflow:hidden;
     }
     .kv{grid-template-columns:1fr;row-gap:0}
+    /* Bot-trader card's stats row (paper-api / github URLs) is decorative
+       on desktop but redundant on mobile where the card itself links to
+       the GitHub repo. Hide to reclaim vertical space. */
+    .proj-detail .proj-stats{display:none}
+    /* Holdings list: tighten letter-spacing and flex gap. Wider mobile
+       (500-860px) still fits one row; narrower viewports get the 5×2
+       grid override below. */
+    .equity-positions{letter-spacing:0;gap:4px}
+    .equity-positions .label{letter-spacing:.05em}
+  }
+  /* Narrow phone widths: force a 5×2 grid so the 10 symbols land in two
+     even rows of 5 instead of awkwardly wrapping into 3 uneven rows. */
+  @media (max-width:500px){
+    .equity-positions #equityPositionsList{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:6px 0;
+      flex-basis:100%;
+      text-align:center;
+    }
+    .equity-positions .sep{display:none}
+    /* Footer stats: stack vertically and center. justify-content:center
+       alone wasn't enough because the week-open/week-close pair happen to
+       fill the row almost exactly at this width — so the row looked
+       "left/right anchored" even when it was technically centered. */
+    .proj-chart .proj-stats{flex-direction:column;align-items:center;gap:6px}
+    .proj-chart .proj-stats .equity-caption{margin-left:0}
   }
   @media (max-width:720px){
     /* loader: stack the boot-head pieces and shrink the chrome */
@@ -527,46 +628,59 @@ _______________||________________</pre>
         </div>
       </div>
 
-      <!-- ========================================================= -->
-      <!-- PROJECTS SECTION — hidden until polished. Remove the outer -->
-      <!-- comment wrapper below (the two lines marked === UNCOMMENT  -->
-      <!-- ===) to restore. Also update the boot-log line in the JS   -->
-      <!-- (search for "3 projects") when re-enabling.                -->
-      <!-- ========================================================= -->
-      <!-- === UNCOMMENT ===
       <div class="cmd">
-        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~/work</span></span>
+        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~/projects</span></span>
         <span class="arrow">❯</span>
         <span class="c">ls <span class="flag">--long --featured</span></span>
       </div>
-      <div class="out dim">total 3 · side projects · sorted by recency</div>
+      <div class="out dim">total 1 · open source</div>
 
       <div class="projects">
-        <a class="proj" href="/projects/untitled-basketball-game">
-          <div class="proj-head"><span class="id">001</span><span>SIDE</span></div>
-          <div class="proj-name"><span class="nm">untitled-basketball-game</span><span class="proj-go">&rarr;</span></div>
-          <div class="proj-desc">A turn-based grand strategy basketball game. Build a franchise, scout, draft, set schemes, play out seasons.</div>
-          <div class="proj-stack"><span>PHP</span><span>LARAVEL</span><span>VUE</span></div>
-          <div class="proj-stats"><div>main</div><div>WIP</div><div>&starf; &mdash;</div></div>
+        <a class="proj proj-detail" href="https://github.com/chasecrawford/bot-trader" target="_blank" rel="noopener">
+          <div class="proj-head"><span class="id">001</span><span>OSS</span></div>
+          <div class="proj-name"><span class="nm">bot-trader</span><span class="proj-go">&rarr;</span></div>
+          <div class="proj-desc">Two-sleeve systematic momentum trader for Alpaca paper trading. Dual Momentum (Antonacci GEM) on broad ETFs alongside an EMA trend-state strategy across a curated 234-name equity universe. Documented for educational use.</div>
+          <div class="proj-stack"><span>PYTHON</span><span>REST API</span><span>SQLITE</span><span>ALPACA</span><span>YFINANCE</span></div>
+          <div class="proj-stats"><div>paper-api.alpaca.markets</div><div>github.com/chasecrawford/bot-trader</div></div>
+          <div class="proj-thesis">
+            <div class="thesis-label">Goal</div>
+            Beat SPY total-return over full market cycles, not in any single year. 19&#8209;year backtest: <b>+768%</b> vs SPY's <b class="vs">+615%</b>, drawdown <b>34%</b> vs SPY's <b class="vs">56%</b>.
+          </div>
         </a>
 
-        <a class="proj" href="/projects/louisville-civic-dashboard">
-          <div class="proj-head"><span class="id">002</span><span>SIDE</span></div>
-          <div class="proj-name"><span class="nm">louisville-civic-dashboard</span><span class="proj-go">&rarr;</span></div>
-          <div class="proj-desc">Civic-data dashboard surfacing Louisville Metro open-data feeds &mdash; calls for service, permits, budgets &mdash; in one place.</div>
-          <div class="proj-stack"><span>VUE</span><span>LARAVEL</span><span>POSTGRES</span></div>
-          <div class="proj-stats"><div>main</div><div>nightly</div><div>local</div></div>
-        </a>
-
-        <a class="proj" href="/projects/pokeone-lab">
-          <div class="proj-head"><span class="id">003</span><span>SIDE</span></div>
-          <div class="proj-name"><span class="nm">pokeone-lab</span><span class="proj-go">&rarr;</span></div>
-          <div class="proj-desc">Companion tools for the PokéOne MMO &mdash; team builder, encounter tables, route planner, damage calc.</div>
-          <div class="proj-stack"><span>VUE</span><span>NODE</span><span>JSON</span></div>
-          <div class="proj-stats"><div>main</div><div>tools</div><div>&starf; &mdash;</div></div>
-        </a>
+        <div class="proj proj-chart" id="equityCard" aria-label="Paper-trading equity, last 7 days">
+          <div class="proj-head"><span class="id">Paper Trading Trial No. 2</span><span id="equityCadence">7D</span></div>
+          <div class="proj-name"><span class="nm">EMA trend-state strategy</span></div>
+          <div class="equity-frame" id="equityFrame">
+            <div class="equity-yaxis">
+              <span class="ymax" id="equityYMax">&mdash;</span>
+              <span class="ystart" id="equityYStart" style="display:none">&mdash;</span>
+              <span class="ymin" id="equityYMin">&mdash;</span>
+            </div>
+            <svg class="equity-spark" id="equitySpark" viewBox="0 0 320 100" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="equityGradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#00ff88" stop-opacity=".25"/>
+                  <stop offset="100%" stop-color="#00ff88" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- reference line + path are populated by JS -->
+            </svg>
+          </div>
+          <div class="equity-xaxis" id="equityXAxis">
+            <!-- one span per snapshot, populated by JS -->
+          </div>
+          <div class="proj-stats" id="equityStats">
+            <div>week open: <b id="equityStart">&mdash;</b></div>
+            <div>week close: <b id="equityNow">&mdash;</b></div>
+            <div class="equity-caption" id="equitySince">&mdash;</div>
+          </div>
+          <div class="equity-positions" id="equityPositions" style="display:none">
+            <span class="label">Holding</span>
+            <span id="equityPositionsList"></span>
+          </div>
+        </div>
       </div>
-      === UNCOMMENT === -->
 
       <!-- cat experience -->
       <div class="cmd">
@@ -629,22 +743,22 @@ _______________||________________</pre>
       <div class="out dim">4 frames</div>
 
       <div class="gal">
-        <div class="gframe gframe-photo" style="--hue:315deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('xmas-25.jpg')">
+        <div class="gframe gframe-photo" style="--hue:315deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('images/xmas-25.jpg')">
           <div class="gframe-id">01</div>
           <div class="gframe-label">XMAS &#8217;25</div>
           <div class="scan"></div>
         </div>
-        <div class="gframe gframe-photo" style="--hue:107deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('halloween-25.jpg')">
+        <div class="gframe gframe-photo" style="--hue:107deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('images/halloween-25.jpg')">
           <div class="gframe-id">02</div>
           <div class="gframe-label">HALLOWEEN &#8217;25</div>
           <div class="scan"></div>
         </div>
-        <div class="gframe gframe-photo" style="--hue:287deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('nox-25.jpg')">
+        <div class="gframe gframe-photo" style="--hue:287deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('images/nox-25.jpg')">
           <div class="gframe-id">03</div>
           <div class="gframe-label">NOX &#8217;25</div>
           <div class="scan"></div>
         </div>
-        <div class="gframe gframe-photo" style="--hue:15deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('lilo-25.jpg')">
+        <div class="gframe gframe-photo" style="--hue:15deg; background-image:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,.70) 100%), url('images/lilo-25.jpg')">
           <div class="gframe-id">04</div>
           <div class="gframe-label">LILO &#8217;25</div>
           <div class="scan"></div>
@@ -663,7 +777,7 @@ _______________||________________</pre>
         <a class="clink" href="mailto:chase@ch4ze.com" id="emailLink"><span class="k">EMAIL</span><span class="v">chase@ch4ze.com</span></a>
         <a class="clink" href="tel:+15024388129"><span class="k">PHONE</span><span class="v">502-438-8129</span></a>
         <a class="clink" href="https://www.linkedin.com/in/chasecrawford" target="_blank" rel="noopener"><span class="k">LINKEDIN</span><span class="v">/in/chasecrawford</span></a>
-        <a class="clink" href="resume.pdf" target="_blank" rel="noopener"><span class="k">RESUME</span><span class="v">resume.pdf</span></a>
+        <a class="clink" href="pdf/resume.pdf" target="_blank" rel="noopener"><span class="k">RESUME</span><span class="v">resume.pdf</span></a>
         <a class="clink" href="https://bsky.app/profile/chasecrawford.dev" target="_blank" rel="noopener"><span class="k">BLUESKY</span><span class="v">@chasecrawford.dev</span></a>
         <a class="clink" href="https://steamcommunity.com/id/ch4ze/" target="_blank" rel="noopener"><span class="k">STEAM</span><span class="v">/id/ch4ze</span></a>
         <a class="clink" href="https://live.xbox.com/Profile?Gamertag=Adalius" target="_blank" rel="noopener"><span class="k">XBOX</span><span class="v">Adalius</span></a>
@@ -706,7 +820,7 @@ _______________||________________</pre>
     {t:'[0.000]', cls:'dim',  txt:'BIOS init · chasecrawford.dev v3.0.0'},
     {t:'[0.018]', cls:'ok',   txt:'> DNS resolved · tls 1.3 handshake ok'},
     {t:'[0.071]', cls:'info', txt:'> fetching manifest … ok'},
-    {t:'[0.120]', cls:'warn', txt:'> /home/chase/projects: hidden until complete'},
+    {t:'[0.120]', cls:'ok',   txt:'> mount /home/chase/projects (1 entry · open source)'},
     {t:'[0.154]', cls:'ok',   txt:'> mount /home/chase/photos (4 frames)'},
     {t:'[0.201]', cls:'info', txt:'> hydrate experience.log (6 entries · since 2008)'},
     {t:'[0.248]', cls:'warn', txt:'> WARN: lilo on the keyboard · purring at 18 hz'},
@@ -853,6 +967,183 @@ _______________||________________</pre>
     show(order[pos]);
     renderBar(0);
     requestAnimationFrame(tick);
+  })();
+
+  // =========== EQUITY SPARKLINE ===========
+  // Fetches paper-equity.json (refreshed by the bot-trader scheduled task)
+  // and draws an SVG line + reference line + axis labels into the equity card.
+  // Silent on failure: a broken fetch hides the card rather than showing
+  // a half-rendered chart.
+  (async function renderEquity() {
+    const card = document.getElementById('equityCard');
+    if (!card) return;
+    const startEl = document.getElementById('equityStart');
+    const nowEl = document.getElementById('equityNow');
+    const sinceEl = document.getElementById('equitySince');
+    const cadenceEl = document.getElementById('equityCadence');
+    const yMaxEl = document.getElementById('equityYMax');
+    const yMinEl = document.getElementById('equityYMin');
+    const yStartEl = document.getElementById('equityYStart');
+    const xAxis = document.getElementById('equityXAxis');
+    const frame = document.getElementById('equityFrame');
+    const svg = document.getElementById('equitySpark');
+
+    let data;
+    try {
+      const res = await fetch('json/paper-equity.json', {cache: 'no-cache'});
+      if (!res.ok) throw new Error('http ' + res.status);
+      data = await res.json();
+    } catch (_) {
+      // Network error or missing file — hide card rather than render a broken state.
+      card.style.display = 'none';
+      return;
+    }
+
+    const snaps = (data.snapshots || []).filter(s => typeof s.equity === 'number');
+    const fmtUSD2 = v => '$' + v.toLocaleString(undefined, {
+      minimumFractionDigits: 2, maximumFractionDigits: 2,
+    });
+    // Axis labels: drop the cents so the y-axis column stays narrow.
+    const fmtUSD0 = v => '$' + Math.round(v).toLocaleString();
+    // Parse "YYYY-MM-DD" manually — using `new Date(iso)` then a locale formatter
+    // would shift the displayed date by the viewer's tz (UTC midnight reads as
+    // "the day before" in PT). Manual split avoids the trip through Date.
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const fmtDate = iso => {
+      const [, m, d] = iso.split('-').map(Number);
+      return `${MONTHS[m - 1]} ${String(d).padStart(2, '0')}`;
+    };
+    // Count weekdays from `startISO` (YYYY-MM-DD) to `endISO` (YYYY-MM-DD or
+    // full timestamp), inclusive on both ends. US holidays aren't excluded —
+    // good enough at 7-day scope, off by ~9 days/year at long horizons.
+    const tradingDaysFrom = (startISO, endISO) => {
+      if (!startISO || !endISO) return 0;
+      const [sy, sm, sd] = startISO.split('T')[0].split('-').map(Number);
+      const [ey, em, ed] = endISO.split('T')[0].split('-').map(Number);
+      const cursor = new Date(Date.UTC(sy, sm - 1, sd));
+      const end = new Date(Date.UTC(ey, em - 1, ed));
+      let count = 0;
+      while (cursor <= end) {
+        const day = cursor.getUTCDay();
+        if (day !== 0 && day !== 6) count++;   // 0=Sun, 6=Sat
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+      }
+      return count;
+    };
+    const daysTraded = tradingDaysFrom(data.start_date, data.as_of);
+    cadenceEl.textContent = daysTraded + ' Days Traded';
+
+    if (data.start_date) {
+      sinceEl.textContent =
+        '$5,000 paper account · opened ' + data.start_date;
+    }
+
+    // Empty / one-point: replace the whole chart frame with a tagline. Hide
+    // the x-axis row too so we don't render orphan date labels under nothing.
+    if (snaps.length < 2) {
+      const empty = document.createElement('div');
+      empty.className = 'equity-empty';
+      empty.textContent = snaps.length === 0
+        ? 'awaiting first snapshot'
+        : 'awaiting second snapshot · curve renders at 2 points';
+      frame.replaceWith(empty);
+      xAxis.style.display = 'none';
+      if (snaps.length === 1) {
+        startEl.textContent = nowEl.textContent = fmtUSD2(snaps[0].equity);
+      }
+      return;
+    }
+
+    // 2+ snapshots — render path + reference line + axis labels.
+    // Coordinate space: viewBox is 0 0 320 100; we render into that and
+    // preserveAspectRatio="none" stretches it to the card's actual width.
+    const W = 320, H = 100, padX = 4, padY = 8;
+    const equities = snaps.map(s => s.equity);
+    const startEq = equities[0];
+    const nowEq = equities[equities.length - 1];
+    const yMin = Math.min(...equities);
+    const yMax = Math.max(...equities);
+    const yRange = (yMax - yMin) || 1;       // avoid div/0 if equity is flat
+    const yPad = yRange * 0.15;              // 15% headroom top + bottom
+    const yLo = yMin - yPad;
+    const yHi = yMax + yPad;
+
+    const xAt = i => padX + (i / (snaps.length - 1)) * (W - 2 * padX);
+    const yAt = v => padY + (1 - (v - yLo) / (yHi - yLo)) * (H - 2 * padY);
+
+    const linePts = snaps
+      .map((s, i) => `${i === 0 ? 'M' : 'L'}${xAt(i).toFixed(2)} ${yAt(s.equity).toFixed(2)}`)
+      .join(' ');
+    // Closed area path under the line, for the gradient fill.
+    const areaD = linePts +
+      ` L${xAt(snaps.length - 1).toFixed(2)} ${(H - padY).toFixed(2)}` +
+      ` L${xAt(0).toFixed(2)} ${(H - padY).toFixed(2)} Z`;
+    const refY = yAt(startEq).toFixed(2);
+
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs) {
+      const node = document.createElementNS(SVG_NS, tag);
+      for (const k in attrs) node.setAttribute(k, attrs[k]);
+      return node;
+    }
+    svg.appendChild(el('line', {
+      class: 'ref', x1: padX, y1: refY, x2: W - padX, y2: refY,
+    }));
+    svg.appendChild(el('path', {class: 'area', d: areaD}));
+    svg.appendChild(el('path', {class: 'line', d: linePts}));
+
+    // Y-axis labels — bounds at the actual data extremes, plus the start
+    // equity label sitting on the dotted reference line.
+    yMaxEl.textContent = fmtUSD0(yMax);
+    yMinEl.textContent = fmtUSD0(yMin);
+    // Skip the start label if it would visually overlap with yMin/yMax
+    // (within 10% of the chart height = within ~10 SVG units).
+    const refPos = yAt(startEq);   // 0..100 in SVG coordinate space
+    const tooCloseToBound = Math.abs(refPos - padY) < 10
+                         || Math.abs(refPos - (H - padY)) < 10;
+    if (!tooCloseToBound) {
+      yStartEl.style.display = '';
+      yStartEl.style.top = refPos + '%';
+      yStartEl.textContent = fmtUSD0(startEq);
+    }
+
+    // X-axis: one date label per snapshot. justify-content:space-between puts
+    // the first flush-left and the last flush-right; intermediate labels sit
+    // at evenly distributed positions, matching xAt(i)'s linear spacing.
+    snaps.forEach(s => {
+      const span = document.createElement('span');
+      span.textContent = fmtDate(s.date);
+      xAxis.appendChild(span);
+    });
+
+    startEl.textContent = fmtUSD2(startEq);
+    nowEl.textContent = fmtUSD2(nowEq);
+
+    // Currently-held positions row. Hide the section entirely when empty
+    // — a "no positions" message would just be visual noise.
+    const positions = Array.isArray(data.positions) ? data.positions : [];
+    if (positions.length) {
+      const row = document.getElementById('equityPositions');
+      const list = document.getElementById('equityPositionsList');
+      list.textContent = '';
+      positions.forEach((sym, i) => {
+        if (i > 0) {
+          const sep = document.createElement('span');
+          sep.className = 'sep';
+          sep.textContent = ' · ';
+          list.appendChild(sep);
+        }
+        const link = document.createElement('a');
+        link.className = 'symbol';
+        link.textContent = sym;
+        link.href = 'https://finance.yahoo.com/quote/' + encodeURIComponent(sym);
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.title = 'View ' + sym + ' on Yahoo Finance';
+        list.appendChild(link);
+      });
+      row.style.display = '';
+    }
   })();
 
   // =========== DISCORD CLICK-TO-COPY ===========
