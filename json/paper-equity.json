@@ -1,27 +1,31 @@
 {
-  "_comment": "Real Alpaca data captured 2026-05-04. Scheduled task on trader host overwrites this in normal operation.",
   "start_date": "2026-04-22",
-  "as_of": "2026-05-02T00:00:00+00:00",
+  "as_of": "2026-05-08T00:00:00+00:00",
   "snapshots": [
     {
-      "date": "2026-04-27",
-      "equity": 5148.76
-    },
-    {
-      "date": "2026-04-28",
-      "equity": 5016.67
-    },
-    {
-      "date": "2026-04-29",
-      "equity": 5125.21
-    },
-    {
-      "date": "2026-04-30",
-      "equity": 5194.94
-    },
-    {
       "date": "2026-05-01",
-      "equity": 5235.88
+      "equity": 5194.94,
+      "spy_equity": 5066.37
+    },
+    {
+      "date": "2026-05-05",
+      "equity": 5235.88,
+      "spy_equity": 5088.3
+    },
+    {
+      "date": "2026-05-06",
+      "equity": 5460.58,
+      "spy_equity": 5159.02
+    },
+    {
+      "date": "2026-05-07",
+      "equity": 5565.0,
+      "spy_equity": 5143.21
+    },
+    {
+      "date": "2026-05-08",
+      "equity": 5398.16,
+      "spy_equity": 5185.67
     }
   ],
   "positions": [
@@ -29,10 +33,10 @@
     "AMAT",
     "CAT",
     "DOW",
+    "GLW",
     "INTC",
     "LRCX",
     "MU",
-    "PBR",
     "SLB",
     "TXN"
   ]
