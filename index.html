@@ -260,6 +260,27 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .equity-spark .line{stroke:var(--green);stroke-width:1.5;fill:none;
                       filter:drop-shadow(0 0 3px rgba(0,255,136,.4))}
   .equity-spark .area{fill:url(#equityGradient);opacity:.6}
+  /* SPY benchmark — dashed cyan, sits on top of area but below strategy line. */
+  .equity-spark .spy-line{stroke:var(--cyan);stroke-width:1.25;fill:none;
+                          stroke-dasharray:4 3;opacity:.85}
+  /* Legend — only shown when SPY data is present (toggled by JS).
+     Sits under the strategy name, above the chart frame. */
+  .equity-legend{
+    display:flex;gap:16px;font-size:10px;color:var(--ink2);
+    letter-spacing:.05em;margin:-4px 0 0;
+  }
+  .equity-legend span.item{display:inline-flex;align-items:center}
+  .equity-legend .swatch{
+    display:inline-block;width:14px;height:2px;
+    vertical-align:middle;margin-right:6px;
+  }
+  .equity-legend .strategy{color:var(--green)}
+  .equity-legend .strategy .swatch{background:currentColor}
+  .equity-legend .spy{color:var(--cyan)}
+  .equity-legend .spy .swatch{
+    background:transparent;height:0;
+    border-top:2px dashed currentColor;
+  }
   .equity-xaxis{
     display:flex;justify-content:space-between;
     padding-left:62px;        /* yaxis width (54) + gap (8) keeps it under the chart */
@@ -662,6 +683,10 @@ _______________||________________</pre>
         <div class="proj proj-chart" id="equityCard" aria-label="Paper-trading equity, last 7 days">
           <div class="proj-head"><span class="id">Paper Trading Trial No. 2</span><span id="equityCadence">7D</span></div>
           <div class="proj-name"><span class="nm">EMA trend-state strategy</span></div>
+          <div class="equity-legend" id="equityLegend" style="display:none" aria-hidden="true">
+            <span class="item strategy"><span class="swatch"></span>Strategy</span>
+            <span class="item spy"><span class="swatch"></span>SPY benchmark</span>
+          </div>
           <div class="equity-frame" id="equityFrame">
             <div class="equity-yaxis">
               <span class="ymax" id="equityYMax">&mdash;</span>
@@ -1072,8 +1097,14 @@ _______________||________________</pre>
     const equities = snaps.map(s => s.equity);
     const startEq = equities[0];
     const nowEq = equities[equities.length - 1];
-    const yMin = Math.min(...equities);
-    const yMax = Math.max(...equities);
+    // SPY benchmark series — optional, only present when bot-trader publishes
+    // with --benchmark SPY. Some snapshots may legitimately omit spy_equity
+    // (e.g., yfinance gap), so we work with valid points only.
+    const spyVals = snaps.map(s => typeof s.spy_equity === 'number' ? s.spy_equity : null);
+    const validSpy = spyVals.filter(v => v !== null);
+    const hasSpy = validSpy.length >= 2;
+    const yMin = Math.min(...equities, ...(hasSpy ? validSpy : []));
+    const yMax = Math.max(...equities, ...(hasSpy ? validSpy : []));
     const yRange = (yMax - yMin) || 1;       // avoid div/0 if equity is flat
     const yPad = yRange * 0.15;              // 15% headroom top + bottom
     const yLo = yMin - yPad;
@@ -1101,6 +1132,24 @@ _______________||________________</pre>
       class: 'ref', x1: padX, y1: refY, x2: W - padX, y2: refY,
     }));
     svg.appendChild(el('path', {class: 'area', d: areaD}));
+    // SPY benchmark line — drawn after the area but before the strategy line
+    // so the strategy stays on top, and SPY isn't dimmed by the gradient fill
+    // when it dips below the strategy line. Gaps in spy_equity start a new
+    // sub-path via "M" so we don't draw straight-line interpolation across
+    // missing data.
+    if (hasSpy) {
+      let spyD = '';
+      let prevIdx = -2;
+      spyVals.forEach((v, i) => {
+        if (v === null) return;
+        spyD += (i === prevIdx + 1 ? 'L' : 'M') +
+                xAt(i).toFixed(2) + ' ' + yAt(v).toFixed(2) + ' ';
+        prevIdx = i;
+      });
+      svg.appendChild(el('path', {class: 'spy-line', d: spyD.trim()}));
+      const legend = document.getElementById('equityLegend');
+      if (legend) { legend.style.display = ''; legend.setAttribute('aria-hidden', 'false'); }
+    }
     svg.appendChild(el('path', {class: 'line', d: linePts}));
 
     // Y-axis labels — bounds at the actual data extremes, plus the start
