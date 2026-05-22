@@ -1,31 +1,31 @@
 {
   "start_date": "2026-04-22",
-  "as_of": "2026-05-15T00:00:00+00:00",
+  "as_of": "2026-05-22T00:00:00+00:00",
   "snapshots": [
     {
-      "date": "2026-05-08",
-      "equity": 5398.16,
-      "spy_equity": 5185.67
+      "date": "2026-05-18",
+      "equity": 5667.0,
+      "spy_equity": 5192.91
     },
     {
-      "date": "2026-05-12",
-      "equity": 5886.89,
-      "spy_equity": 5189.61
+      "date": "2026-05-19",
+      "equity": 5471.49,
+      "spy_equity": 5158.32
     },
     {
-      "date": "2026-05-13",
-      "equity": 5745.43,
-      "spy_equity": 5218.64
+      "date": "2026-05-20",
+      "equity": 5460.05,
+      "spy_equity": 5211.19
     },
     {
-      "date": "2026-05-14",
-      "equity": 5838.1,
-      "spy_equity": 5259.84
+      "date": "2026-05-21",
+      "equity": 5631.04,
+      "spy_equity": 5221.52
     },
     {
-      "date": "2026-05-15",
-      "equity": 5813.12,
-      "spy_equity": 5196.57
+      "date": "2026-05-22",
+      "equity": 5677.8,
+      "spy_equity": 5242.05
     }
   ],
   "positions": [
