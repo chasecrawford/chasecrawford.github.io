@@ -1,38 +1,38 @@
 {
   "start_date": "2026-04-22",
-  "as_of": "2026-05-22T00:00:00+00:00",
+  "as_of": "2026-05-29T00:00:00+00:00",
   "snapshots": [
-    {
-      "date": "2026-05-18",
-      "equity": 5667.0,
-      "spy_equity": 5192.91
-    },
-    {
-      "date": "2026-05-19",
-      "equity": 5471.49,
-      "spy_equity": 5158.32
-    },
-    {
-      "date": "2026-05-20",
-      "equity": 5460.05,
-      "spy_equity": 5211.19
-    },
-    {
-      "date": "2026-05-21",
-      "equity": 5631.04,
-      "spy_equity": 5221.52
-    },
     {
       "date": "2026-05-22",
       "equity": 5677.8,
       "spy_equity": 5242.05
+    },
+    {
+      "date": "2026-05-26",
+      "equity": 5906.12,
+      "spy_equity": 5276.85
+    },
+    {
+      "date": "2026-05-27",
+      "equity": 6070.8,
+      "spy_equity": 5275.94
+    },
+    {
+      "date": "2026-05-28",
+      "equity": 6021.37,
+      "spy_equity": 5305.04
+    },
+    {
+      "date": "2026-05-29",
+      "equity": 6025.65,
+      "spy_equity": 5318.26
     }
   ],
   "positions": [
     "ADI",
     "AMAT",
     "AMD",
-    "DOW",
+    "DELL",
     "GLW",
     "INTC",
     "LRCX",
