@@ -102,39 +102,188 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   .body{padding:24px;flex:1;position:relative}
 
-  /* hero-side ASCII rotator — centered in the empty space beside the banner */
-  .pika-wrap{
-    position:absolute;top:24px;right:24px;left:45%;
-    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-    pointer-events:none;
+  /* ---- hero split: left = whoami/ls, right = 8-ball ---- */
+  .hero-split{display:flex;gap:16px;align-items:flex-start}
+  .hero-left{flex:1;min-width:0}
+  .hero-right{flex:1;min-width:0;padding-top:28px}
+  @media (max-width:1400px){.hero-split{flex-direction:column}}
+
+  /* ---- cc8: ASCII Magic 8-Ball ---- */
+  .cc8{
+    --panel:var(--bg2);
+    --border:var(--line);
+    --green-dim:#00994d;
+    --amber:var(--yellow);
+    --text:var(--ink);
+    --muted:var(--ink2);
+    --white:var(--ink);
+    width:100%;
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--text);
   }
-  .art-stage{
-    position:relative;width:100%;height:300px;
+  .cc8-prompt{
+    display:flex;align-items:center;flex-wrap:wrap;
+    gap:0 0.55ch;font-weight:500;margin-bottom:8px;
   }
-  .art{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    color:var(--green);text-shadow:0 0 6px rgba(0,255,136,.2);
-    line-height:1;white-space:pre;margin:0;
-    opacity:0;transition:opacity .5s ease;
+  .cc8-prompt .u{color:var(--green)}
+  .cc8-prompt .at,.cc8-prompt .path{color:var(--cyan)}
+  .cc8-prompt .chev{color:var(--green);font-weight:700}
+  .cc8-prompt .cc8-cmd{color:var(--magenta)}
+  .cc8-meta{
+    color:var(--muted);font-size:13px;letter-spacing:.02em;margin-bottom:22px;
   }
-  .art.is-active{opacity:.6}
-  .art-progress{
-    margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;
+  .cc8-meta kbd{
+    font:inherit;color:var(--text);
+    border:1px solid var(--border);border-radius:3px;
+    padding:0 6px;margin:0 2px;
   }
-  .art-bar{
-    color:var(--green);text-shadow:0 0 4px rgba(0,255,136,.45);
-    font-size:14px;letter-spacing:0;line-height:1;
-    font-family:inherit;white-space:pre;margin:0;
+  .cc8-out{
+    display:grid;grid-template-columns:auto 1fr;
+    gap:clamp(20px,4vw,48px);align-items:center;
   }
-  .art-toggle{
-    pointer-events:auto;cursor:pointer;background:transparent;
-    border:0;color:var(--green);
-    font:inherit;font-size:14px;letter-spacing:0;
-    padding:0;line-height:1;
-    text-shadow:0 0 4px rgba(0,255,136,.45);
+  .cc8-ballwrap{position:relative;display:inline-block;line-height:0}
+  pre.cc8-ball{
+    margin:0;font-family:inherit;
+    font-size:clamp(7px,1.55vmin,11px);
+    line-height:1.0;letter-spacing:0;white-space:pre;
+    color:var(--green);
+    text-shadow:0 0 8px color-mix(in oklab,var(--green) 55%,transparent);
+    user-select:none;will-change:transform;
   }
-  .art-toggle:hover{color:var(--green);text-shadow:0 0 6px rgba(0,255,136,.7)}
-  @media (max-width:1400px){.pika-wrap{display:none}}
+  .cc8-ballwrap.shaking{animation:cc8-jit 90ms steps(2) infinite}
+  @keyframes cc8-jit{
+    0%{transform:translate(-2px,1px) rotate(-.4deg)}
+    25%{transform:translate(2px,-2px) rotate(.5deg)}
+    50%{transform:translate(-2px,2px) rotate(-.3deg)}
+    75%{transform:translate(2px,1px) rotate(.4deg)}
+    100%{transform:translate(-1px,-1px) rotate(-.2deg)}
+  }
+  .cc8-medallion{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:50%;aspect-ratio:1;
+    perspective:680px;
+  }
+  .cc8-flip{
+    position:relative;width:100%;height:100%;
+    transform-style:preserve-3d;
+    transition:transform 0.72s cubic-bezier(.42,.04,.2,1.04);
+  }
+  .cc8-flip.flipped{transform:rotateX(180deg)}
+  .cc8-back,.cc8-window{
+    position:absolute;inset:0;border-radius:50%;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    display:flex;align-items:center;justify-content:center;
+    transition:visibility 0s linear 0.36s;
+  }
+  .cc8-window{visibility:hidden}
+  .cc8-flip.flipped .cc8-window{visibility:visible}
+  .cc8-flip.flipped .cc8-back{visibility:hidden}
+  .cc8-back{
+    background:radial-gradient(circle at 50% 33%,
+      color-mix(in oklab,var(--green) 74%,white) 0%,
+      var(--green) 40%,
+      color-mix(in oklab,var(--green) 72%,#00130a) 84%,
+      color-mix(in oklab,var(--green) 52%,#00130a) 100%);
+    box-shadow:
+      inset 0 -7px 16px rgba(0,0,0,.42),
+      inset 0 7px 14px rgba(255,255,255,.28),
+      0 0 0 2px color-mix(in oklab,var(--green) 28%,#000),
+      0 0 22px color-mix(in oklab,var(--green) 45%,transparent);
+  }
+  .cc8-num{
+    font-family:inherit;font-weight:700;
+    font-size:clamp(34px,8.4vmin,62px);line-height:1;
+    color:#04130b;
+    text-shadow:0 1px 0 color-mix(in oklab,var(--green) 55%,white);
+  }
+  .cc8-window{
+    transform:rotateX(180deg);
+    background:radial-gradient(circle at 50% 36%,#07150e 0%,#020806 62%,#000402 100%);
+    box-shadow:
+      inset 0 6px 18px rgba(0,0,0,.92),
+      inset 0 -3px 9px color-mix(in oklab,var(--green) 16%,transparent),
+      0 0 0 2px rgba(0,0,0,.55),
+      0 0 0 3px color-mix(in oklab,var(--green) 13%,transparent);
+    line-height:1;
+  }
+  .cc8-window-clip{
+    position:absolute;inset:0;border-radius:50%;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .cc8-window::after{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 50% 60%,color-mix(in oklab,var(--green) 22%,transparent),transparent 60%);
+    opacity:0;
+  }
+  .cc8-window.murk::after{opacity:1;animation:cc8-murk 1.1s ease-in-out infinite}
+  @keyframes cc8-murk{
+    0%,100%{transform:translateY(8%) scale(.9);opacity:.35}
+    50%{transform:translateY(-6%) scale(1.05);opacity:.8}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .cc8-flip,.cc8-dieface{transition:none}
+    .cc8-ballwrap.shaking{animation:none}
+  }
+  .cc8-dieface{position:absolute;inset:0;opacity:0;transform:translateY(26%) scale(0.7)}
+  .cc8-dieface.show{opacity:1;transform:none;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.9,.3,1.2)}
+  .cc8-tri{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-33.33%);
+    width:84%;aspect-ratio:1 / 0.866;
+    clip-path:polygon(0% 0%,100% 0%,50% 100%);
+    background:linear-gradient(168deg,
+      color-mix(in oklab,var(--green) 96%,#001008) 0%,
+      color-mix(in oklab,var(--green) 64%,#001008) 52%,
+      color-mix(in oklab,var(--green) 30%,#001008) 100%);
+    filter:drop-shadow(0 0 9px var(--green)) drop-shadow(0 0 2px var(--green));
+  }
+  .cc8-txt{
+    position:absolute;top:40%;left:50%;transform:translateX(-50%);
+    width:46%;text-align:center;
+    text-transform:uppercase;font-weight:700;
+    font-size:clamp(7px,1.7vmin,11px);
+    line-height:1.05;letter-spacing:.01em;
+    color:#04130b;
+    text-shadow:0 1px 0 color-mix(in oklab,var(--green) 50%,white);
+    text-wrap:balance;
+  }
+  .cc8-side{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .cc8-resp{font-size:13px;min-height:3.4em}
+  .cc8-resp .lead{color:var(--green)}
+  .cc8-resp .ans{color:var(--white)}
+  .cc8-resp .typing::after{
+    content:"▋";color:var(--green);
+    animation:cc8-blink 1.05s steps(1) infinite;
+  }
+  .cc8-resp .hint{color:var(--muted)}
+  @keyframes cc8-blink{50%{opacity:0}}
+  .cc8-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  button.cc8-btn{
+    font:inherit;font-weight:700;
+    text-transform:uppercase;letter-spacing:.22em;text-indent:.22em;
+    color:var(--green);
+    background:transparent;
+    border:1px solid color-mix(in oklab,var(--green) 55%,var(--border));
+    border-radius:4px;
+    padding:8px 22px;
+    cursor:pointer;
+    transition:background .12s,color .12s,box-shadow .12s,transform .08s;
+  }
+  button.cc8-btn:hover:not(:disabled){
+    background:var(--green);color:#04130b;
+    box-shadow:0 0 16px color-mix(in oklab,var(--green) 45%,transparent);
+  }
+  button.cc8-btn:active:not(:disabled){transform:translateY(1px)}
+  button.cc8-btn:disabled{opacity:.4;cursor:default}
+  .cc8-status{
+    font-size:13px;letter-spacing:.06em;
+    color:var(--muted);
+    display:inline-flex;align-items:center;gap:.7ch;
+  }
+  .cc8-status .dot{color:var(--green)}
+  .cc8-status.busy .dot{color:var(--amber);animation:cc8-blink .7s steps(1) infinite}
 
   /* ============ LOADER ============ */
   #loader{
@@ -544,113 +693,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="body">
-      <!-- decorative ASCII rotator centered in the empty space beside the banner -->
-      <div class="pika-wrap" aria-hidden="true">
-        <div class="art-stage">
-          <pre class="art" data-name="pikachu" style="font-size:7px">quu..___
- $$$b  `---.___
-  "$$b        `--.                          ___.---uuudP
-   `$$b           `.__.------.___     ___.---'      $$$$"              .
-     "$b          -'            `.-.'            $$$"              .'|
-       ".                                       d$"             _.'  |
-         `.   /                              ..."             .'     |
-           `./                           ..::-'            _.'       |
-            /                         .:::-'            .-'         .'
-           :                          ::''\          _.'            |
-          .' .-.             .-.           `.      .'               |
-          : /'$$|           .@"$\           `.   .'              _.-'
-         .'|$u$$|          |$$,$$|           |  &lt;            _.-'
-         | `:$$:'          :$$$$$:           `.  `.       .-'
-         :                  `"--'             |    `-.     \
-        :##.       ==             .###.       `.      `.    `\
-        |##:                      :###:        |        &gt;     &gt;
-        |#'     `..'..'          `###'        x:      /     /
-         \                                   xXX|     /    ./
-          \                                xXXX'|    /   ./
-          /`-.                                  `.  /   /
-         :    `-  ...........,                   | /  .'
-         |         ``:::::::'       .            |&lt;    `.
-         |             ```          |           x| \ `.:```.
-         |                         .'    /'   xXX|  `:` M`M':.
-         |    |                    ;    /:' xXXX'|  -'MMMMM:'
-         `.  .'                   :    /:'       |-'MMMM.-'
-          |  |                   .'   /'        .'MMM.-'
-          `'`'                   :  ,'          |MMM&lt;
-            |                     `'            |tbap\
-             \                                  :MM.-'
-              \                 |              .''
-               \.               `.            /
-                /     .:::::::.. :           /
-               |     .::::::::::`.         /
-               |   .:::------------\       /
-              /   .''               &gt;::'  /
-              `',:                 :    .'
-                                   `:.:'</pre>
-          <pre class="art" data-name="fishing" style="font-size:18px">            ________
-    o      |   __   |
-      \_ O |  |__|  |
-   ____/ \ |___WW___|
-   __/   /     ||
-               ||
-               ||
-_______________||________________</pre>
-          <pre class="art" data-name="r2d2" style="font-size:11px">             ______
-          ,-'//__\\`-.
-        ,'  ____      `.
-       /   / ,-.-.      \
-      (/# /__`-'_| || || )
-      ||# []/()] O || || |
-    __`------------------'__
-   |--| |&lt;=={_______}=|| |--|
-   |  | |-------------|| |  |
-   |  | |={_______}==&gt;|| |  |
-   |  | |   |: _ :|   || |  |
-   &gt; _| |___|:===:|   || |__&lt;
-   :| | __| |: - :|   || | |:
-   :| | ==| |: _ :|   || | |:
-   :| | ==|_|:===:|___||_| |:
-   :| |___|_|:___:|___||_| |:
-   :| |||   ||/_\|| ||| -| |:
-   ;I_|||[]_||\_/|| ||| -|_I;
-   |_ |__________________| _|
-   | `\\\___|____|____/_//' |
-   J : |     \____/     | : L
-  _|_: |      |__|      | :_|_
--/ _-_.'    -/    \-    `.-_- \-
-/______\    /______\    /______\</pre>
-          <pre class="art" data-name="plane" style="font-size:18px">            ____
-  |        | ___\          /~~~|
- _:_______|/'(..)`\_______/  | |
-&lt;_|``````  \__~~__/       ___|_|
-  :\_____(=========,   ,--\__|_/
-  |       \       /---'
-            |     /
-            |____/</pre>
-          <pre class="art" data-name="castle" style="font-size:13px">                                  |&gt;&gt;&gt;
-                                  |
-                    |&gt;&gt;&gt;      _  _|_  _         |&gt;&gt;&gt;
-                    |        |;| |;| |;|        |
-                _  _|_  _    \.    .  /    _  _|_  _
-               |;|_|;|_|;|    \:. ,  /    |;|_|;|_|;|
-               \..      /    ||;   . |    \.    .  /
-                \.  ,  /     ||:  .  |     \:  .  /
-                 ||:   |_   _ ||_ . _ | _   _||:   |
-                 ||:  .|||_|;|_|;|_|;|_|;|_|;||:.  |
-                 ||:   ||.    .     .      . ||:  .|
-                 ||: . || .     . .   .  ,   ||:   |       \,/
-                 ||:   ||:  ,  _______   .   ||: , |            /`\
-                 ||:   || .   /+++++++\    . ||:   |
-                 ||:   ||.    |+++++++| .    ||: . |
-              __ ||: . ||: ,  |+++++++|.  . _||_   |
-     ____--`~    '--~~__|.    |+++++__|----~    ~`---,              ___
--~--~                   ~---|,--~'                  ~~----_____-~'   `~----~~</pre>
-        </div>
-        <div class="art-progress">
-          <button type="button" class="art-toggle" id="artToggle" aria-label="Pause rotation">[ ❚❚ ]</button>
-          <span class="art-bar" id="artBar">[                                    ]</span>
-        </div>
-      </div>
-      <!-- BANNER -->
+      <!-- BANNER (full width) -->
       <pre class="banner"> ██████╗██╗  ██╗ █████╗ ███████╗███████╗ ██████╗██████╗  █████╗ ██╗    ██╗███████╗ ██████╗ ██████╗ ██████╗     ██████╗ ███████╗██╗   ██╗
 ██╔════╝██║  ██║██╔══██╗██╔════╝██╔════╝██╔════╝██╔══██╗██╔══██╗██║    ██║██╔════╝██╔═══██╗██╔══██╗██╔══██╗    ██╔══██╗██╔════╝██║   ██║
 ██║     ███████║███████║███████╗█████╗  ██║     ██████╔╝███████║██║ █╗ ██║█████╗  ██║   ██║██████╔╝██║  ██║    ██║  ██║█████╗  ██║   ██║
@@ -666,25 +709,67 @@ _______________||________________</pre>
       <div class="banner-sub">// personal site v3.0 — lead backend developer @ hatfield media, louisville ky —
 <span style="color:var(--green)">● online</span></div>
 
-      <!-- whoami -->
-      <div class="cmd">
-        <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span></span>
-        <span class="arrow">❯</span>
-        <span class="c">whoami <span class="flag">--verbose</span></span>
-      </div>
-      <div class="out">
-        <div class="kv">
-          <div class="k">name</div><div class="v">Chase Crawford</div>
-          <div class="k">role</div><div class="v">Lead Backend Developer</div>
-          <div class="k">employer</div><div class="v"><a href="https://hatfieldmedia.com" target="_blank" rel="noopener">Hatfield Media</a></div>
-          <div class="k">location</div><div class="v">Louisville, Kentucky</div>
-          <div class="k">skills</div><div class="v chips">
-            <span class="chip">PHP</span><span class="chip">LARAVEL</span><span class="chip">VUE</span>
-            <span class="chip">MYSQL</span><span class="chip">POSTGRES</span><span class="chip">AWS</span>
-            <span class="chip">NGINX</span><span class="chip">APACHE</span>
+      <!-- hero split: whoami/ls left, 8-ball right -->
+      <div class="hero-split">
+        <div class="hero-left">
+          <!-- whoami -->
+          <div class="cmd">
+            <span class="cmd-pre"><span class="user">chase</span><span class="at">@</span><span class="host">louisville</span><span class="sep">:</span><span class="path">~</span></span>
+            <span class="arrow">❯</span>
+            <span class="c">whoami <span class="flag">--verbose</span></span>
           </div>
-          <div class="k">status</div><div class="v"><span class="ok">● employed full-time</span></div>
-          <div class="k">pronouns</div><div class="v">he/him</div>
+          <div class="out">
+            <div class="kv">
+              <div class="k">name</div><div class="v">Chase Crawford</div>
+              <div class="k">role</div><div class="v">Lead Backend Developer</div>
+              <div class="k">employer</div><div class="v"><a href="https://hatfieldmedia.com" target="_blank" rel="noopener">Hatfield Media</a></div>
+              <div class="k">location</div><div class="v">Louisville, Kentucky</div>
+              <div class="k">skills</div><div class="v chips">
+                <span class="chip">PHP</span><span class="chip">LARAVEL</span><span class="chip">VUE</span>
+                <span class="chip">MYSQL</span><span class="chip">POSTGRES</span><span class="chip">AWS</span>
+                <span class="chip">NGINX</span><span class="chip">APACHE</span>
+              </div>
+              <div class="k">status</div><div class="v"><span class="ok">● employed full-time</span></div>
+              <div class="k">pronouns</div><div class="v">he/him</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="hero-right">
+          <section class="cc8" id="cc8">
+            <div class="cc8-prompt">
+              <span class="u">chase</span><span class="at">@louisville</span><span class="path">:~</span>
+              <span class="chev">❯</span>
+              <span class="cc8-cmd">8ball</span>
+            </div>
+            <div class="cc8-meta">magic 8-ball · 20 answers</div>
+            <div class="cc8-out">
+              <div class="cc8-ballwrap">
+                <pre class="cc8-ball" id="cc8-ball"></pre>
+                <div class="cc8-medallion">
+                  <div class="cc8-flip" id="cc8-flip">
+                    <div class="cc8-back"><div class="cc8-num">8</div></div>
+                    <div class="cc8-window" id="cc8-window">
+                      <div class="cc8-window-clip">
+                        <div class="cc8-dieface" id="cc8-dieface">
+                          <div class="cc8-tri"></div>
+                          <div class="cc8-txt" id="cc8-txt"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cc8-side">
+                <div class="cc8-resp" id="cc8-resp"><span class="hint">// the 8 is up — shake to flip the ball and consult the oracle</span></div>
+                <div class="cc8-row">
+                  <button class="cc8-btn" id="cc8-btn">Shake</button>
+                  <span class="cc8-status" id="cc8-status"><span class="dot">●</span><span id="cc8-statustxt">ready</span></span>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -1001,73 +1086,139 @@ _______________||________________</pre>
     tick();
   }
 
-  // =========== ASCII ART ROTATOR ===========
-  (function rotateArt() {
-    const arts = document.querySelectorAll('.pika-wrap .art');
-    const bar = document.getElementById('artBar');
-    const toggle = document.getElementById('artToggle');
-    if (!arts.length || !bar) return;
+  // =========== ASCII MAGIC 8-BALL ===========
+  (function () {
+    "use strict";
 
-    const ROTATE_MS = 8000;
-    const BAR_LENGTH = 36;
+    var ANSWERS = [
+      "It is certain", "It is decidedly so", "Without a doubt", "Yes — definitely",
+      "You may rely on it", "As I see it, yes", "Most likely", "Outlook good",
+      "Yes", "Signs point to yes",
+      "Reply hazy, try again", "Ask again later", "Better not tell you now",
+      "Cannot predict now", "Concentrate and ask again",
+      "Don't count on it", "My reply is no", "My sources say no",
+      "Outlook not so good", "Very doubtful"
+    ];
 
-    // Fisher-Yates shuffle once on load, then loop through the shuffled order.
-    const order = Array.from({length: arts.length}, (_, i) => i);
-    for (let i = order.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [order[i], order[j]] = [order[j], order[i]];
-    }
+    var RAMP = " .,:;~-=+*oa#%@";
+    var R = 12, COLS = 23, W = COLS * 2 + 1, H = R * 2 + 1;
 
-    let pos = 0;
-    let cycleStart = performance.now();
-    let lastFilled = -1;
-    let paused = false;
-    let pausedElapsed = 0;
-
-    function show(i) {
-      arts.forEach((a, j) => a.classList.toggle('is-active', j === i));
-    }
-
-    function renderBar(progress) {
-      const filled = Math.max(0, Math.min(BAR_LENGTH, Math.floor(progress * BAR_LENGTH)));
-      if (filled === lastFilled) return; // only repaint when the block count actually changes
-      lastFilled = filled;
-      bar.textContent = '[' + '█'.repeat(filled) + '░'.repeat(BAR_LENGTH - filled) + ']';
-    }
-
-    function tick(t) {
-      if (paused) { requestAnimationFrame(tick); return; }
-      const elapsed = t - cycleStart;
-      if (elapsed >= ROTATE_MS) {
-        pos = (pos + 1) % order.length;
-        show(order[pos]);
-        cycleStart = t;
-        lastFilled = -1;
-        renderBar(0);
-      } else {
-        renderBar(elapsed / ROTATE_MS);
-      }
-      requestAnimationFrame(tick);
-    }
-
-    if (toggle) {
-      toggle.addEventListener('click', () => {
-        paused = !paused;
-        if (paused) {
-          pausedElapsed = performance.now() - cycleStart;
-          toggle.textContent = '[ ▶ ]';
-          toggle.setAttribute('aria-label', 'Resume rotation');
-        } else {
-          cycleStart = performance.now() - pausedElapsed;
-          toggle.textContent = '[ ❚❚ ]';
-          toggle.setAttribute('aria-label', 'Pause rotation');
+    function makeBall(angle) {
+      var lx = Math.cos(angle) * 0.72, ly = Math.sin(angle) * 0.72, lz = 0.62;
+      var ll = Math.sqrt(lx*lx + ly*ly + lz*lz); lx/=ll; ly/=ll; lz/=ll;
+      var out = "";
+      for (var yi = 0; yi < H; yi++) {
+        var y = yi - R, ny = y / R, line = "";
+        for (var xi = 0; xi < W; xi++) {
+          var x = xi - COLS, nx = x / COLS, d = nx*nx + ny*ny;
+          if (d > 1.0) { line += " "; continue; }
+          var nz = Math.sqrt(Math.max(0, 1 - d));
+          var b = Math.max(0, nx*lx + ny*ly + nz*lz);
+          var v = 0.16 + 0.84 * b;
+          v = Math.min(1, v * 0.72 + Math.pow(b, 7));
+          if (d > 0.86) v *= 0.55;
+          var idx = Math.max(0, Math.min(RAMP.length - 1, Math.round(v * (RAMP.length - 1))));
+          line += RAMP.charAt(idx);
         }
-      });
+        out += line + (yi < H - 1 ? "\n" : "");
+      }
+      return out;
     }
 
-    show(order[pos]);
-    renderBar(0);
-    requestAnimationFrame(tick);
+    var BASE_ANGLE = -2.35;
+
+    var ballEl = document.getElementById("cc8-ball");
+    if (!ballEl) return;
+    var wrapEl = ballEl.parentNode;
+    var flipEl = document.getElementById("cc8-flip");
+    var windowEl = document.getElementById("cc8-window");
+    var dieEl = document.getElementById("cc8-dieface");
+    var txtEl = document.getElementById("cc8-txt");
+    var respEl = document.getElementById("cc8-resp");
+    var btn = document.getElementById("cc8-btn");
+    var statusEl = document.getElementById("cc8-status");
+    var statusTxt = document.getElementById("cc8-statustxt");
+
+    var angle = BASE_ANGLE, shaking = false, rafId = 0, typeTimer = 0;
+    ballEl.textContent = makeBall(angle);
+
+    function setStatus(label, busy) {
+      statusTxt.textContent = label;
+      statusEl.classList.toggle("busy", !!busy);
+    }
+
+    function typeResp(answer) {
+      clearTimeout(typeTimer);
+      var lead = "oracle ❯ ";
+      var i = 0;
+      respEl.innerHTML = '<span class="lead"></span><span class="ans typing"></span>';
+      var leadEl = respEl.querySelector(".lead");
+      var ansEl = respEl.querySelector(".ans");
+      leadEl.textContent = lead;
+      (function step() {
+        if (i <= answer.length) {
+          ansEl.textContent = answer.slice(0, i);
+          i++;
+          typeTimer = setTimeout(step, 26);
+        } else {
+          ansEl.classList.remove("typing");
+        }
+      })();
+    }
+
+    function shake() {
+      if (shaking) return;
+      shaking = true;
+      flipEl.classList.add("flipped");
+      wrapEl.classList.add("shaking");
+      windowEl.classList.add("murk");
+      dieEl.classList.remove("show");
+      respEl.innerHTML = '<span class="hint">// shaking… the die is surfacing</span>';
+      setStatus("shaking…", true);
+
+      var dur = 900, start = performance.now();
+      cancelAnimationFrame(rafId);
+      function frame(now) {
+        var p = (now - start) / dur;
+        if (p < 1) {
+          angle = BASE_ANGLE + p * 14 + Math.sin(now / 40) * 0.6;
+          ballEl.textContent = makeBall(angle);
+          rafId = requestAnimationFrame(frame);
+        } else {
+          angle = BASE_ANGLE;
+          ballEl.textContent = makeBall(angle);
+          settle();
+        }
+      }
+      rafId = requestAnimationFrame(frame);
+    }
+
+    function settle() {
+      shaking = false;
+      wrapEl.classList.remove("shaking");
+      windowEl.classList.remove("murk");
+      var answer = ANSWERS[Math.floor(Math.random() * ANSWERS.length)];
+      txtEl.textContent = answer;
+      dieEl.classList.add("show");
+      setStatus("answered", false);
+      typeResp(answer);
+    }
+
+    btn.addEventListener("click", shake);
+
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      shake = function () {
+        if (shaking) return;
+        flipEl.classList.add("flipped");
+        var answer = ANSWERS[Math.floor(Math.random() * ANSWERS.length)];
+        txtEl.textContent = answer;
+        dieEl.classList.add("show");
+        setStatus("answered", false);
+        respEl.innerHTML = '<span class="lead">oracle ❯ </span><span class="ans"></span>';
+        respEl.querySelector(".ans").textContent = answer;
+      };
+      btn.addEventListener("click", shake);
+    }
   })();
 
   // =========== EQUITY SPARKLINE ===========
