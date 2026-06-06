@@ -443,12 +443,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);
                 margin:8px 0 12px;flex:1;display:flex;align-items:center;
                 justify-content:center}
-  /* footer stats centered; caption is its own row below */
-  .proj-chart .proj-stats{justify-content:center;flex-wrap:wrap}
-  .equity-caption{
-    font-size:12px;color:var(--ink2);letter-spacing:.05em;
-    text-align:center;margin-top:4px;
+  /* footer: stats + caption on one row at desktop, stacked on narrow screens */
+  .equity-footer{
+    display:flex;flex-direction:row;align-items:center;
+    justify-content:space-between;
+    border-top:1px dashed var(--line);padding-top:10px;
   }
+  /* strip the border/padding that .proj-stats normally carries — footer owns it */
+  .proj-chart .proj-stats{justify-content:center;flex-wrap:nowrap;flex-shrink:0;gap:8px;border:none;padding:0;margin:0}
+  .equity-caption{font-size:12px;color:var(--ink2);letter-spacing:.05em;white-space:nowrap}
   /* 7D / 30D toggle pill in the card header */
   .equity-toggle{display:inline-flex;border:1px solid var(--line);border-radius:3px;overflow:hidden}
   .equity-toggle button{
@@ -603,6 +606,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       text-align:center;
     }
     .equity-positions .sep{display:none}
+    .equity-footer{flex-direction:column;align-items:center;gap:6px}
     .proj-chart .proj-stats{flex-direction:column;align-items:center;gap:6px}
   }
   @media (max-width:720px){
@@ -824,11 +828,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="equity-xaxis" id="equityXAxis">
             <!-- one span per snapshot, populated by JS -->
           </div>
-          <div class="proj-stats" id="equityStats">
-            <div>open: <b id="equityStart">&mdash;</b></div>
-            <div>close: <b id="equityNow">&mdash;</b></div>
+          <div class="equity-footer">
+            <div class="proj-stats" id="equityStats">
+              <div>open: <b id="equityStart">&mdash;</b></div>
+              <div>close: <b id="equityNow">&mdash;</b></div>
+            </div>
+            <div class="equity-caption" id="equitySince"></div>
           </div>
-          <div class="equity-caption" id="equitySince"></div>
           <div class="equity-positions" id="equityPositions" style="display:none">
             <span class="label">Holding</span>
             <span id="equityPositionsList"></span>
