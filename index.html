@@ -1232,18 +1232,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   // Silent on failure: a broken fetch hides the card rather than showing
   // a half-rendered chart.
   (async function renderEquity() {
-    const card = document.getElementById('equityCard');
+    const card    = document.getElementById('equityCard');
     if (!card) return;
-    const startEl = document.getElementById('equityStart');
-    const nowEl = document.getElementById('equityNow');
-    const sinceEl = document.getElementById('equitySince');
-    const cadenceEl = document.getElementById('equityCadence');
-    const yMaxEl = document.getElementById('equityYMax');
-    const yMinEl = document.getElementById('equityYMin');
+    const startEl  = document.getElementById('equityStart');
+    const nowEl    = document.getElementById('equityNow');
+    const sinceEl  = document.getElementById('equitySince');
+    const yMaxEl   = document.getElementById('equityYMax');
+    const yMinEl   = document.getElementById('equityYMin');
     const yStartEl = document.getElementById('equityYStart');
-    const xAxis = document.getElementById('equityXAxis');
-    const frame = document.getElementById('equityFrame');
-    const svg = document.getElementById('equitySpark');
+    const xAxis    = document.getElementById('equityXAxis');
+    const frame    = document.getElementById('equityFrame');
+    const svg      = document.getElementById('equitySpark');
+    const toggle   = document.getElementById('equityToggle');
 
     let data;
     try {
@@ -1251,160 +1251,168 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (!res.ok) throw new Error('http ' + res.status);
       data = await res.json();
     } catch (_) {
-      // Network error or missing file — hide card rather than render a broken state.
       card.style.display = 'none';
       return;
     }
 
-    const snaps = (data.snapshots || []).filter(s => typeof s.equity === 'number');
+    const allSnaps = (data.snapshots || []).filter(s => typeof s.equity === 'number');
+
     const fmtUSD2 = v => '$' + v.toLocaleString(undefined, {
       minimumFractionDigits: 2, maximumFractionDigits: 2,
     });
-    // Axis labels: drop the cents so the y-axis column stays narrow.
     const fmtUSD0 = v => '$' + Math.round(v).toLocaleString();
-    // Parse "YYYY-MM-DD" manually — using `new Date(iso)` then a locale formatter
-    // would shift the displayed date by the viewer's tz (UTC midnight reads as
-    // "the day before" in PT). Manual split avoids the trip through Date.
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const fmtDate = iso => {
       const [, m, d] = iso.split('-').map(Number);
       return `${MONTHS[m - 1]} ${String(d).padStart(2, '0')}`;
     };
-    // Count weekdays from `startISO` (YYYY-MM-DD) to `endISO` (YYYY-MM-DD or
-    // full timestamp), inclusive on both ends. US holidays aren't excluded —
-    // good enough at 7-day scope, off by ~9 days/year at long horizons.
-    const tradingDaysFrom = (startISO, endISO) => {
-      if (!startISO || !endISO) return 0;
-      const [sy, sm, sd] = startISO.split('T')[0].split('-').map(Number);
-      const [ey, em, ed] = endISO.split('T')[0].split('-').map(Number);
-      const cursor = new Date(Date.UTC(sy, sm - 1, sd));
-      const end = new Date(Date.UTC(ey, em - 1, ed));
-      let count = 0;
-      while (cursor <= end) {
-        const day = cursor.getUTCDay();
-        if (day !== 0 && day !== 6) count++;   // 0=Sun, 6=Sat
-        cursor.setUTCDate(cursor.getUTCDate() + 1);
-      }
-      return count;
-    };
-    const daysTraded = tradingDaysFrom(data.start_date, data.as_of);
-    cadenceEl.textContent = daysTraded + ' Days Traded';
+
+    // Filter allSnaps to entries whose date falls within `days` calendar days
+    // of the most recent snapshot. "7D" means today and the 6 days before it.
+    function sliceByDays(days) {
+      if (!allSnaps.length) return allSnaps;
+      const last = allSnaps[allSnaps.length - 1].date;
+      const [ly, lm, ld] = last.split('-').map(Number);
+      const cutoff = new Date(Date.UTC(ly, lm - 1, ld - (days - 1)));
+      return allSnaps.filter(s => {
+        const [y, m, d] = s.date.split('-').map(Number);
+        return new Date(Date.UTC(y, m - 1, d)) >= cutoff;
+      });
+    }
 
     if (data.start_date) {
-      sinceEl.textContent =
-        '$5,000 paper account · opened ' + data.start_date;
+      sinceEl.textContent = '$5,000 paper account · opened ' + data.start_date;
     }
 
-    // Empty / one-point: replace the whole chart frame with a tagline. Hide
-    // the x-axis row too so we don't render orphan date labels under nothing.
-    if (snaps.length < 2) {
-      const empty = document.createElement('div');
-      empty.className = 'equity-empty';
-      empty.textContent = snaps.length === 0
-        ? 'awaiting first snapshot'
-        : 'awaiting second snapshot · curve renders at 2 points';
-      frame.replaceWith(empty);
-      xAxis.style.display = 'none';
-      if (snaps.length === 1) {
-        startEl.textContent = nowEl.textContent = fmtUSD2(snaps[0].equity);
-      }
-      return;
-    }
-
-    // 2+ snapshots — render path + reference line + axis labels.
-    // Coordinate space: viewBox is 0 0 320 100; we render into that and
-    // preserveAspectRatio="none" stretches it to the card's actual width.
-    const W = 320, H = 100, padX = 4, padY = 8;
-    const equities = snaps.map(s => s.equity);
-    const startEq = equities[0];
-    const nowEq = equities[equities.length - 1];
-    // SPY benchmark series — optional, only present when bot-trader publishes
-    // with --benchmark SPY. Some snapshots may legitimately omit spy_equity
-    // (e.g., yfinance gap), so we work with valid points only.
-    const spyVals = snaps.map(s => typeof s.spy_equity === 'number' ? s.spy_equity : null);
-    const validSpy = spyVals.filter(v => v !== null);
-    const hasSpy = validSpy.length >= 2;
-    const yMin = Math.min(...equities, ...(hasSpy ? validSpy : []));
-    const yMax = Math.max(...equities, ...(hasSpy ? validSpy : []));
-    const yRange = (yMax - yMin) || 1;       // avoid div/0 if equity is flat
-    const yPad = yRange * 0.15;              // 15% headroom top + bottom
-    const yLo = yMin - yPad;
-    const yHi = yMax + yPad;
-
-    const xAt = i => padX + (i / (snaps.length - 1)) * (W - 2 * padX);
-    const yAt = v => padY + (1 - (v - yLo) / (yHi - yLo)) * (H - 2 * padY);
-
-    const linePts = snaps
-      .map((s, i) => `${i === 0 ? 'M' : 'L'}${xAt(i).toFixed(2)} ${yAt(s.equity).toFixed(2)}`)
-      .join(' ');
-    // Closed area path under the line, for the gradient fill.
-    const areaD = linePts +
-      ` L${xAt(snaps.length - 1).toFixed(2)} ${(H - padY).toFixed(2)}` +
-      ` L${xAt(0).toFixed(2)} ${(H - padY).toFixed(2)} Z`;
-    const refY = yAt(startEq).toFixed(2);
-
-    const SVG_NS = 'http://www.w3.org/2000/svg';
-    function el(tag, attrs) {
-      const node = document.createElementNS(SVG_NS, tag);
-      for (const k in attrs) node.setAttribute(k, attrs[k]);
-      return node;
-    }
-    svg.appendChild(el('line', {
-      class: 'ref', x1: padX, y1: refY, x2: W - padX, y2: refY,
-    }));
-    svg.appendChild(el('path', {class: 'area', d: areaD}));
-    // SPY benchmark line — drawn after the area but before the strategy line
-    // so the strategy stays on top, and SPY isn't dimmed by the gradient fill
-    // when it dips below the strategy line. Gaps in spy_equity start a new
-    // sub-path via "M" so we don't draw straight-line interpolation across
-    // missing data.
-    if (hasSpy) {
-      let spyD = '';
-      let prevIdx = -2;
-      spyVals.forEach((v, i) => {
-        if (v === null) return;
-        spyD += (i === prevIdx + 1 ? 'L' : 'M') +
-                xAt(i).toFixed(2) + ' ' + yAt(v).toFixed(2) + ' ';
-        prevIdx = i;
+    // Wire toggle buttons before first render so clicks work immediately.
+    if (toggle) {
+      toggle.addEventListener('click', e => {
+        const btn = e.target.closest('button[data-days]');
+        if (!btn) return;
+        toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderWindow(Number(btn.dataset.days));
       });
-      svg.appendChild(el('path', {class: 'spy-line', d: spyD.trim()}));
-      const legend = document.getElementById('equityLegend');
-      if (legend) { legend.style.display = ''; legend.setAttribute('aria-hidden', 'false'); }
-    }
-    svg.appendChild(el('path', {class: 'line', d: linePts}));
-
-    // Y-axis labels — bounds at the actual data extremes, plus the start
-    // equity label sitting on the dotted reference line.
-    yMaxEl.textContent = fmtUSD0(yMax);
-    yMinEl.textContent = fmtUSD0(yMin);
-    // Skip the start label if it would visually overlap with yMin/yMax
-    // (within 10% of the chart height = within ~10 SVG units).
-    const refPos = yAt(startEq);   // 0..100 in SVG coordinate space
-    const tooCloseToBound = Math.abs(refPos - padY) < 10
-                         || Math.abs(refPos - (H - padY)) < 10;
-    if (!tooCloseToBound) {
-      yStartEl.style.display = '';
-      yStartEl.style.top = refPos + '%';
-      yStartEl.textContent = fmtUSD0(startEq);
     }
 
-    // X-axis: one date label per snapshot. justify-content:space-between puts
-    // the first flush-left and the last flush-right; intermediate labels sit
-    // at evenly distributed positions, matching xAt(i)'s linear spacing.
-    snaps.forEach(s => {
-      const span = document.createElement('span');
-      span.textContent = fmtDate(s.date);
-      xAxis.appendChild(span);
-    });
+    // ---- renderWindow -------------------------------------------------------
+    // Clears the SVG + axes and re-draws for the given calendar-day window.
+    // Called on page load (days=7) and on every toggle click.
+    function renderWindow(days) {
+      const snaps = sliceByDays(days);
 
-    startEl.textContent = fmtUSD2(startEq);
-    nowEl.textContent = fmtUSD2(nowEq);
+      // Clear previous render.
+      while (svg.childElementCount > 1) svg.removeChild(svg.lastChild); // keep <defs>
+      xAxis.textContent = '';
+      yMaxEl.textContent = yMinEl.textContent = '—';
+      yStartEl.style.display = 'none';
+      yStartEl.textContent = '—';
 
-    // Currently-held positions row. Hide the section entirely when empty
-    // — a "no positions" message would just be visual noise.
+      if (snaps.length < 2) {
+        const empty = document.createElement('div');
+        empty.className = 'equity-empty';
+        empty.textContent = snaps.length === 0
+          ? 'awaiting first snapshot'
+          : 'awaiting second snapshot · curve renders at 2 points';
+        // Only replace the frame on first call; on subsequent calls the frame
+        // may already have been replaced.
+        if (frame.parentNode) frame.replaceWith(empty);
+        xAxis.style.display = 'none';
+        if (snaps.length === 1) {
+          startEl.textContent = nowEl.textContent = fmtUSD2(snaps[0].equity);
+        }
+        return;
+      }
+
+      const W = 320, H = 100, padX = 4, padY = 8;
+      const equities = snaps.map(s => s.equity);
+      const startEq  = equities[0];
+      const nowEq    = equities[equities.length - 1];
+
+      const spyVals  = snaps.map(s => typeof s.spy_equity === 'number' ? s.spy_equity : null);
+      const validSpy = spyVals.filter(v => v !== null);
+      const hasSpy   = validSpy.length >= 2;
+
+      const yMin   = Math.min(...equities, ...(hasSpy ? validSpy : []));
+      const yMax   = Math.max(...equities, ...(hasSpy ? validSpy : []));
+      const yRange = (yMax - yMin) || 1;
+      const yPad   = yRange * 0.15;
+      const yLo    = yMin - yPad;
+      const yHi    = yMax + yPad;
+
+      const xAt = i => padX + (i / (snaps.length - 1)) * (W - 2 * padX);
+      const yAt = v => padY + (1 - (v - yLo) / (yHi - yLo)) * (H - 2 * padY);
+
+      const linePts = snaps
+        .map((s, i) => `${i === 0 ? 'M' : 'L'}${xAt(i).toFixed(2)} ${yAt(s.equity).toFixed(2)}`)
+        .join(' ');
+      const areaD = linePts +
+        ` L${xAt(snaps.length - 1).toFixed(2)} ${(H - padY).toFixed(2)}` +
+        ` L${xAt(0).toFixed(2)} ${(H - padY).toFixed(2)} Z`;
+      const refY = yAt(startEq).toFixed(2);
+
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      function el(tag, attrs) {
+        const node = document.createElementNS(SVG_NS, tag);
+        for (const k in attrs) node.setAttribute(k, attrs[k]);
+        return node;
+      }
+      svg.appendChild(el('line', {class: 'ref', x1: padX, y1: refY, x2: W - padX, y2: refY}));
+      svg.appendChild(el('path', {class: 'area', d: areaD}));
+
+      if (hasSpy) {
+        let spyD = '';
+        let prevIdx = -2;
+        spyVals.forEach((v, i) => {
+          if (v === null) return;
+          spyD += (i === prevIdx + 1 ? 'L' : 'M') +
+                  xAt(i).toFixed(2) + ' ' + yAt(v).toFixed(2) + ' ';
+          prevIdx = i;
+        });
+        svg.appendChild(el('path', {class: 'spy-line', d: spyD.trim()}));
+        const legend = document.getElementById('equityLegend');
+        if (legend) { legend.style.display = ''; legend.setAttribute('aria-hidden', 'false'); }
+      }
+      svg.appendChild(el('path', {class: 'line', d: linePts}));
+
+      // Y-axis labels.
+      yMaxEl.textContent = fmtUSD0(yMax);
+      yMinEl.textContent = fmtUSD0(yMin);
+      const refPos = yAt(startEq);
+      const tooCloseToBound = Math.abs(refPos - padY) < 10
+                           || Math.abs(refPos - (H - padY)) < 10;
+      if (!tooCloseToBound) {
+        yStartEl.style.display = '';
+        yStartEl.style.top = refPos + '%';
+        yStartEl.textContent = fmtUSD0(startEq);
+      }
+
+      // X-axis labels. When there are more than 8 points, thin to 4 labels
+      // (first, ~1/3, ~2/3, last) to avoid crowding at 30D density.
+      const n = snaps.length;
+      const xIndices = n > 8
+        ? [0, Math.floor((n - 1) / 3), Math.floor(2 * (n - 1) / 3), n - 1]
+        : snaps.map((_, i) => i);
+      // Deduplicate in case rounding produces the same index twice at small n.
+      const uniqueIndices = [...new Set(xIndices)];
+      // Build a Set for O(1) lookup when iterating all snaps.
+      const labelSet = new Set(uniqueIndices);
+      snaps.forEach((s, i) => {
+        if (!labelSet.has(i)) return;
+        const span = document.createElement('span');
+        span.textContent = fmtDate(s.date);
+        xAxis.appendChild(span);
+      });
+
+      startEl.textContent = fmtUSD2(startEq);
+      nowEl.textContent   = fmtUSD2(nowEq);
+    }
+    // ---- end renderWindow ---------------------------------------------------
+
+    // Render positions (static — doesn't change with the toggle window).
     const positions = Array.isArray(data.positions) ? data.positions : [];
     if (positions.length) {
-      const row = document.getElementById('equityPositions');
+      const row  = document.getElementById('equityPositions');
       const list = document.getElementById('equityPositionsList');
       list.textContent = '';
       positions.forEach((sym, i) => {
@@ -1425,6 +1433,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       });
       row.style.display = '';
     }
+
+    // Default render — 7D matches current published JSON window.
+    renderWindow(7);
   })();
 
   // =========== DISCORD CLICK-TO-COPY ===========
