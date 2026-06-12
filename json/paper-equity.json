@@ -1,27 +1,7 @@
 {
   "start_date": "2026-04-22",
-  "as_of": "2026-06-05T00:00:00+00:00",
+  "as_of": "2026-06-12T00:00:00+00:00",
   "snapshots": [
-    {
-      "date": "2026-04-22",
-      "equity": 5000.0,
-      "spy_equity": 5000.0
-    },
-    {
-      "date": "2026-04-23",
-      "equity": 5047.67,
-      "spy_equity": 4980.6
-    },
-    {
-      "date": "2026-04-24",
-      "equity": 5004.17,
-      "spy_equity": 5019.19
-    },
-    {
-      "date": "2026-04-28",
-      "equity": 5148.76,
-      "spy_equity": 5003.37
-    },
     {
       "date": "2026-04-29",
       "equity": 5016.67,
@@ -146,18 +126,43 @@
       "date": "2026-06-05",
       "equity": 6378.79,
       "spy_equity": 5185.18
+    },
+    {
+      "date": "2026-06-08",
+      "equity": 6068.08,
+      "spy_equity": 5196.92
+    },
+    {
+      "date": "2026-06-09",
+      "equity": 6121.04,
+      "spy_equity": 5181.66
+    },
+    {
+      "date": "2026-06-10",
+      "equity": 5999.21,
+      "spy_equity": 5099.97
+    },
+    {
+      "date": "2026-06-11",
+      "equity": 5859.53,
+      "spy_equity": 5186.65
+    },
+    {
+      "date": "2026-06-12",
+      "equity": 6300.34,
+      "spy_equity": 5214.7
     }
   ],
   "positions": [
-    "ADI",
     "AMAT",
     "AMD",
+    "ASML",
     "DELL",
     "GLW",
+    "HPE",
     "INTC",
     "LRCX",
     "MU",
-    "SLB",
     "TXN"
   ]
 }
