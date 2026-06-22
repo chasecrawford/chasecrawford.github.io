@@ -12,6 +12,7 @@
   --yellow: #ffd60a;
   --magenta: #ff4db8;
   --red: #ff5c5c;
+  --green-ink: #04130b;  /* dark-green ink — text shown on a --green fill (Button hover, Magic8Ball) */
 
   /* type */
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;

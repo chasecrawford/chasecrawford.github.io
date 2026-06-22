@@ -14,7 +14,7 @@
 - **Package name:** `@chasecrawford/ch4ze-ui`. **Global name:** `Ch4zeUI`.
 - **Node:** 20+. **Package manager:** npm (greenfield; no lockfile inherited).
 - **React/ReactDOM are peer dependencies** and must be externalized in the library build — never bundled.
-- **No hard-coded colors in component CSS.** Every color references a token: `var(--green)`, `var(--ink)`, etc. The tokens are defined once in `src/tokens/tokens.css`.
+- **Palette colors must use tokens; incidental source colors may be ported verbatim.** The 10 named palette colors MUST always be referenced via their token (`var(--green)`, `var(--ink)`, `var(--ink2)`, `var(--line)`, `var(--cyan)`, `var(--yellow)`, `var(--magenta)`, `var(--red)`, `var(--bg)`, `var(--bg2)`) — never re-hard-code a palette hex. Non-palette values the source uses as one-off accents (near-black shell tones like `#060606`/`#000`, shadow `rgba(...)`, `color-mix(...)` mixes, gradient stops) MAY be ported as-is to preserve fidelity — they are not a defect. The recurring dark-green ink `#04130b` (text shown on a `--green` fill; used by Button and Magic8Ball) is promoted to a token `--green-ink: #04130b;` in `src/tokens/tokens.css` — use `var(--green-ink)` for it.
 - **Minimum font size 12px** site-wide (matches the site's a11y rule; commit `e5fd39c`). Never emit a smaller `font-size`.
 - **CSS Modules** for every component (`<Name>.module.css`); class names are local. Global selectors (resets, `:root`, font `@import`) live only in `src/tokens/tokens.css` and `src/styles.css`.
 - **Respect `prefers-reduced-motion`** in every animated component (8-ball, ticker, boot loader, gallery, murk/blink effects) — mirror the `@media (prefers-reduced-motion:reduce)` rules already in the source.

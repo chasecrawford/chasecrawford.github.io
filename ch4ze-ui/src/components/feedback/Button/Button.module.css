@@ -19,7 +19,7 @@
 
 .primary:hover:not(:disabled) {
   background: var(--green);
-  color: #04130b;
+  color: var(--green-ink);
   box-shadow: 0 0 16px color-mix(in oklab, var(--green) 45%, transparent);
 }
 
