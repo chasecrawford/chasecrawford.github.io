@@ -1,0 +1,73 @@
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 0 14px;
+  border-bottom: 1px solid var(--line);
+  background: #060606;
+  min-height: 32px;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: var(--ink2);
+  text-transform: uppercase;
+}
+
+.tbLeft {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.tbCenter {
+  flex: 1;
+  text-align: center;
+}
+
+.tbRight {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-right: 14px;
+}
+
+/* Windows-style window controls */
+.wcontrols {
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+}
+
+.wctl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 100%;
+  color: var(--ink2);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s, color 0.12s;
+  background: transparent;
+  border: 0;
+  font-family: inherit;
+}
+
+.wctl:hover {
+  background: #151515;
+  color: var(--ink);
+}
+
+.wctl.close:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+
+.wctl:focus {
+  outline: none;
+}
+
+.wctl:focus-visible {
+  outline: 1px dashed var(--green);
+  outline-offset: -3px;
+}
