@@ -1,0 +1,44 @@
+.cmd {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 28px 0 8px;
+  flex-wrap: wrap;
+}
+
+.cmdPre {
+  white-space: nowrap;
+}
+
+.user {
+  color: var(--green);
+}
+
+.at {
+  color: var(--ink2);
+}
+
+.host {
+  color: var(--cyan);
+}
+
+.sep {
+  color: var(--ink2);
+}
+
+.path {
+  color: var(--yellow);
+}
+
+.arrow {
+  color: var(--magenta);
+}
+
+.c {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.flag {
+  color: var(--cyan);
+}
