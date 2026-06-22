@@ -9,3 +9,4 @@ export * from './components/terminal/Prompt';
 export * from './components/terminal/Output';
 export * from './components/terminal/Banner';
 export * from './components/shell/Shell';
+export * from './components/shell/Window';
