@@ -12,3 +12,4 @@ export * from './components/shell/Shell';
 export * from './components/shell/Window';
 export * from './components/shell/TitleBar';
 export * from './components/shell/StatusBar';
+export * from './components/content/KVList';
