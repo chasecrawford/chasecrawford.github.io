@@ -1,0 +1,88 @@
+.gal {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.gframe {
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  background: #060606;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px;
+  transition: all 0.15s;
+  overflow: hidden;
+}
+
+.gframe:hover {
+  border-color: var(--magenta);
+}
+
+.gframeLabel {
+  font-size: 12px;
+  color: var(--ink2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 2;
+}
+
+.gframeId {
+  font-size: 12px;
+  color: var(--ink2);
+  position: relative;
+  z-index: 2;
+}
+
+.gframeViz {
+  position: absolute;
+  inset: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.scan {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 3px,
+    rgba(0, 255, 136, 0.04) 3px,
+    rgba(0, 255, 136, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gframePhoto {
+  --hue: 287deg;
+  background-size: 100% 100%, cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: grayscale(1) sepia(0.6) saturate(2) hue-rotate(var(--hue));
+  transition: filter 0.4s ease, border-color 0.15s;
+}
+
+.gframePhoto:hover {
+  filter: grayscale(0) sepia(0) saturate(1) hue-rotate(0deg);
+}
+
+.gframePhoto .gframeId,
+.gframePhoto .gframeLabel {
+  color: #e6e6e6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Responsive: 2-col at 860px */
+@media (max-width: 860px) {
+  .gal {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

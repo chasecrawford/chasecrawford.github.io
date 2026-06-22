@@ -15,3 +15,4 @@ export * from './components/shell/StatusBar';
 export * from './components/content/KVList';
 export * from './components/content/Card';
 export * from './components/content/ExperienceTable';
+export * from './components/content/Gallery';
