@@ -50,7 +50,9 @@ export function sliceByDays(snaps: EquitySnapshot[], days: number): EquitySnapsh
   if (!snaps.length) return snaps;
   const last = snaps[snaps.length - 1].date;
   const [ly, lm, ld] = last.split('-').map(Number);
-  const cutoff = new Date(Date.UTC(ly, lm - 1, ld - days));
+  // "7D" = the last day and the 6 days before it (7 calendar days inclusive),
+  // matching the source: cutoff = last - (days - 1).
+  const cutoff = new Date(Date.UTC(ly, lm - 1, ld - (days - 1)));
   return snaps.filter(s => {
     const [y, m, d] = s.date.split('-').map(Number);
     return new Date(Date.UTC(y, m - 1, d)) >= cutoff;

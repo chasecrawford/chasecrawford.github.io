@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { PAPER_EQUITY } from '../../../sample-data/equity';
 import {
   buildGeometry,
-  fmtDate,
   fmtUSD0,
   fmtUSD2,
   sliceByDays,
@@ -37,7 +36,7 @@ export function EquityChart({
   const positions = Array.isArray(data.positions) ? data.positions : [];
 
   const sinceText = data.start_date
-    ? `$5,000 paper account · opened ${fmtDate(data.start_date.replace(/-/g, '-'))}`
+    ? `$5,000 paper account · opened ${data.start_date}`
     : '';
 
   const wrapClass = [styles['proj-chart'], className].filter(Boolean).join(' ');
