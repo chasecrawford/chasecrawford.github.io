@@ -1,0 +1,37 @@
+declare const styles: {
+  readonly 'proj-chart': string;
+  readonly 'equity-frame': string;
+  readonly 'equity-yaxis': string;
+  readonly ymax: string;
+  readonly ymin: string;
+  readonly ystart: string;
+  readonly 'equity-spark': string;
+  readonly ref: string;
+  readonly line: string;
+  readonly area: string;
+  readonly 'spy-line': string;
+  readonly 'equity-legend': string;
+  readonly item: string;
+  readonly swatch: string;
+  readonly strategy: string;
+  readonly spy: string;
+  readonly 'equity-xaxis': string;
+  readonly 'equity-empty': string;
+  readonly 'equity-footer': string;
+  readonly 'proj-stats': string;
+  readonly 'equity-caption': string;
+  readonly 'equity-toggle': string;
+  readonly active: string;
+  readonly 'equity-positions': string;
+  readonly label: string;
+  readonly symbol: string;
+  readonly sep: string;
+  readonly empty: string;
+  readonly 'equity-positions-list': string;
+  readonly 'proj-head': string;
+  readonly id: string;
+  readonly 'proj-name': string;
+  readonly nm: string;
+};
+
+export default styles;
