@@ -14,3 +14,4 @@ export * from './components/shell/TitleBar';
 export * from './components/shell/StatusBar';
 export * from './components/content/KVList';
 export * from './components/content/Card';
+export * from './components/content/ExperienceTable';

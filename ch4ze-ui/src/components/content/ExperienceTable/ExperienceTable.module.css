@@ -1,0 +1,68 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px dashed var(--line);
+  vertical-align: top;
+}
+
+.table th {
+  color: var(--ink2);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding-top: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table tbody tr:hover td {
+  background: rgba(0, 255, 136, 0.03);
+}
+
+.role {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.company {
+  color: var(--cyan);
+  font-size: 12px;
+  display: block;
+  margin-top: 2px;
+}
+
+.company a {
+  color: var(--cyan);
+}
+
+.status {
+  color: var(--green);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+}
+
+.status.closed {
+  color: var(--ink2);
+}
+
+.notes {
+  max-width: 65ch;
+}
+
+/* Hide STATUS column at max-width: 720px */
+@media (max-width: 720px) {
+  .table th:nth-child(4),
+  .table td.status {
+    display: none;
+  }
+}
