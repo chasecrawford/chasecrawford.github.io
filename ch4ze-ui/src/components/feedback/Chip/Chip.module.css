@@ -1,0 +1,35 @@
+.chip {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  font-size: var(--fs-min);
+  color: var(--ink2);
+}
+
+.green {
+  color: var(--green);
+}
+
+.cyan {
+  color: var(--cyan);
+}
+
+.yellow {
+  color: var(--yellow);
+}
+
+.magenta {
+  color: var(--magenta);
+}
+
+.red {
+  color: var(--red);
+}
+
+.ink {
+  color: var(--ink);
+}
+
+.dim {
+  color: var(--dim);
+}
