@@ -1,0 +1,58 @@
+.btn {
+  font: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  padding: 8px 22px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.12s, color 0.12s, box-shadow 0.12s, transform 0.08s;
+  font-size: var(--fs-min);
+}
+
+.primary {
+  color: var(--green);
+  background: transparent;
+  border: 1px solid color-mix(in oklab, var(--green) 55%, var(--line));
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--green);
+  color: #04130b;
+  box-shadow: 0 0 16px color-mix(in oklab, var(--green) 45%, transparent);
+}
+
+.primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.primary:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 8px 14px;
+  font-size: var(--fs-min);
+  letter-spacing: 0.2em;
+}
+
+.ghost:hover:not(:disabled) {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.ghost:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}
