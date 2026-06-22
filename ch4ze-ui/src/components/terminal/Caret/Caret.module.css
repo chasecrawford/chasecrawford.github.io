@@ -1,0 +1,22 @@
+.caret {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--green);
+  vertical-align: middle;
+  margin-left: 4px;
+  animation: blink 1s steps(2) infinite;
+  box-shadow: 0 0 6px var(--green);
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    animation: none;
+  }
+}
