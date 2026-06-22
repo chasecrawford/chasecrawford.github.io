@@ -112,11 +112,12 @@ Interaction tests additionally import `userEvent` from `@testing-library/user-ev
     "react-dom": "^18.3.0",
     "typescript": "^5.5.0",
     "vite": "^5.4.0",
+    "vite-plugin-dts": "^4.0.0",
     "vitest": "^2.1.0"
   }
 }
 ```
-(Storybook devDependencies are added in Task 3 by its `storybook init`.)
+(Storybook devDependencies are added in Task 3 by its `storybook init`. Also create `ch4ze-ui/vitest.setup.ts` containing `import '@testing-library/jest-dom/vitest';` in this task — `vite.config.ts` references it and Task 2 runs tests before Task 3.)
 
 - [ ] **Step 2: Create `tsconfig.json` and `tsconfig.node.json`**
 
@@ -166,10 +167,11 @@ Interaction tests additionally import `userEvent` from `@testing-library/user-ev
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import dts from 'vite-plugin-dts';   // emits dist/index.d.ts (the exports map promises it)
 import { resolve } from 'node:path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), dts({ insertTypesEntry: true, include: ['src'] })],
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
@@ -348,19 +350,15 @@ git commit -m "feat(ch4ze-ui): token layer, shared types, global styles"
 ### Task 3: Storybook + Vitest harness
 
 **Files:**
-- Create: `ch4ze-ui/vitest.setup.ts`
 - Create (via `storybook init`, then edit): `ch4ze-ui/.storybook/main.ts`, `ch4ze-ui/.storybook/preview.ts`
 - Create: `ch4ze-ui/src/smoke.test.tsx`
 
 **Interfaces:**
-- Produces: a working Storybook that loads `src/styles.css` globally; a Vitest setup that registers jest-dom matchers.
+- Produces: a working Storybook that loads `src/styles.css` globally. (`vitest.setup.ts` already exists — created in Task 1.)
 
-- [ ] **Step 1: Create the Vitest setup file**
+- [ ] **Step 1: Confirm the Vitest setup file exists**
 
-`ch4ze-ui/vitest.setup.ts`:
-```ts
-import '@testing-library/jest-dom/vitest';
-```
+`ch4ze-ui/vitest.setup.ts` was created in Task 1 and already contains `import '@testing-library/jest-dom/vitest';`. Do NOT recreate it. Verify it is present before proceeding.
 
 - [ ] **Step 2: Initialize Storybook**
 
