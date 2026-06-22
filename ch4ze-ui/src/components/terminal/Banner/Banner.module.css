@@ -1,0 +1,51 @@
+.banner {
+  color: var(--green);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.28);
+  font-size: clamp(3px, 0.82vw, 9px);
+  line-height: 1.15;
+  margin: 0;
+  white-space: pre;
+  overflow: hidden;
+}
+
+.bannerSm {
+  display: none;
+}
+
+.bannerSub {
+  color: var(--ink2);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+@media (max-width: 860px) {
+  .banner {
+    display: none;
+  }
+  .bannerSm {
+    display: block;
+    color: var(--green);
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.28);
+    font-size: clamp(7px, 2.4vw, 12px);
+    line-height: 1.15;
+    margin: 0;
+    white-space: pre;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 720px) {
+  .banner {
+    display: none;
+  }
+  .bannerSm {
+    display: block;
+    color: var(--green);
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.28);
+    font-size: clamp(7px, 2.4vw, 12px);
+    line-height: 1.15;
+    margin: 0;
+    white-space: pre;
+    overflow: hidden;
+  }
+}
