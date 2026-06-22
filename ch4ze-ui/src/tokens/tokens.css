@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+:root {
+  /* colors — verbatim from chasecrawford.dev */
+  --bg: #0a0a0a;
+  --bg2: #0f0f0f;
+  --ink: #d8e4d8;
+  --ink2: #6a7a6a;
+  --line: #1d2a1d;
+  --green: #00ff88;
+  --cyan: #00d4ff;
+  --yellow: #ffd60a;
+  --magenta: #ff4db8;
+  --red: #ff5c5c;
+
+  /* type */
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --fs-base: 13px;     /* body */
+  --fs-min: 12px;      /* a11y floor — never go below */
+  --lh-base: 1.6;
+}
