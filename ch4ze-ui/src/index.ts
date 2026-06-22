@@ -20,3 +20,4 @@ export * from './components/content/Gallery';
 export * from './components/content/ContactLinks';
 export * from './components/content/FeedList';
 export * from './components/feature/DisconnectOverlay';
+export * from './components/feature/Magic8Ball';
