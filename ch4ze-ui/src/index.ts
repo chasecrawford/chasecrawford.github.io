@@ -5,3 +5,4 @@ export * from './components/feedback/Chip';
 export * from './components/feedback/Button';
 export * from './components/terminal/Caret';
 export * from './components/terminal/Prompt';
+export * from './components/terminal/Output';

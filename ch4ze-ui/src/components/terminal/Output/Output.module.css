@@ -1,0 +1,32 @@
+.out {
+  padding: 4px 0 8px 0;
+  color: var(--ink);
+}
+
+.dim {
+  color: var(--ink2);
+}
+
+.pre {
+  margin: 0;
+  font: inherit;
+  white-space: pre;
+  overflow-x: auto;
+  padding: 0 0 8px;
+}
+
+.success {
+  color: var(--green);
+}
+
+.warn {
+  color: var(--yellow);
+}
+
+.info {
+  color: var(--cyan);
+}
+
+.key {
+  color: var(--magenta);
+}
