@@ -47,7 +47,7 @@ export function App() {
 
 ## Styling
 
-All visual tokens are CSS custom properties defined in the bundled stylesheet (`ch4ze-ui.css`). Component CSS references variables like `var(--green)`, `var(--bg)`, `var(--dim)`, `var(--amber)`, and `var(--red)` so you can override the palette at the `:root` level without touching component code. No hard-coded colors appear in component styles — every shade flows through the token layer, making full re-theming a single CSS block.
+All palette colors are CSS custom properties defined in the bundled stylesheet (`ch4ze-ui.css`). Component CSS references the named palette tokens — `var(--bg)`, `var(--bg2)`, `var(--ink)`, `var(--ink2)`, `var(--line)`, `var(--green)`, `var(--cyan)`, `var(--yellow)`, `var(--magenta)`, `var(--red)`, and `var(--green-ink)` — so you can re-theme by overriding them at the `:root` level without touching component code. Incidental accents the source uses verbatim (near-black shell tones, `rgba(...)` shadows, `color-mix(...)` and gradient stops) are intentionally left un-tokenized to preserve fidelity to the original design.
 
 ## Components
 
