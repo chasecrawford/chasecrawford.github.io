@@ -1,0 +1,157 @@
+.proj {
+  border: 1px solid var(--line);
+  padding: 16px;
+  background: rgba(0, 255, 136, 0.02);
+  position: relative;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.proj:hover {
+  border-color: var(--green);
+  background: rgba(0, 255, 136, 0.06);
+}
+
+.proj:hover .projGo {
+  color: var(--green);
+}
+
+.projHead {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--ink2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.projHead .id {
+  color: var(--cyan);
+}
+
+.projName {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.projName .nm {
+  font-size: 17px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.projGo {
+  color: var(--ink2);
+  transition: color 0.15s;
+}
+
+.projDesc {
+  color: var(--ink2);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.projDesc :global(b) {
+  color: var(--ink);
+}
+
+/* thesis callout — visually separates the project's goal/result from the description */
+.projThesis {
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--green);
+  background: rgba(0, 255, 136, 0.04);
+  padding: 10px 12px;
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.projThesis .thesisLabel {
+  color: var(--cyan);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.projThesis :global(b) {
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* "detail" project card — flex-col so the thesis can pin to the bottom,
+   plus larger text throughout to fill the card height now that goal sits
+   at the bottom rather than mid-card. */
+.projDetail {
+  display: flex;
+  flex-direction: column;
+}
+
+.projDetail .projThesis {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+/* guarantee breathing room above Goal even when flex-auto collapses on
+   shorter cards (e.g. feeds-by-chase) */
+.projDetail .projStats {
+  margin-bottom: 14px;
+}
+
+.projDetail .projHead {
+  font-size: 14px;
+}
+
+.projDetail .projDesc {
+  font-size: 14px;
+}
+
+.projDetail .projThesis {
+  font-size: 14px;
+}
+
+.projDetail .projThesis .thesisLabel {
+  font-size: 14px;
+}
+
+.projDetail .projStack span {
+  font-size: 14px;
+}
+
+.projDetail .projStats {
+  font-size: 14px;
+}
+
+.projStack {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.projStack span {
+  font-size: 12px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  letter-spacing: 0.1em;
+}
+
+.projStats {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--ink2);
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+
+.projStats :global(b) {
+  color: var(--cyan);
+  font-weight: 700;
+}
