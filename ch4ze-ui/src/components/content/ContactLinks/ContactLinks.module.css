@@ -1,0 +1,70 @@
+.contactLinks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin: 8px 0 12px;
+}
+
+.clink {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  transition: all 0.15s;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.clink:hover {
+  border-color: var(--cyan);
+  background: rgba(0, 212, 255, 0.05);
+}
+
+.clink .k {
+  color: var(--ink2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.clink .v {
+  color: var(--ink);
+}
+
+button.clink {
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  transition: all 0.15s;
+  color: var(--ink);
+}
+
+button.clink:hover {
+  border-color: var(--cyan);
+  background: rgba(0, 212, 255, 0.05);
+}
+
+button.clink.copied {
+  border-color: var(--green);
+  background: rgba(0, 255, 136, 0.06);
+}
+
+button.clink.copied .v::after {
+  content: ' · copied';
+  color: var(--green);
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+@media (max-width: 860px) {
+  .contactLinks {
+    grid-template-columns: 1fr;
+  }
+}
