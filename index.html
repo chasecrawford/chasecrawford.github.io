@@ -22,7 +22,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     --bg:#0a0a0a;
     --bg2:#0f0f0f;
     --ink:#d8e4d8;
-    --ink2:#6a7a6a;
+    --ink2:#8a9d8a;
     --line:#1d2a1d;
     --green:#00ff88;
     --cyan:#00d4ff;
@@ -720,8 +720,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 ██║     ██╔══██║██╔══██║╚════██║██╔══╝
 ╚██████╗██║  ██║██║  ██║███████║███████╗
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝</pre>
-      <div class="banner-sub">// personal site v3.0 — lead backend developer @ hatfield media, louisville ky —
-<span style="color:var(--green)">● online</span></div>
+      <div class="banner-sub">// personal site v3.0 — lead backend developer @ hatfield media, louisville ky</div>
 
       <!-- hero split: whoami/ls left, 8-ball right -->
       <div class="hero-split">
@@ -738,6 +737,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <div class="k">role</div><div class="v">Lead Backend Developer</div>
               <div class="k">employer</div><div class="v"><a href="https://hatfieldmedia.com" target="_blank" rel="noopener">Hatfield Media</a></div>
               <div class="k">location</div><div class="v">Louisville, Kentucky</div>
+              <div class="k">timezone</div><div class="v">EST · UTC-5</div>
+              <div class="k">uptime</div><div class="v"><span id="age">—</span></div>
               <div class="k">skills</div><div class="v chips">
                 <span class="chip">PHP</span><span class="chip">LARAVEL</span><span class="chip">VUE</span>
                 <span class="chip">MYSQL</span><span class="chip">POSTGRES</span><span class="chip">AWS</span>
@@ -1494,6 +1495,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   // =========== COPYRIGHT YEAR ===========
   const copyYear = document.getElementById('copyYear');
   if (copyYear) copyYear.textContent = new Date().getFullYear();
+
+  // =========== WHOAMI UPTIME (days alive, approx — computed from birth year) ===========
+  const ageEl = document.getElementById('age');
+  if (ageEl) {
+    const days = Math.floor((Date.now() - Date.UTC(1990, 0, 1)) / 86400000);
+    ageEl.textContent = '~' + days.toLocaleString() + ' days';
+  }
 
   // =========== WINDOW CONTROLS ===========
   const wMin   = document.getElementById('wctlMin');
