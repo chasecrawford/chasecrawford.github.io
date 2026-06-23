@@ -1,9 +1,10 @@
 /**
  * FullPage.stories.tsx
  *
- * Composed fidelity reference — assembles all major ch4ze-ui components into
- * the full chasecrawford.dev layout. This is NOT an assertion test; it exists
- * purely as a Storybook visual proof that the parts compose correctly.
+ * Composed fidelity reference — assembles the ch4ze-ui components into the
+ * full chasecrawford.dev layout, 1:1 with the live site (index.html). This is
+ * NOT an assertion test; it is a Storybook visual proof that the real parts,
+ * with their real default content, reproduce the site.
  */
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
@@ -14,143 +15,122 @@ import { TitleBar } from '../shell/TitleBar/TitleBar';
 import { StatusBar } from '../shell/StatusBar/StatusBar';
 import { Banner } from '../terminal/Banner/Banner';
 import { Prompt } from '../terminal/Prompt/Prompt';
-import { BootLoader } from '../terminal/BootLoader/BootLoader';
+import { Output } from '../terminal/Output/Output';
+import { Caret } from '../terminal/Caret/Caret';
 import { Ticker } from '../feedback/Ticker/Ticker';
 import { KVList } from '../content/KVList/KVList';
 import { Card } from '../content/Card/Card';
 import { EquityChart } from '../feature/EquityChart/EquityChart';
+import { Magic8Ball } from '../feature/Magic8Ball/Magic8Ball';
 import { ExperienceTable } from '../content/ExperienceTable/ExperienceTable';
 import { Gallery } from '../content/Gallery/Gallery';
 import { ContactLinks } from '../content/ContactLinks/ContactLinks';
 import { FeedList } from '../content/FeedList/FeedList';
 import { DisconnectOverlay } from '../feature/DisconnectOverlay/DisconnectOverlay';
-import { Button } from '../feedback/Button/Button';
+import { BOT_TRADER, FEEDS_BY_CHASE } from '../../sample-data/projects';
 
-/* ------------------------------------------------------------------ */
-/* Ticker items — mirrors the live site                                 */
-/* ------------------------------------------------------------------ */
+/* Ticker phrases — verbatim from the live site (the component inserts the
+   `//` separators between items). */
 const TICKER_ITEMS = [
-  'chasecrawford.dev',
-  'software engineer',
-  'louisville · ky',
-  'react · typescript · node',
-  'open to work',
+  'LEAD BACKEND DEVELOPER • HATFIELD MEDIA • LOUISVILLE KY',
+  'CUSTOM SOLUTIONS IN PHP SINCE 2008',
+  'WANNABE INDIE GAME DEV',
+  'REAL HUMAN',
 ];
 
-/* ------------------------------------------------------------------ */
-/* Root component that wires up the full page                           */
-/* ------------------------------------------------------------------ */
+/* Demo-only layout that mirrors index.html's `.hero-split` and `.projects`
+   grid (these live in the page, not in any single component). */
+const LAYOUT_CSS = `
+.demo-hero { display: flex; gap: 16px; align-items: flex-start; }
+.demo-hero-left { flex: 1; min-width: 0; }
+.demo-hero-right { flex: 1; min-width: 0; padding-top: 28px; }
+@media (max-width: 1400px) { .demo-hero { flex-direction: column; } }
+.demo-projects { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 12px 0 16px; }
+@media (max-width: 860px) { .demo-projects { grid-template-columns: 1fr; } }
+`;
+
 function FullPageDemo() {
   const [disconnected, setDisconnected] = useState(false);
-  const [booting, setBooting] = useState(false);
 
   return (
     <Shell>
-      {/* Boot-loader overlay — shown when "Boot" button is clicked */}
-      {booting && (
-        <BootLoader
-          onComplete={() => setBooting(false)}
-          autoStart
-        />
-      )}
+      <style>{LAYOUT_CSS}</style>
 
-      {/* Disconnect overlay */}
-      <DisconnectOverlay
-        open={disconnected}
-        onReconnect={() => setDisconnected(false)}
-      />
+      {/* Close (×) in the title bar shows the disconnect overlay — exactly as
+          the live site behaves. */}
+      <DisconnectOverlay open={disconnected} onReconnect={() => setDisconnected(false)} />
 
       <Window>
-        {/* Title bar */}
         <TitleBar
           title="chase@louisville · Windows PowerShell"
           status={<span style={{ color: 'var(--green)' }}>● LIVE</span>}
           onClose={() => setDisconnected(true)}
         />
 
-        {/* Scrolling marquee below the title bar */}
-        <Ticker items={TICKER_ITEMS} durationSec={40} />
+        <Ticker items={TICKER_ITEMS} durationSec={50} />
 
-        {/* Collapsible body */}
         <WindowBody>
-          {/* ASCII banner */}
-          <Banner />
+          <Banner
+            subtitle={
+              <>
+                // personal site v3.0 — lead backend developer @ hatfield media, louisville ky —{' '}
+                <span style={{ color: 'var(--green)' }}>● online</span>
+              </>
+            }
+          />
 
-          {/* whoami */}
-          <Prompt command="whoami" flags="--verbose" />
-          <KVList />
-
-          {/* Projects grid — two cards side by side */}
-          <Prompt command="ls" flags="./projects" />
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '1rem',
-              padding: '0.5rem 0',
-            }}
-          >
-            <Card
-              id="01"
-              badge="ACTIVE"
-              name="chasecrawford.dev"
-              href="https://chasecrawford.dev"
-              description="Personal site — the one you are looking at. Terminal / CRT aesthetic built in React + TypeScript."
-              stack={['React', 'TypeScript', 'Vite', 'CSS Modules']}
-            />
-            <EquityChart defaultDays={30} />
+          {/* hero: whoami (left) · ASCII 8-ball (right) */}
+          <div className="demo-hero">
+            <div className="demo-hero-left">
+              <Prompt command="whoami" flags="--verbose" />
+              <KVList />
+            </div>
+            <div className="demo-hero-right">
+              <Magic8Ball />
+            </div>
           </div>
 
-          {/* Experience */}
-          <Prompt command="cat" flags="./experience.log" />
+          {/* projects: bot-trader · equity chart · feeds-by-chase · live feeds */}
+          <Prompt path="~/projects" command="ls" flags="--long --featured" />
+          <Output dim>total 2 · open source</Output>
+          <div className="demo-projects">
+            <Card {...BOT_TRADER} />
+            <EquityChart defaultDays={30} />
+            <Card {...FEEDS_BY_CHASE} />
+            <FeedList />
+          </div>
+
+          {/* experience */}
+          <Prompt command="cat experience.log" flags="| sort -r" />
           <ExperienceTable />
 
-          {/* Gallery */}
-          <Prompt command="ls" flags="./gallery" />
+          {/* gallery */}
+          <Prompt path="~/photos" command="open" flags="--grid=4 *.jpg" />
+          <Output dim>4 frames</Output>
           <Gallery />
 
-          {/* Contact + feeds */}
-          <Prompt command="cat" flags="./contact.json" />
+          {/* contact */}
+          <Prompt command="contact" flags="--all" />
+          <Output dim>7 endpoints · 1 asset · reply time ~24h</Output>
           <ContactLinks />
-          <FeedList />
+
+          {/* final typed prompt */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '28px 0 8px' }}>
+            <Prompt command="contact --provider=bs" />
+            <Caret />
+          </div>
         </WindowBody>
 
-        {/* Status bar */}
         <StatusBar left="NORMAL · UTF-8 · LF · READY" showClock />
       </Window>
-
-      {/* Dev controls — not part of the site; purely for story interaction */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '1rem',
-          right: '1rem',
-          display: 'flex',
-          gap: '0.5rem',
-          zIndex: 9999,
-        }}
-      >
-        <Button variant="ghost" onClick={() => setBooting(true)}>
-          Boot sequence
-        </Button>
-        <Button variant="ghost" onClick={() => setDisconnected(true)}>
-          Disconnect
-        </Button>
-      </div>
     </Shell>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Storybook meta                                                        */
-/* ------------------------------------------------------------------ */
 const meta = {
   title: '_demo/FullPage',
   component: FullPageDemo,
-  parameters: {
-    layout: 'fullscreen',
-  },
-  tags: ['autodocs'],
+  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof FullPageDemo>;
 
 export default meta;
