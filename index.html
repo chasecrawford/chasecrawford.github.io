@@ -51,6 +51,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     box-shadow: 0 0 0 1px #000 inset, 0 40px 80px -40px rgba(0,255,136,.08);
     min-height:calc(100vh - 32px);
     display:flex;flex-direction:column;
+    /* Cap + center on very wide screens (4K etc.) so content doesn't stretch
+       edge-to-edge; the scanline shell fills the rest of the viewport. Below
+       1800px the window stays full-bleed, so smaller screens are unchanged. */
+    max-width:1800px;
+    margin-inline:auto;width:100%;
   }
   .titlebar{
     display:flex;align-items:center;gap:12px;
