@@ -1,0 +1,19 @@
+{
+  "projectId": "b91c56f7-85fd-4e01-976e-b58a70cd1129",
+  "pkg": "@chasecrawford/ch4ze-ui",
+  "globalName": "Ch4zeUI",
+  "shape": "storybook",
+  "cssEntry": "dist/ch4ze-ui.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "storybookStatic": ".design-sync/sb-reference",
+  "storybookConfigDir": "ch4ze-ui/.storybook",
+  "buildCmd": "npm --prefix ch4ze-ui run build",
+  "overrides": {
+    "Card": { "cardMode": "column" },
+    "EquityChart": { "cardMode": "column" },
+    "Magic8Ball": { "cardMode": "column" },
+    "TitleBar": { "cardMode": "column" },
+    "DisconnectOverlay": { "cardMode": "single", "primaryStory": "Open", "viewport": "900x700" },
+    "BootLoader": { "skip": ["components-terminal-bootloader--playing", "components-terminal-bootloader--static"] }
+  }
+}

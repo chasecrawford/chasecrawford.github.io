@@ -10,6 +10,11 @@ html, body {
   line-height: var(--lh-base);
   overflow-x: hidden;
 }
+/* The terminal surface is intentionally dark. `html body` (specificity 0,0,2)
+   wins over a host/embed that sets a later, lower-specificity `body { background }`
+   (e.g. a preview-card template's inline `body{background:#fff}`), so the dark
+   surface holds wherever these styles are loaded. */
+html body { background: var(--bg); }
 a { color: var(--cyan); text-decoration: none; border-bottom: 1px dashed transparent; }
 a:hover { border-bottom-color: var(--cyan); }
 ::selection { background: var(--green); color: #000; }

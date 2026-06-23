@@ -13,7 +13,7 @@ export function DisconnectOverlay({ open, onReconnect, className }: DisconnectOv
   useEffect(() => {
     if (!open) return;
 
-    btnRef.current?.focus();
+    btnRef.current?.focus({ preventScroll: true });
 
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === 'Escape') {
