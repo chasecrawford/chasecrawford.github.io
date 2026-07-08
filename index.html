@@ -809,7 +809,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </a>
 
         <div class="proj proj-chart" id="equityCard" aria-label="Paper-trading equity chart">
-          <div class="proj-head"><span class="id">Paper Trading Trial No. 2</span><div class="equity-toggle" id="equityToggle" role="group" aria-label="Chart window"><button type="button" data-days="7">7D</button><button type="button" class="active" data-days="30">30D</button></div></div>
+          <div class="proj-head"><span class="id">Paper Trading Trial No. 2</span><div class="equity-toggle" id="equityToggle" role="group" aria-label="Chart window"><button type="button" data-days="7">7D</button><button type="button" class="active" data-days="30">30D</button><button type="button" data-days="60">60D</button></div></div>
           <div class="proj-name"><span class="nm">EMA trend-state strategy</span></div>
           <div class="equity-legend" id="equityLegend" style="display:none" aria-hidden="true">
             <span class="item strategy"><span class="swatch"></span>Strategy</span>
@@ -1280,12 +1280,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     };
 
     // Filter allSnaps to entries whose date falls within `days` calendar days
-    // of the most recent snapshot. "7D" means today and the 6 days before it.
+    // of today's real wall-clock date -- NOT the most recent snapshot. If the
+    // weekly publish job falls behind, the window should shrink (or empty
+    // out) rather than quietly re-centering on stale data.
     function sliceByDays(days) {
       if (!allSnaps.length) return allSnaps;
-      const last = allSnaps[allSnaps.length - 1].date;
-      const [ly, lm, ld] = last.split('-').map(Number);
-      const cutoff = new Date(Date.UTC(ly, lm - 1, ld - (days - 1)));
+      const now = new Date();
+      const cutoff = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() - (days - 1)));
       return allSnaps.filter(s => {
         const [y, m, d] = s.date.split('-').map(Number);
         return new Date(Date.UTC(y, m - 1, d)) >= cutoff;
