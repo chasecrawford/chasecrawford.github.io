@@ -155,7 +155,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .step p{margin:0 0 14px;color:var(--ink2);font-size:13px}
   .step p b{color:var(--ink);font-weight:700}
   .step .aside{margin:12px 0 0;font-size:12px;opacity:.85}
-  .step .aside code{color:var(--cyan);font-size:12px;word-break:break-all}
+  /* Own line so the address doesn't start mid-sentence and split across two;
+     it fits unbroken from ~340px up. break-word rather than break-all so it
+     only fragments on the narrowest phones, and never mid-line by default. */
+  .step .aside code{
+    display:block;margin-top:4px;
+    color:var(--cyan);font-size:12px;
+    overflow-wrap:break-word;
+  }
 
   .btn{
     display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -274,7 +281,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <a class="btn" href="https://groups.google.com/g/blackjack-coach-testers" target="_blank" rel="noopener">
             <span>Join the group</span><span class="arr">&rarr;</span>
           </a>
-          <p class="aside">Link not working? Search Google Groups for <code>blackjack-coach-testers@googlegroups.com</code>.</p>
+          <p class="aside">Link not working? Search Google Groups for this address:<code>blackjack-coach-testers@googlegroups.com</code></p>
         </li>
 
         <li class="step">
