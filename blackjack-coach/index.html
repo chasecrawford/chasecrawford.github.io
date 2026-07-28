@@ -126,6 +126,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .callout b{color:var(--ink);font-weight:700}
   .callout.ask{border-left-color:var(--green);background:rgba(0,255,136,.04)}
   .callout.ask .label{color:var(--green)}
+  .callout .asks{margin:10px 0;padding-left:18px;display:flex;flex-direction:column;gap:8px}
+  .callout .asks li::marker{color:var(--green)}
 
   /* ============ steps ============ */
   .steps{list-style:none;margin:0 0 24px;padding:0;display:flex;flex-direction:column;gap:14px}
@@ -265,8 +267,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </ol>
 
       <section class="callout ask">
-        <span class="label">Then: leave it installed</span>
-        Google counts 12 testers who stay opted in for <b>14 straight days</b>. Uninstalling or leaving the group resets the clock for everyone, so please leave it on your phone for two weeks. Play it or don't — that part's up to you.
+        <span class="label">Then: play it now and then</span>
+        Google counts 12 testers who stay opted in for <b>14 straight days</b> — and when I apply to launch, they ask how much testers actually used the app. So two asks:
+        <ul class="asks">
+          <li>Leave it installed the full two weeks. Uninstalling or leaving the group resets the clock for everyone.</li>
+          <li>Open it every couple of days and play a few hands. If you can, poke at all four tabs at least once — Table, Chart, Stats, and Settings.</li>
+        </ul>
+        Ten minutes total across two weeks covers it.
       </section>
 
       <section class="block">
