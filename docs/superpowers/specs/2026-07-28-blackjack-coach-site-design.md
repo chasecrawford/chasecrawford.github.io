@@ -145,9 +145,24 @@ audience is non-technical people opening a texted link on a phone.
 6. **Step 03 — Install it.** "Once you're a tester, the Play Store page works normally. Tap
    Install." → `OPEN IN PLAY STORE →` →
    `https://play.google.com/store/apps/details?id=dev.chasecrawford.blackjack.twa`
-7. **Then: leave it installed** — "Google counts 12 testers who stay opted in for **14
-   straight days**. Uninstalling or leaving the group resets the clock for everyone, so please
-   leave it on your phone for two weeks. Play it or don't — that part's up to you."
+7. **Then: play it now and then** — "Google counts 12 testers who stay opted in for **14
+   straight days** — and when I apply to launch, they ask how much testers actually used the
+   app. So two asks:" followed by two bullets — (a) "Leave it installed the full two weeks.
+   Uninstalling or leaving the group resets the clock for everyone." (b) "Open it every couple
+   of days and play a few hands. If you can, poke at all four tabs at least once — Table,
+   Chart, Stats, and Settings." Closing line: "Ten minutes total across two weeks covers it."
+
+   **Why this wording** (revised 2026-07-28 after the initial build): Play has *two* gates and
+   they measure different things. The automated 12-tester counter is opt-in only —
+   [Google's requirements page](https://support.google.com/googleplay/android-developer/answer/14151465)
+   says "a minimum of 12 testers who have been opted-in for at least the last 14 days
+   continuously," with no activity condition. But the **production access application** asks
+   the developer to "provide information about the engagement you received from testers,"
+   explicitly including "whether testers used all of your app's features," and to "summarize
+   the feedback that you received from testers, and let us know how you collected this
+   feedback." Idle installs satisfy the counter and sink the application. Naming the four tabs
+   maps onto the "all of your app's features" question; pointing testers at the in-app **Send
+   feedback** button supplies the "how you collected this feedback" answer.
 8. **Found a bug?** — "Settings tab → **Send feedback**. It comes straight to me."
 9. **Stuck?** — three fixes:
    - *App says "not available"* — wrong Google account, or the opt-in hasn't propagated; wait
