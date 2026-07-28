@@ -199,10 +199,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .statusbar a:hover{color:var(--green);border-bottom-color:transparent}
 
   @media (max-width:520px){
-    /* The homepage titlebar wraps to three lines at this width. Dropping the
-       host prefix and shortening the return link keeps this bar one line tall on
-       the phones most testers use, while desktop stays identical. */
-    .tb-host{display:none}
+    /* Shortening the return link keeps the bar one line tall on the phones
+       most testers use. */
     .tb-home-full{display:none}
     .tb-home-short{display:inline}
     .tb-home{gap:6px}
@@ -230,7 +228,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="tb-left">
         <span style="color:var(--green)">● LIVE</span>
       </div>
-      <div class="tb-center"><span class="tb-host">chase@louisville · </span>blackjack-coach</div>
+      <div class="tb-center">blackjack-coach</div>
       <div class="tb-right">
         <a class="tb-home" href="/">
           <span aria-hidden="true">&larr;</span>
