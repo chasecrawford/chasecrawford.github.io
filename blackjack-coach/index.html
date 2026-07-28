@@ -76,20 +76,28 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
      shared link, so an escape hatch is worth more here than fake chrome. */
   .titlebar{
     display:flex;align-items:center;gap:12px;
-    padding:0 0 0 14px;border-bottom:1px solid var(--line);
+    /* padding lives on .tb-left, not here — an asymmetric padding on the bar
+       shifts its content box, which drags the centered label off true centre. */
+    padding:0;border-bottom:1px solid var(--line);
     background:#060606;min-height:32px;
     font-size:12px;letter-spacing:.15em;color:var(--ink2);text-transform:uppercase;
   }
-  .tb-left{display:flex;gap:14px;align-items:center;flex:0 0 auto}
-  .tb-center{flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* tb-left and tb-right take an equal flex basis so tb-center is centered
+     against the whole bar. With flex:1 on the center instead, it would center
+     within the leftover space and drift toward whichever side is narrower. */
+  .tb-left{display:flex;gap:14px;align-items:center;flex:1 1 0;min-width:0;padding-left:14px}
+  .tb-center{flex:0 1 auto;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  /* Left and right carry matching 14px padding on purpose: with box-sizing
+     border-box, flex-basis:0 clamps to the item's padding, so unequal padding
+     here makes the two sides unequal and drags the centred label off centre. */
+  .tb-right{display:flex;justify-content:flex-end;align-items:center;flex:1 1 0;min-width:0;padding-right:14px}
   .tb-home{
-    display:flex;align-items:center;gap:8px;flex:0 0 auto;
-    height:32px;padding:0 14px;
+    display:flex;align-items:center;gap:8px;
     color:var(--ink2);font-size:12px;letter-spacing:.15em;text-transform:uppercase;
     white-space:nowrap;border-bottom:0;
-    transition:background .12s, color .12s;
+    transition:color .12s;
   }
-  .tb-home:hover{background:#151515;color:var(--green);border-bottom:0}
+  .tb-home:hover{color:var(--green);border-bottom:0}
   .tb-home-short{display:none}
 
   .body{padding:24px 20px 28px}
@@ -197,7 +205,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .tb-host{display:none}
     .tb-home-full{display:none}
     .tb-home-short{display:inline}
-    .tb-home{padding:0 12px;gap:6px}
+    .tb-home{gap:6px}
+    .tb-left{padding-left:12px}
+    .tb-right{padding-right:12px}
     .body{padding:20px 14px 24px}
     .hero{gap:12px}
     .hero img{width:60px;height:60px}
@@ -221,11 +231,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span style="color:var(--green)">● LIVE</span>
       </div>
       <div class="tb-center"><span class="tb-host">chase@louisville · </span>blackjack-coach</div>
-      <a class="tb-home" href="/">
-        <span aria-hidden="true">&larr;</span>
-        <span class="tb-home-full">chasecrawford.dev</span>
-        <span class="tb-home-short">home</span>
-      </a>
+      <div class="tb-right">
+        <a class="tb-home" href="/">
+          <span aria-hidden="true">&larr;</span>
+          <span class="tb-home-full">chasecrawford.dev</span>
+          <span class="tb-home-short">home</span>
+        </a>
+      </div>
     </div>
 
     <main class="body">
