@@ -71,19 +71,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     max-width:760px;margin-inline:auto;width:100%;
     display:flex;flex-direction:column;
   }
+  /* Mirrors the homepage titlebar exactly. The window controls are decorative
+     here (spans, aria-hidden) — a working close button on the page whose job is
+     recruiting testers would just lose testers. */
   .titlebar{
     display:flex;align-items:center;gap:12px;
-    padding:0 14px;border-bottom:1px solid var(--line);
-    background:#060606;min-height:34px;
-    font-size:11px;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase;
+    padding:0 0 0 14px;border-bottom:1px solid var(--line);
+    background:#060606;min-height:32px;
+    font-size:12px;letter-spacing:.15em;color:var(--ink2);text-transform:uppercase;
   }
-  .tb-dots{display:flex;gap:6px;flex:0 0 auto}
-  .tb-dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
-  .tb-dots i:first-child{background:#3a2020}
+  .tb-left{display:flex;gap:14px;align-items:center;flex:0 0 auto}
   .tb-center{flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tb-right{flex:0 0 auto}
-  .tb-right a{color:var(--ink2);font-size:11px;letter-spacing:.14em}
-  .tb-right a:hover{color:var(--green);border-bottom-color:transparent}
+  .wcontrols{display:flex;align-items:stretch;height:32px;flex:0 0 auto}
+  .wctl{
+    display:flex;align-items:center;justify-content:center;
+    width:40px;height:100%;color:var(--ink2);font-size:12px;
+    user-select:none;cursor:default;
+    transition:background .12s, color .12s;
+  }
+  .wctl:hover{background:#151515;color:var(--ink)}
+  .wctl.close:hover{background:#c42b1c;color:#fff}
 
   .body{padding:24px 20px 28px}
 
@@ -184,6 +191,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .statusbar a:hover{color:var(--green);border-bottom-color:transparent}
 
   @media (max-width:520px){
+    /* The homepage titlebar wraps to three lines at this width. Dropping the
+       host prefix keeps the bar one line tall on the phones most testers use,
+       while desktop stays identical to the homepage. */
+    .tb-host{display:none}
     .body{padding:20px 14px 24px}
     .hero{gap:12px}
     .hero img{width:60px;height:60px}
@@ -203,9 +214,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="window">
 
     <div class="titlebar">
-      <span class="tb-dots"><i></i><i></i><i></i></span>
-      <span class="tb-center">blackjack-coach — closed beta</span>
-      <span class="tb-right"><a href="/">chasecrawford.dev</a></span>
+      <div class="tb-left">
+        <span style="color:var(--green)">● LIVE</span>
+      </div>
+      <div class="tb-center"><span class="tb-host">chase@louisville · </span>blackjack-coach</div>
+      <div class="wcontrols" aria-hidden="true">
+        <span class="wctl">&#xFF3F;</span>
+        <span class="wctl">&#x25A1;</span>
+        <span class="wctl close">&times;</span>
+      </div>
     </div>
 
     <main class="body">
