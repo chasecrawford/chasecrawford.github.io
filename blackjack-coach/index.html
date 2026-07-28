@@ -71,9 +71,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     max-width:760px;margin-inline:auto;width:100%;
     display:flex;flex-direction:column;
   }
-  /* Mirrors the homepage titlebar exactly. The window controls are decorative
-     here (spans, aria-hidden) — a working close button on the page whose job is
-     recruiting testers would just lose testers. */
+  /* Mirrors the homepage titlebar, except the window controls are replaced by a
+     real way back to the site — this page is a leaf that people arrive at from a
+     shared link, so an escape hatch is worth more here than fake chrome. */
   .titlebar{
     display:flex;align-items:center;gap:12px;
     padding:0 0 0 14px;border-bottom:1px solid var(--line);
@@ -82,15 +82,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
   .tb-left{display:flex;gap:14px;align-items:center;flex:0 0 auto}
   .tb-center{flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .wcontrols{display:flex;align-items:stretch;height:32px;flex:0 0 auto}
-  .wctl{
-    display:flex;align-items:center;justify-content:center;
-    width:40px;height:100%;color:var(--ink2);font-size:12px;
-    user-select:none;cursor:default;
+  .tb-home{
+    display:flex;align-items:center;gap:8px;flex:0 0 auto;
+    height:32px;padding:0 14px;
+    color:var(--ink2);font-size:12px;letter-spacing:.15em;text-transform:uppercase;
+    white-space:nowrap;border-bottom:0;
     transition:background .12s, color .12s;
   }
-  .wctl:hover{background:#151515;color:var(--ink)}
-  .wctl.close:hover{background:#c42b1c;color:#fff}
+  .tb-home:hover{background:#151515;color:var(--green);border-bottom:0}
+  .tb-home-short{display:none}
 
   .body{padding:24px 20px 28px}
 
@@ -192,9 +192,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   @media (max-width:520px){
     /* The homepage titlebar wraps to three lines at this width. Dropping the
-       host prefix keeps the bar one line tall on the phones most testers use,
-       while desktop stays identical to the homepage. */
+       host prefix and shortening the return link keeps this bar one line tall on
+       the phones most testers use, while desktop stays identical. */
     .tb-host{display:none}
+    .tb-home-full{display:none}
+    .tb-home-short{display:inline}
+    .tb-home{padding:0 12px;gap:6px}
     .body{padding:20px 14px 24px}
     .hero{gap:12px}
     .hero img{width:60px;height:60px}
@@ -218,11 +221,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span style="color:var(--green)">● LIVE</span>
       </div>
       <div class="tb-center"><span class="tb-host">chase@louisville · </span>blackjack-coach</div>
-      <div class="wcontrols" aria-hidden="true">
-        <span class="wctl">&#xFF3F;</span>
-        <span class="wctl">&#x25A1;</span>
-        <span class="wctl close">&times;</span>
-      </div>
+      <a class="tb-home" href="/">
+        <span aria-hidden="true">&larr;</span>
+        <span class="tb-home-full">chasecrawford.dev</span>
+        <span class="tb-home-short">home</span>
+      </a>
     </div>
 
     <main class="body">
