@@ -1,32 +1,7 @@
 {
   "start_date": "2026-04-22",
-  "as_of": "2026-07-24T00:00:00+00:00",
+  "as_of": "2026-07-31T00:00:00+00:00",
   "snapshots": [
-    {
-      "date": "2026-04-29",
-      "equity": 5016.67,
-      "spy_equity": 5002.6
-    },
-    {
-      "date": "2026-04-30",
-      "equity": 5125.21,
-      "spy_equity": 5052.38
-    },
-    {
-      "date": "2026-05-01",
-      "equity": 5194.94,
-      "spy_equity": 5066.37
-    },
-    {
-      "date": "2026-05-05",
-      "equity": 5235.88,
-      "spy_equity": 5088.3
-    },
-    {
-      "date": "2026-05-06",
-      "equity": 5460.58,
-      "spy_equity": 5159.02
-    },
     {
       "date": "2026-05-07",
       "equity": 5565.0,
@@ -301,17 +276,43 @@
       "date": "2026-07-24",
       "equity": 6077.54,
       "spy_equity": 5208.26
+    },
+    {
+      "date": "2026-07-27",
+      "equity": 5858.72,
+      "spy_equity": 5209.39
+    },
+    {
+      "date": "2026-07-28",
+      "equity": 5767.11,
+      "spy_equity": 5221.87
+    },
+    {
+      "date": "2026-07-29",
+      "equity": 5560.28,
+      "spy_equity": 5141.51
+    },
+    {
+      "date": "2026-07-30",
+      "equity": 5527.97,
+      "spy_equity": 5227.72
+    },
+    {
+      "date": "2026-07-31",
+      "equity": 5499.74,
+      "spy_equity": 5265.35
     }
   ],
   "positions": [
-    "AMAT",
     "AMD",
+    "CVS",
     "DD",
-    "DELL",
-    "HPE",
+    "HUM",
     "MPC",
-    "MU",
     "NTAP",
-    "TXN"
+    "NUE",
+    "TGT",
+    "UNH",
+    "VLO"
   ]
 }
