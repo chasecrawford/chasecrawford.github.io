@@ -451,12 +451,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   /* footer: stats + caption on one row at desktop, stacked on narrow screens */
   .equity-footer{
     display:flex;flex-direction:row;align-items:center;
-    justify-content:space-between;
+    justify-content:space-between;flex-wrap:wrap;gap:6px;
     border-top:1px dashed var(--line);padding-top:10px;
   }
   /* strip the border/padding that .proj-stats normally carries — footer owns it */
   .proj-chart .proj-stats{justify-content:center;flex-wrap:nowrap;flex-shrink:0;gap:8px;border:none;padding:0;margin:0}
-  .equity-caption{font-size:12px;color:var(--ink2);letter-spacing:.05em;white-space:nowrap}
+  /* container wraps between segments; each span (account line / data-through
+     date) stays intact so line breaks land on the "·" separator */
+  .equity-caption{font-size:12px;color:var(--ink2);letter-spacing:.05em;text-align:right;min-width:0}
+  .equity-caption span{white-space:nowrap}
   /* 7D / 30D toggle pill in the card header */
   .equity-toggle{display:inline-flex;border:1px solid var(--line);border-radius:3px;overflow:hidden}
   .equity-toggle button{
@@ -645,6 +648,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
     .equity-positions .sep{display:none}
     .equity-footer{flex-direction:column;align-items:center;gap:6px}
+    .equity-caption{text-align:center}
     .proj-chart .proj-stats{flex-direction:column;align-items:center;gap:6px}
   }
   @media (max-width:720px){
@@ -1339,21 +1343,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     };
 
     // Filter allSnaps to entries whose date falls within `days` calendar days
-    // of today's real wall-clock date -- NOT the most recent snapshot. If the
-    // weekly publish job falls behind, the window should shrink (or empty
-    // out) rather than quietly re-centering on stale data.
+    // of the NEWEST snapshot -- not today's wall-clock date. The publish job
+    // runs weekly, so a wall-clock window starves to 0 points by Friday; the
+    // "data through <date>" caption is what discloses staleness instead.
     function sliceByDays(days) {
       if (!allSnaps.length) return allSnaps;
-      const now = new Date();
-      const cutoff = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() - (days - 1)));
+      const [ly, lm, ld] = allSnaps[allSnaps.length - 1].date.split('-').map(Number);
+      const cutoff = Date.UTC(ly, lm - 1, ld - (days - 1));
       return allSnaps.filter(s => {
         const [y, m, d] = s.date.split('-').map(Number);
-        return new Date(Date.UTC(y, m - 1, d)) >= cutoff;
+        return Date.UTC(y, m - 1, d) >= cutoff;
       });
     }
 
     if (data.start_date) {
-      sinceEl.textContent = '$5,000 paper account · opened ' + data.start_date;
+      // Two nowrap <span>s so narrow screens wrap at the separator, not
+      // mid-phrase (the container allows wrapping; each segment doesn't).
+      const seg1 = document.createElement('span');
+      seg1.textContent = '$5,000 paper account · opened ' + data.start_date;
+      sinceEl.replaceChildren(seg1);
+      if (allSnaps.length) {
+        const seg2 = document.createElement('span');
+        seg2.textContent = '· data through ' + fmtDate(allSnaps[allSnaps.length - 1].date);
+        sinceEl.append(' ', seg2);
+      }
     }
 
     // Wire toggle buttons before first render so clicks work immediately.
