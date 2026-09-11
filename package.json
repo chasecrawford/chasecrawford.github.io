@@ -1,0 +1,13 @@
+{
+  "name": "chasecrawford-dev-html",
+  "private": true,
+  "description": "Dev tooling only. The site itself is static and has no build step.",
+  "scripts": {
+    "serve": "http-server -p 4173 -c-1 .",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "http-server": "^14.1.1"
+  }
+}
