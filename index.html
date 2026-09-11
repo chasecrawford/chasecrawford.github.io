@@ -19,11 +19,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root{
+    /* Channel triplet, so every translucent green is rgba(var(--green-rgb), a)
+       instead of a fresh literal per alpha value. */
+    --green-rgb:0,255,65;
     --bg:#020803; --panel:rgba(0,18,7,0.75); --panel-solid:#001207;
     --green:#00ff41; --ink:#b6ffc9;
     --dim-1:#8affa8; --dim-2:#5ec97b; --dim-3:#3fa05c; --dim-4:#2f7a4a;
     --amber:#ffd75e; --blue:#4aa8d8;
-    --line:rgba(0,255,65,0.25); --line-strong:rgba(0,255,65,0.5);
+    --nav-bg:#031208; --nav-bg-hover:#06240f;
+    --line:rgba(var(--green-rgb),0.25); --line-strong:rgba(var(--green-rgb),0.5);
   }
   *,*::before,*::after{box-sizing:border-box}
   html{overflow-x:hidden}
@@ -49,10 +53,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .boot{position:fixed;inset:0;z-index:60;background:#000;display:flex;align-items:flex-start;
         padding:48px;cursor:pointer;transition:opacity .9s ease;
         font-size:clamp(18px,3vw,30px);color:#22ff55;
-        text-shadow:0 0 8px rgba(0,255,65,.8),0 0 24px rgba(0,255,65,.4)}
+        text-shadow:0 0 8px rgba(var(--green-rgb),.8),0 0 24px rgba(var(--green-rgb),.4)}
   .boot-cursor{display:inline-block;width:.55em;height:1.1em;background:#22ff55;
         vertical-align:text-bottom;margin-left:2px;animation:blink 1s infinite;
-        box-shadow:0 0 8px rgba(0,255,65,.8)}
+        box-shadow:0 0 8px rgba(var(--green-rgb),.8)}
   @media (prefers-reduced-motion:reduce){ .boot-cursor{animation:none} }
 
   .section{min-height:100vh;box-sizing:border-box;scroll-snap-align:start}
@@ -61,21 +65,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .hero-right{flex:1 1 320px;max-width:440px;min-width:280px}
   .name{font-family:'Share Tech Mono',monospace;font-size:clamp(44px,8vw,96px);line-height:1;
         margin:0;color:var(--green);letter-spacing:.01em;
-        text-shadow:0 0 24px rgba(0,255,65,.55),0 0 90px rgba(0,255,65,.25)}
+        text-shadow:0 0 24px rgba(var(--green-rgb),.55),0 0 90px rgba(var(--green-rgb),.25)}
   .name-line{display:block;white-space:nowrap}
   .role{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
         font-size:13px;letter-spacing:.14em;color:var(--dim-1)}
   .role-sep{color:var(--dim-4)}
   .nav{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:13px}
-  .nav-btn{background:#031208;border:1px solid rgba(0,255,65,.2);padding:10px 18px;
+  .nav-btn{background:var(--nav-bg);border:1px solid rgba(var(--green-rgb),.2);padding:10px 18px;
            color:var(--dim-1);letter-spacing:.1em}
-  .nav-btn:hover{background:#06240f;border-color:rgba(0,255,65,.6);color:var(--green);
-           box-shadow:0 0 18px rgba(0,255,65,.35);text-decoration:none}
+  .nav-btn:hover{background:var(--nav-bg-hover);border-color:rgba(var(--green-rgb),.6);color:var(--green);
+           box-shadow:0 0 18px rgba(var(--green-rgb),.35);text-decoration:none}
   .nav-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-  .panel{border:1px solid rgba(0,255,65,.3);background:var(--panel);backdrop-filter:blur(3px);
-         box-shadow:0 0 32px rgba(0,255,65,.12)}
+  .panel{border:1px solid rgba(var(--green-rgb),.3);background:var(--panel);backdrop-filter:blur(3px);
+         box-shadow:0 0 32px rgba(var(--green-rgb),.12)}
   .panel-head{display:flex;justify-content:space-between;padding:8px 12px;
-         border-bottom:1px solid rgba(0,255,65,.2);
+         border-bottom:1px solid rgba(var(--green-rgb),.2);
          font-size:10px;letter-spacing:.14em;color:var(--dim-3)}
   .trace-frame{position:relative;aspect-ratio:4/3;overflow:hidden;max-width:100%}
 </style>
@@ -137,6 +141,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         var x = i * PITCH, y = drops[i] * PITCH;
         ctx.fillStyle = 'rgba(180,255,200,' + OPACITY + ')';
         ctx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], x, y);
+        // JS string, not CSS — var(--green-rgb) would not resolve here, so this literal stays.
         ctx.fillStyle = 'rgba(0,255,65,' + (OPACITY * 0.55) + ')';
         ctx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], x, y - PITCH);
         drops[i] = (y > c.height && Math.random() > 0.975) ? 0 : drops[i] + 1;
