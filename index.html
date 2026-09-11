@@ -26,7 +26,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     --green-rgb:0,255,65;
     --bg:#020803; --panel:rgba(0,18,7,0.75); --panel-solid:#001207;
     --green:#00ff41; --ink:#b6ffc9;
-    --dim-1:#8affa8; --dim-2:#5ec97b; --dim-3:#3fa05c; --dim-4:#2f7a4a;
+    --dim-1:#8affa8; --dim-2:#5ec97b; --dim-3:#3fa05c; --dim-4:#378d53;
     --amber:#ffd75e; --blue:#4aa8d8;
     --nav-bg:#031208; --nav-bg-hover:#06240f;
     --line:rgba(var(--green-rgb),0.25); --line-strong:rgba(var(--green-rgb),0.5);
@@ -187,6 +187,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .clink-k{font-size:11px;letter-spacing:.14em;color:var(--dim-3)}
   .clink-v{color:var(--ink-bright)}
 
+  .wrap :focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+  @media (max-width:480px){
+    .name{font-size:clamp(30px,11vw,44px)}
+  }
   @media (max-width:768px){
     html{scroll-snap-type:none}
     :root{--proj-row:auto;--graph-col:auto;--graph-row:auto;--vr-disp:none}
@@ -247,7 +252,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="proj-stack"><span class="chip">PYTHON</span><span class="chip">SQLITE</span><span class="chip">ALPACA</span><span class="chip">YFINANCE</span></div>
       <div class="proj-links">
         <a class="proj-link" href="https://github.com/chasecrawford/bot-trader" target="_blank" rel="noopener">→ github.com/chasecrawford/bot-trader</a>
-        <button type="button" id="viewResults" class="proj-link proj-toggle" hidden>→ view results</button>
+        <button type="button" id="viewResults" class="proj-link proj-toggle" hidden aria-expanded="false">→ view results</button>
       </div>
     </div>
 
@@ -255,9 +260,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="equity-head">
         <span class="equity-title">PAPER TRADING TRIAL NO. 2</span>
         <div class="equity-range" id="equityToggle" role="group" aria-label="Chart window">
-          <button type="button" class="range-btn" data-days="7">7D</button>
-          <button type="button" class="range-btn" data-days="30">30D</button>
-          <button type="button" class="range-btn is-active" data-days="60">60D</button>
+          <button type="button" class="range-btn" data-days="7" aria-pressed="false">7D</button>
+          <button type="button" class="range-btn" data-days="30" aria-pressed="false">30D</button>
+          <button type="button" class="range-btn is-active" data-days="60" aria-pressed="true">60D</button>
           <button type="button" id="equityDismiss" class="range-btn equity-close" aria-label="Close results">✕</button>
         </div>
       </div>
@@ -497,7 +502,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     function setActiveDays(days){
       toggle.querySelectorAll('button[data-days]').forEach(function(x){
-        x.classList.toggle('is-active', Number(x.dataset.days) === days);
+        var active = Number(x.dataset.days) === days;
+        x.classList.toggle('is-active', active);
+        x.setAttribute('aria-pressed', active ? 'true' : 'false');
       });
     }
 
@@ -596,10 +603,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         });
 
         btn.addEventListener('click', function(){
-          panel.hidden = false; setOthers(true); render(60);
+          panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); setOthers(true); render(60);
         });
         document.getElementById('equityDismiss').addEventListener('click', function(){
-          panel.hidden = true; setOthers(false);
+          panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); setOthers(false);
         });
 
         // Render once, eagerly, regardless of a click: below 768px the CSS
