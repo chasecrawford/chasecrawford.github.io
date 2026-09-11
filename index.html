@@ -159,6 +159,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .equity-holding[hidden]{display:none}
   .equity-empty{font-size:12px;color:var(--dim-3);padding:24px 0;text-align:center}
 
+  .gal-section{display:flex;flex-direction:column;justify-content:center;padding:48px 0}
+  .gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+  .gframe{margin:0}
+  .gframe-box{aspect-ratio:1;border:1px solid var(--line);max-width:100%;overflow:hidden}
+  .gframe-img{width:100%;height:100%;object-fit:cover;display:block;
+      filter:grayscale(1) sepia(1) hue-rotate(65deg) saturate(1.6) brightness(.95)}
+  .gframe-cap{font-size:11px;color:var(--dim-3);letter-spacing:.12em;margin-top:8px}
+
   @media (max-width:768px){
     html{scroll-snap-type:none}
     :root{--proj-row:auto;--graph-col:auto;--graph-row:auto;--vr-disp:none}
@@ -283,6 +291,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </section>
+
+<section id="photos" class="section gal-section" data-screen-label="photos">
+  <div class="prompt"><span class="prompt-user">chase@localhost</span><span class="prompt-path">:~/photos</span> ❯ <span>open *.jpg</span></div>
+  <div class="gal">
+    <figure class="gframe">
+      <div class="gframe-box"><img class="gframe-img" src="images/xmas-25.jpg" alt="Christmas 2025" loading="lazy" decoding="async"></div>
+      <figcaption class="gframe-cap">02 · XMAS '25</figcaption>
+    </figure>
+    <figure class="gframe">
+      <div class="gframe-box"><img class="gframe-img" src="images/halloween-25.jpg" alt="Halloween 2025" loading="lazy" decoding="async"></div>
+      <figcaption class="gframe-cap">03 · HALLOWEEN '25</figcaption>
+    </figure>
+    <figure class="gframe">
+      <div class="gframe-box"><img class="gframe-img" src="images/lilo-25.jpg" alt="Lilo 2025" loading="lazy" decoding="async"></div>
+      <figcaption class="gframe-cap">04 · LILO '25</figcaption>
+    </figure>
+    <figure class="gframe">
+      <div class="gframe-box"><img class="gframe-img" src="images/nox-25.jpg" alt="Nox 2025" loading="lazy" decoding="async"></div>
+      <figcaption class="gframe-cap">05 · NOX '25</figcaption>
+    </figure>
+  </div>
+</section>
+
 </div>
 
 <script>
