@@ -11,6 +11,18 @@ test.describe('trace map', () => {
     await expect(page.locator('#trace .map-label')).toContainText('LOUISVILLE, KY');
   });
 
+  test('fills its frame — actual layout, not just DOM/state', async ({ page }) => {
+    await page.goto('/index.html');
+    await dismissBoot(page);
+    await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 45000 });
+    const frameBox = await page.locator('#trace').boundingBox();
+    const mapBox = await page.locator('#trace matrix-map').boundingBox();
+    expect(mapBox.width).toBeGreaterThan(0);
+    expect(mapBox.height).toBeGreaterThan(0);
+    expect(Math.abs(mapBox.width - frameBox.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(mapBox.height - frameBox.height)).toBeLessThanOrEqual(2);
+  });
+
   test('keeps tile attribution visible', async ({ page }) => {
     await page.goto('/index.html');
     await dismissBoot(page);

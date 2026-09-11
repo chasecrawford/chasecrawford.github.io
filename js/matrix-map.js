@@ -8,7 +8,11 @@
       if (this._init) return;
       this._init = true;
       this.style.display = 'block';
-      this.style.position = 'relative';
+      // Only self-position if nothing else has. The page's stylesheet sets
+      // `position:absolute;inset:0` so the element fills its frame; an
+      // unconditional inline `relative` here would outrank that and collapse
+      // the map to zero height.
+      if (getComputedStyle(this).position === 'static') this.style.position = 'relative';
       const deadline = Date.now() + 5000;
       const wait = () => {
         if (window.d3 && window.topojson && window.L) return this.build();
