@@ -91,6 +91,8 @@ The export is a Claude Design canvas document. `<x-dc>`, `<sc-if>`, `<sc-for>`, 
 
 `.rain` `.vignette` `.scanlines` `.wrap` `.boot` `.boot-cursor` `.section` `.hero` `.hero-left` `.hero-right` `.name` `.name-line` `.role` `.nav` `.nav-btn` `.panel` `.panel-head` `.trace-frame` `.prompt` `.prompt-user` `.prompt-path` `.subtitle` `.proj-grid` `.proj` `.proj-head` `.proj-idx` `.proj-name` `.proj-badge` `.proj-badge--live` `.proj-badge--beta` `.proj-desc` `.proj-note` `.proj-stack` `.chip` `.proj-links` `.proj-link` `.equity` `.equity-head` `.equity-title` `.equity-range` `.range-btn` `.range-btn.is-active` `.equity-legend` `.equity-plot` `.equity-hi` `.equity-lo` `.equity-dates` `.equity-stats` `.equity-caption` `.equity-holding` `.equity-empty` `.gal` `.gframe` `.gframe-img` `.gframe-cap` `.contact-grid` `.clink` `.clink-k` `.clink-v`
 
+**Never assert `toBeHidden()` alone.** Playwright treats a locator matching **zero** elements as hidden, so `await expect(page.locator('#x')).toBeHidden()` passes against a page where `#x` was deleted entirely — the assertion cannot fail for the reason you care about. Everywhere this plan expects an element to exist but be invisible, pair it: `toBeAttached()` first, then `toBeHidden()`. Use a bare `toBeHidden()` only when the element's *absence* is genuinely an acceptable outcome.
+
 **Commit style:** Conventional Commits. Every commit message ends with:
 
 ```
@@ -979,12 +981,14 @@ test.describe('equity panel', () => {
   });
 
   test('is hidden until results are requested', async ({ page }) => {
+    await expect(page.locator('#equity')).toBeAttached();
     await expect(page.locator('#equity')).toBeHidden();
   });
 
   test('toggling results swaps the other two cards out and back', async ({ page }) => {
     await expect(page.locator('.proj--other').first()).toBeVisible();
     await openResults(page);
+    await expect(page.locator('.proj--other').first()).toBeAttached();
     await expect(page.locator('.proj--other').first()).toBeHidden();
     await page.locator('#equityDismiss').click();
     await expect(page.locator('#equity')).toBeHidden();
@@ -1041,6 +1045,9 @@ test.describe('equity panel', () => {
     await page.route('**/json/paper-equity.json', (r) => r.abort());
     await page.reload();
     await dismissBoot(page);
+    // The button must still exist and merely be hidden — a bare toBeHidden()
+    // would also pass if the whole card vanished.
+    await expect(page.locator('#viewResults')).toBeAttached();
     await expect(page.locator('#viewResults')).toBeHidden();
     await expect(page.locator('.proj--other').first()).toBeVisible();
     await expect(page.locator('#projects .proj-name').first()).toHaveText('bot-trader');
@@ -1644,6 +1651,7 @@ test.describe('trace map', () => {
     await page.goto('/index.html');
     await dismissBoot(page);
     await page.waitForFunction(() => window.__mapState === 'failed', null, { timeout: 15000 });
+    await expect(page.locator('.hero-right')).toBeAttached();
     await expect(page.locator('.hero-right')).toBeHidden();
     await expect(page.locator('#name')).toBeVisible();
   });
@@ -1834,6 +1842,7 @@ test.describe('mobile layout rules', () => {
     const snap = await page.evaluate(() =>
       getComputedStyle(document.documentElement).scrollSnapType);
     expect(snap === 'none' || snap === '').toBe(true);
+    await expect(page.locator('#viewResults')).toBeAttached();
     await expect(page.locator('#viewResults')).toBeHidden();
   });
 });
