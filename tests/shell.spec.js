@@ -28,7 +28,7 @@ test.describe('page shell', () => {
 
   test('ships no design-canvas runtime constructs', async ({ page }) => {
     const html = await page.content();
-    for (const marker of ['<x-dc', '<sc-if', '<sc-for', 'style-hover', 'support.js', 'image-slot.js']) {
+    for (const marker of ['<x-dc', '<sc-if', '<sc-for', '{{', 'style-hover', 'support.js', 'image-slot.js']) {
       expect(html).not.toContain(marker);
     }
   });
