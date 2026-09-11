@@ -181,10 +181,15 @@ Changes:
 
 1. **Vendored dependencies.** Commit pinned Leaflet 1.9.4 (JS + CSS), d3 7.9.0, and
    topojson-client 3.1.0 under `vendor/`. Load from there, not unpkg.
-2. **Trimmed atlas.** Replace the remote `us-atlas@3.0.1/counties-10m.json` (~1 MB) with a
-   locally committed file containing state geometry plus **Kentucky counties only** — the
-   county mesh is only visible at the end of the zoom, over Kentucky. Target well under
-   200 KB.
+2. **Vendored atlas, unmodified.** Commit `us-atlas@3.0.1/counties-10m.json` (~1 MB) whole to
+   `vendor/` and load it from there instead of jsDelivr. Trimming to Kentucky-only counties
+   was considered and **rejected** — full national county geometry is kept for fidelity.
+   Note that **both** the state outlines and the county mesh come from this one file, so the
+   entire vector layer waits on it — the trace cannot start early. The panel holds on
+   `ACQUIRING SIGNAL...` until the atlas resolves, then begins the zoom. This is confined to
+   the map custom element and must never block first paint or the boot sequence. Give the
+   file a `<link rel="preload" as="fetch" crossorigin>` hint so it starts early. GitHub Pages
+   serves it gzipped (~400 KB over the wire).
 3. **Attribution restored.** Leave `attributionControl` on, or render an equivalent static
    credit line for Esri World_Street_Map.
 4. **Bounded dependency wait.** Replace the unbounded `setTimeout(wait, 60)` poll with a
@@ -257,7 +262,7 @@ Discord is a `<button>` with click-to-copy, carried over from the current site.
 | `images/xmas-25.jpg`, `halloween-25.jpg`, `lilo-25.jpg`, `nox-25.jpg` | present |
 | `images/favicon.svg` | present, reused |
 | `vendor/leaflet.js`, `vendor/leaflet.css`, `vendor/d3.min.js`, `vendor/topojson-client.min.js` | to add |
-| `vendor/us-atlas-trimmed.json` | to generate |
+| `vendor/counties-10m.json` | to add — `us-atlas@3.0.1`, unmodified (~1 MB) |
 
 `vegas-26.png` blocks only the photos section. `DesignSync` reads cap at 256 KB with no
 download-to-disk, so it may need to be supplied manually. Implementation proceeds around it
