@@ -56,3 +56,19 @@ test.describe('boot overlay with reduced motion', () => {
     await expect(page.locator('#boot')).toBeHidden({ timeout: 3000 });
   });
 });
+
+test.describe('boot overlay with JavaScript disabled', () => {
+  test.use({ javaScriptEnabled: false });
+
+  // Without JS, endBoot() never runs -- #boot is the only thing standing
+  // between a no-JS visitor and an otherwise fully-degrading page. The
+  // <noscript><style> rule must hide it, and every other section must
+  // still be there and usable underneath.
+  test('the page is usable — no permanently black rectangle', async ({ page }) => {
+    await page.goto('/index.html');
+    await expect(page.locator('#boot')).toBeAttached();
+    await expect(page.locator('#boot')).toBeHidden();
+    await expect(page.locator('#contact .clink')).toHaveCount(7);
+    await expect(page.locator('#name')).toBeVisible();
+  });
+});

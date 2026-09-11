@@ -39,5 +39,7 @@ test.describe('photos', () => {
   test('nav anchor reaches the section', async ({ page }) => {
     await page.locator('.nav-btn[href="#photos"]').click();
     await expect(page.locator('#photos')).toBeInViewport({ timeout: 5000 });
+    // Spec §Accessibility: nav anchors move focus, not just scroll position.
+    await expect.poll(() => page.evaluate(() => document.activeElement.id)).toBe('photos');
   });
 });

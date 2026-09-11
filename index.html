@@ -146,7 +146,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
              cursor:pointer;letter-spacing:.08em}
   .range-btn.is-active{background:var(--green);color:var(--bg)}
   .range-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-  .equity-close{margin-left:6px;border-color:rgba(var(--green-rgb),.3)}
+  .equity-close{display:var(--vr-disp,inline-block);margin-left:6px;border-color:rgba(var(--green-rgb),.3)}
   .equity-strategy{font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--ink-bright)}
   .equity-legend{display:flex;gap:18px;font-size:12px}
   .lg-strat{color:var(--chart-strat)} .lg-spy{color:var(--blue)}
@@ -208,6 +208,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TMFW9FK"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+<!-- With JavaScript off, endBoot() never runs -- without this the boot
+     overlay would be a permanently black rectangle over an otherwise
+     fully-degrading page. -->
+<noscript><style>#boot{display:none}</style></noscript>
 
 <div id="boot" class="boot"><div><span id="bootLine"></span><span class="boot-cursor"></span></div></div>
 <canvas id="rain" class="rain" aria-hidden="true"></canvas>
@@ -234,7 +238,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </header>
 
-<section id="projects" class="section proj-section" data-screen-label="projects">
+<section id="projects" class="section proj-section" data-screen-label="projects" tabindex="-1">
   <div>
     <div class="prompt"><span class="prompt-user">chase@localhost</span><span class="prompt-path">:~/projects</span> ❯ <span>ls --featured</span></div>
     <div class="subtitle">2 open source · 1 in closed beta</div>
@@ -251,8 +255,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="proj-note">goal: beat SPY over full cycles. 19-yr backtest: +768% vs +615%, drawdown 34% vs 56%.</p>
       <div class="proj-stack"><span class="chip">PYTHON</span><span class="chip">SQLITE</span><span class="chip">ALPACA</span><span class="chip">YFINANCE</span></div>
       <div class="proj-links">
-        <a class="proj-link" href="https://github.com/chasecrawford/bot-trader" target="_blank" rel="noopener">→ github.com/chasecrawford/bot-trader</a>
-        <button type="button" id="viewResults" class="proj-link proj-toggle" hidden aria-expanded="false">→ view results</button>
+        <a href="https://github.com/chasecrawford/bot-trader" target="_blank" rel="noopener">→ github.com/chasecrawford/bot-trader</a>
+        <button type="button" id="viewResults" class="proj-toggle" hidden aria-expanded="false">→ view results</button>
       </div>
     </div>
 
@@ -296,7 +300,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="proj-note"><span class="lbl">running:</span> 3 live feeds — <a href="https://bsky.app/profile/chasecrawford.dev/feed/aaaps4w6ssniy" target="_blank" rel="noopener">UofL Football</a>, <a href="https://bsky.app/profile/chasecrawford.dev/feed/aaalxyswlqxco" target="_blank" rel="noopener">UofL Basketball</a>, <a href="https://bsky.app/profile/chasecrawford.dev/feed/aaaf2gyhpeav6" target="_blank" rel="noopener">Alien: Earth</a>.</p>
       <div class="proj-stack"><span class="chip">TYPESCRIPT</span><span class="chip">AT PROTOCOL</span><span class="chip">JETSTREAM</span><span class="chip">SQLITE</span></div>
       <div class="proj-links">
-        <a class="proj-link" href="https://github.com/chasecrawford/feeds-by-chase" target="_blank" rel="noopener">→ github.com/chasecrawford/feeds-by-chase</a>
+        <a href="https://github.com/chasecrawford/feeds-by-chase" target="_blank" rel="noopener">→ github.com/chasecrawford/feeds-by-chase</a>
       </div>
     </div>
 
@@ -310,14 +314,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="proj-note proj-note--beta"><span class="lede">RECRUITING TESTERS · NEEDS 12</span> <span class="rest">— Android phone + two minutes: opt in on Google Play, install, play now and then.</span></p>
       <div class="proj-stack"><span class="chip">REACT</span><span class="chip">PWA</span><span class="chip">TWA</span><span class="chip">CLOUDFLARE</span></div>
       <div class="proj-links">
-        <a class="proj-link" href="/blackjack-coach/">→ how to join the beta</a>
-        <a class="proj-link" href="https://blackjack.chasecrawford.dev/" target="_blank" rel="noopener">→ play in any browser</a>
+        <a href="/blackjack-coach/">→ how to join the beta</a>
+        <a href="https://blackjack.chasecrawford.dev/" target="_blank" rel="noopener">→ play in any browser</a>
       </div>
     </div>
   </div>
 </section>
 
-<section id="photos" class="section gal-section" data-screen-label="photos">
+<section id="photos" class="section gal-section" data-screen-label="photos" tabindex="-1">
   <div class="prompt"><span class="prompt-user">chase@localhost</span><span class="prompt-path">:~/photos</span> ❯ <span>open *.jpg</span></div>
   <div class="gal">
     <figure class="gframe">
@@ -339,7 +343,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
-<section id="contact" class="section contact-section" data-screen-label="contact">
+<section id="contact" class="section contact-section" data-screen-label="contact" tabindex="-1">
   <div class="prompt"><span class="prompt-user">chase@localhost</span><span class="prompt-path">:~</span> ❯ <span>contact --all</span></div>
   <div class="subtitle">7 endpoints · reply time ~24h</div>
   <div class="contact-grid">
@@ -360,44 +364,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   'use strict';
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ===== DIGITAL RAIN =====
-  var GLYPHS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ZXCVBNM$+*#';
-  var PITCH = 18, OPACITY = 0.3, FPS = 24;
-  (function rain(){
-    var c = document.getElementById('rain');
-    if (!c) return;
-    var ctx = c.getContext('2d'), drops = [];
-    function size(){
-      c.width = window.innerWidth; c.height = window.innerHeight;
-      var cols = Math.floor(c.width / PITCH);
-      drops = Array.from({length: cols}, function(){ return Math.random() * -c.height / PITCH; });
-    }
-    function draw(){
-      ctx.fillStyle = 'rgba(2,8,3,0.12)';
-      ctx.fillRect(0, 0, c.width, c.height);
-      ctx.font = '15px monospace';
-      for (var i = 0; i < drops.length; i++){
-        var x = i * PITCH, y = drops[i] * PITCH;
-        ctx.fillStyle = 'rgba(180,255,200,' + OPACITY + ')';
-        ctx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], x, y);
-        // JS string, not CSS — var(--green-rgb) would not resolve here, so this literal stays.
-        ctx.fillStyle = 'rgba(0,255,65,' + (OPACITY * 0.55) + ')';
-        ctx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], x, y - PITCH);
-        drops[i] = (y > c.height && Math.random() > 0.975) ? 0 : drops[i] + 1;
-      }
-    }
-    size();
-    window.addEventListener('resize', size);
-    if (reduced) { draw(); return; }   // one static frame, no animation loop
-    var last = 0;
-    (function step(t){
-      requestAnimationFrame(step);
-      if (t - last < 1000 / FPS) return;
-      last = t; draw();
-    })(0);
-  })();
-
   // ===== BOOT =====
+  // Runs first, ahead of every other feature IIFE below (in particular the
+  // rain, which -- in the reduced-motion path -- calls draw() synchronously
+  // and would throw before this ever ran if it were downstream). Dismissal
+  // must never depend on decorative code succeeding.
   var BOOT_LINE = 'The Matrix has you...';
   (function boot(){
     var el = document.getElementById('boot');
@@ -435,6 +406,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
     }
     timer = setTimeout(type, 2600);
+  })();
+
+  // ===== DIGITAL RAIN =====
+  var GLYPHS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ZXCVBNM$+*#';
+  var PITCH = 18, OPACITY = 0.3, FPS = 24;
+  (function rain(){
+    var c = document.getElementById('rain');
+    if (!c) return;
+    var ctx = c.getContext('2d'), drops = [];
+    function size(){
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      var cols = Math.floor(c.width / PITCH);
+      drops = Array.from({length: cols}, function(){ return Math.random() * -c.height / PITCH; });
+    }
+    function draw(){
+      ctx.fillStyle = 'rgba(2,8,3,0.12)';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.font = '15px monospace';
+      for (var i = 0; i < drops.length; i++){
+        var x = i * PITCH, y = drops[i] * PITCH;
+        ctx.fillStyle = 'rgba(180,255,200,' + OPACITY + ')';
+        ctx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], x, y);
+        // JS string, not CSS — var(--green-rgb) would not resolve here, so this literal stays.
+        ctx.fillStyle = 'rgba(0,255,65,' + (OPACITY * 0.55) + ')';
+        ctx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], x, y - PITCH);
+        drops[i] = (y > c.height && Math.random() > 0.975) ? 0 : drops[i] + 1;
+      }
+    }
+    size();
+    // Reduced motion draws exactly one static frame via the initial call
+    // below, and never runs the rAF loop that would otherwise redraw it --
+    // so a resize (which clears the canvas via size()'s width/height
+    // reassignment) must explicitly redraw that frame or it is lost for good.
+    window.addEventListener('resize', function(){ size(); if (reduced) draw(); });
+    if (reduced) { draw(); return; }   // one static frame, no animation loop
+    var last = 0;
+    (function step(t){
+      requestAnimationFrame(step);
+      if (t - last < 1000 / FPS) return;
+      last = t; draw();
+    })(0);
   })();
 
   // ===== NAME SCRAMBLE =====

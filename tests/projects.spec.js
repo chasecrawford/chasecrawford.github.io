@@ -40,5 +40,11 @@ test.describe('projects', () => {
   test('nav anchor reaches the section', async ({ page }) => {
     await page.locator('.nav-btn[href="#projects"]').click();
     await expect(page.locator('#projects')).toBeInViewport({ timeout: 5000 });
+    // Spec §Accessibility: nav anchors move focus, not just scroll position.
+    await expect.poll(() => page.evaluate(() => document.activeElement.id)).toBe('projects');
+  });
+
+  test('has no dead proj-link class in the markup', async ({ page }) => {
+    expect(await page.locator('.proj-link').count()).toBe(0);
   });
 });

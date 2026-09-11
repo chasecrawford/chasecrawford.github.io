@@ -189,6 +189,19 @@ test.describe('equity panel', () => {
     await expect(page.locator('.proj--other').last()).toBeVisible();
   });
 
+  // The ✕ used to be a dead control at this width: it visually sat outside
+  // the --vr-disp:none mechanism that hides #viewResults, so a mobile
+  // visitor could tap a close button that did nothing (the mobile CSS
+  // override always forces the panel back open). It must disappear with the
+  // rest of the open/close affordance instead of staying as inert chrome.
+  test('the close control disappears with the rest of the toggle affordance on phone widths', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/index.html');
+    await dismissBoot(page);
+    await expect(page.locator('#equityDismiss')).toBeAttached();
+    await expect(page.locator('#equityDismiss')).toBeHidden();
+  });
+
   test('a failed fetch hides the panel without breaking the other cards', async ({ page }) => {
     await page.route('**/json/paper-equity.json', (r) => r.abort());
     await page.reload();
