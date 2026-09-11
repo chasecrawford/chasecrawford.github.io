@@ -1885,6 +1885,18 @@ test.describe('page health', () => {
     await expect(page.locator('h1')).toHaveText(/CHASE\s*CRAWFORD/);
   });
 
+  // Task 5's review noted the equity controls convey state by colour alone.
+  test('equity controls expose their state to assistive tech', async ({ page }) => {
+    await page.goto('/index.html');
+    await dismissBoot(page);
+    await expect(page.locator('#viewResults')).toHaveAttribute('aria-expanded', 'false');
+    await page.locator('#viewResults').click();
+    await expect(page.locator('#viewResults')).toHaveAttribute('aria-expanded', 'true');
+    const pressed = await page.locator('#equityToggle button[data-days]').evaluateAll((els) =>
+      els.map((e) => e.getAttribute('aria-pressed')));
+    expect(pressed).toEqual(['false', 'false', 'true']);   // 7D, 30D, 60D — 60D is the default
+  });
+
   test('interactive controls are keyboard reachable', async ({ page }) => {
     await page.goto('/index.html');
     await dismissBoot(page);
@@ -1946,6 +1958,13 @@ Add to the `<style>` block:
   }
   .wrap :focus-visible{outline:2px solid var(--green);outline-offset:2px}
 ```
+
+Also add the ARIA state the equity controls lack (Task 5's review flagged that the active
+window is conveyed by colour alone):
+
+- `#viewResults` gets `aria-expanded`, toggled alongside the panel's `hidden` attribute.
+- Each `#equityToggle button[data-days]` gets `aria-pressed`, set in the same helper that
+  maintains the `is-active` class, so the two can never disagree.
 
 Then re-run and fix any remaining overflow the test reports — the likely candidates are `.equity-holding` (long symbol list) and `.equity-dates`; both already wrap or space-between, but confirm rather than assume.
 
