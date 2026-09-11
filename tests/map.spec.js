@@ -23,11 +23,66 @@ test.describe('trace map', () => {
     expect(Math.abs(mapBox.height - frameBox.height)).toBeLessThanOrEqual(2);
   });
 
-  test('keeps tile attribution visible', async ({ page }) => {
+  test('renders a legible, unfiltered Esri credit — not the occluded Leaflet control', async ({ page }) => {
     await page.goto('/index.html');
     await dismissBoot(page);
     await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 45000 });
-    await expect(page.locator('#trace .leaflet-control-attribution')).toContainText(/Esri/i);
+
+    // The old mechanism (Leaflet's own attribution control) must be gone —
+    // it rendered inside the invert-filtered tile layer, under the
+    // .map-label gradient, entirely illegible.
+    await expect(page.locator('#trace .leaflet-control-attribution')).toHaveCount(0);
+
+    const credit = page.locator('#trace .map-label-credit');
+    await expect(credit).toBeAttached();
+    await expect(credit).toBeVisible();
+    await expect(credit).toHaveText('Leaflet | Tiles © Esri');
+
+    const box = await credit.boundingBox();
+    expect(box.width).toBeGreaterThan(0);
+    expect(box.height).toBeGreaterThan(0);
+
+    // The credit must escape the swatch-inverting filter on the tile layer —
+    // walk its ancestors up to <matrix-map> and confirm none of them (nor it)
+    // carries a CSS filter. This is what would catch a regression where the
+    // credit gets moved back inside the filtered mapEl.
+    const escapesFilter = await page.evaluate(() => {
+      const el = document.querySelector('#trace .map-label-credit');
+      const root = document.querySelector('#trace matrix-map');
+      let node = el;
+      while (node && node !== root) {
+        if (getComputedStyle(node).filter !== 'none') return false;
+        node = node.parentElement;
+      }
+      return true;
+    });
+    expect(escapesFilter).toBe(true);
+
+    // .map-label's bounding rect and the credit are the same element family
+    // now (credit is a child span of .map-label) — confirm the credit's own
+    // rect doesn't collapse to zero inside it (the failure mode when a
+    // sibling status line pushes it off or a gradient box occludes it).
+    const labelBox = await page.locator('#trace .map-label').boundingBox();
+    expect(box.y + box.height).toBeLessThanOrEqual(labelBox.y + labelBox.height + 1);
+    expect(box.y).toBeGreaterThanOrEqual(labelBox.y - 1);
+  });
+
+  test('the Esri credit stays legible at phone width', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/index.html');
+    await dismissBoot(page);
+    await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 45000 });
+    const credit = page.locator('#trace .map-label-credit');
+    await expect(credit).toBeAttached();
+    await expect(credit).toBeVisible();
+    const box = await credit.boundingBox();
+    expect(box.width).toBeGreaterThan(0);
+    expect(box.height).toBeGreaterThan(0);
+    const traceBox = await page.locator('#trace').boundingBox();
+    // Fully inside the visible trace frame, not clipped off-screen or
+    // squeezed to nothing by the status text next to it.
+    expect(box.x).toBeGreaterThanOrEqual(traceBox.x - 1);
+    expect(box.x + box.width).toBeLessThanOrEqual(traceBox.x + traceBox.width + 1);
   });
 
   test('loads dependencies locally, never from a public CDN', async ({ page }) => {

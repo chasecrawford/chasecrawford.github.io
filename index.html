@@ -90,11 +90,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .trace-frame{position:relative;aspect-ratio:4/3;overflow:hidden;max-width:100%}
   #trace matrix-map{position:absolute;inset:0}
   .map-label{position:absolute;left:0;right:0;bottom:0;z-index:500;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:8px;
     font:11px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--green);
     padding:8px 12px;background:linear-gradient(transparent,rgba(0,8,3,.85));pointer-events:none}
-  .leaflet-control-attribution{background:rgba(2,8,3,.8)!important;color:var(--dim-3)!important;
-    font-size:9px!important}
-  .leaflet-control-attribution a{color:var(--dim-2)!important}
+  .map-label-status{min-width:0}
+  .map-label-credit{flex:none;font-size:9px;letter-spacing:.06em;color:var(--dim-2)}
 
   html{scroll-snap-type:y mandatory}
   .proj-section{display:flex;flex-direction:column;justify-content:center;padding:48px 0;gap:18px}

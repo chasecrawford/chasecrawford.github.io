@@ -32,13 +32,16 @@
       mapEl.style.cssText = 'position:absolute;inset:0;background:#020803;filter:invert(1) sepia(1) hue-rotate(65deg) saturate(3.2) brightness(0.85) contrast(1.15);opacity:0;transition:opacity 1.2s ease';
       this.appendChild(mapEl);
       const map = L.map(mapEl, {
-        center: LOU_LL, zoom: 12, zoomControl: false, attributionControl: true,
+        center: LOU_LL, zoom: 12, zoomControl: false, attributionControl: false,
         dragging: false, scrollWheelZoom: false, doubleClickZoom: false,
         boxZoom: false, keyboard: false, touchZoom: false, fadeAnimation: false
       });
+      // Esri's terms require visible attribution, but Leaflet's own attribution
+      // control renders inside mapEl -- under the invert/hue-rotate filter above,
+      // and occluded by the .map-label gradient. A static, unfiltered credit in
+      // the label (below) satisfies the terms; the control is not used.
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19,
-        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, USGS, NRCAN'
+        maxZoom: 19
       }).addTo(map);
       new ResizeObserver(() => map.invalidateSize({ animate: false })).observe(mapEl);
       setTimeout(() => map.invalidateSize({ animate: false }), 400);
@@ -82,16 +85,21 @@
 
       const label = document.createElement('div');
       label.className = 'map-label';
-      label.style.cssText = "position:absolute;left:0;right:0;bottom:0;z-index:500;font:11px 'IBM Plex Mono',monospace;letter-spacing:0.1em;color:#00ff41;padding:8px 12px;background:linear-gradient(transparent,rgba(0,8,3,0.85));pointer-events:none";
-      label.textContent = 'ACQUIRING SIGNAL...';
+      const status = document.createElement('span');
+      status.className = 'map-label-status';
+      status.textContent = 'ACQUIRING SIGNAL...';
+      const credit = document.createElement('span');
+      credit.className = 'map-label-credit';
+      credit.textContent = 'Leaflet | Tiles © Esri';
+      label.appendChild(status);
+      label.appendChild(credit);
       this.appendChild(label);
 
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (reduced) {
         svgWrap.style.opacity = '0';
         mapEl.style.opacity = '1';
-        label.className = 'map-label';
-        label.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY · 38.2527°N 85.7585°W';
+        status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY · 38.2527°N 85.7585°W';
         window.__mapState = 'locked';
         return;
       }
@@ -117,7 +125,7 @@
           .on('end', () => {
             svgWrap.style.opacity = '0';
             mapEl.style.opacity = '1';
-            label.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY · 38.2527°N 85.7585°W';
+            status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY · 38.2527°N 85.7585°W';
             window.__mapState = 'locked';
           });
       };
@@ -126,7 +134,7 @@
         counties.attr('opacity', 0);
         svgWrap.style.opacity = '1';
         mapEl.style.opacity = '0';
-        label.textContent = 'ACQUIRING SIGNAL...';
+        status.textContent = 'ACQUIRING SIGNAL...';
         window.__mapState = 'acquiring';
         setTimeout(zoomTo, 900);
       };
