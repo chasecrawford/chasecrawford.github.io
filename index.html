@@ -156,11 +156,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .equity-holding{border-top:1px solid rgba(var(--green-rgb),.2);padding-top:10px;font-size:12px;
              letter-spacing:.1em;color:var(--amber);display:flex;flex-wrap:wrap;gap:10px}
   .equity-holding .lbl{color:var(--amber-dim)}
+  .equity-holding[hidden]{display:none}
   .equity-empty{font-size:12px;color:var(--dim-3);padding:24px 0;text-align:center}
 
   @media (max-width:768px){
     html{scroll-snap-type:none}
     :root{--proj-row:auto;--graph-col:auto;--graph-row:auto;--vr-disp:none}
+    /* No toggle at this width (--vr-disp:none), so the panel must not depend on
+       one: show it stacked with the cards, matching the approved design. */
+    #equity[hidden]{display:flex}
+    .proj--other{display:flex}
   }
   @media (prefers-reduced-motion:reduce){ html{scroll-snap-type:none} }
 </style>
@@ -425,7 +430,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.documentElement.style.setProperty('--others-disp', hidden ? 'none' : 'flex');
     }
 
+    function setActiveDays(days){
+      toggle.querySelectorAll('button[data-days]').forEach(function(x){
+        x.classList.toggle('is-active', Number(x.dataset.days) === days);
+      });
+    }
+
     function render(days){
+      setActiveDays(days);
       var win = sliceByDays(days);
       var strat = document.getElementById('equityStrat');
       var spy   = document.getElementById('equitySpy');
@@ -441,6 +453,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           win.length === 1 ? usd2(win[0].equity) : '—';
         document.getElementById('equityClose').textContent =
           win.length === 1 ? usd2(win[0].equity) : '—';
+        document.getElementById('equityHi').textContent = '—';
+        document.getElementById('equityLo').textContent = '—';
         var empty = document.createElement('div');
         empty.className = 'equity-empty';
         empty.textContent = win.length === 0
@@ -452,20 +466,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
 
       var eq  = win.map(function(s){ return s.equity; });
-      var bm  = win.map(function(s){ return typeof s.spy_equity === 'number' ? s.spy_equity : null; })
-                   .filter(function(v){ return v !== null; });
-      var all = eq.concat(bm);
+      // Keep each SPY point's original index into `win` so a missing
+      // spy_equity mid-window doesn't compress the benchmark onto a
+      // different x-scale than the strategy line -- both must share the
+      // same x = i / (win.length - 1) * 600 mapping.
+      var bm  = win.map(function(s, i){
+        return typeof s.spy_equity === 'number' ? {i: i, v: s.spy_equity} : null;
+      }).filter(function(p){ return p !== null; });
+      var all = eq.concat(bm.map(function(p){ return p.v; }));
       var min = Math.min.apply(null, all), max = Math.max.apply(null, all);
       var span = (max - min) || 1;
-      var pts = function(arr){
-        return arr.map(function(v, i){
-          return (i / (arr.length - 1) * 600).toFixed(1) + ',' +
-                 (10 + (1 - (v - min) / span) * 200).toFixed(1);
-        }).join(' ');
-      };
-      var stratPts = pts(eq);
+      var yOf = function(v){ return (10 + (1 - (v - min) / span) * 200).toFixed(1); };
+      var xOf = function(i){ return (i / (win.length - 1) * 600).toFixed(1); };
+      var stratPts = eq.map(function(v, i){ return xOf(i) + ',' + yOf(v); }).join(' ');
+      var bmPts = bm.map(function(p){ return xOf(p.i) + ',' + yOf(p.v); }).join(' ');
       strat.setAttribute('points', stratPts);
-      spy.setAttribute('points', bm.length > 1 ? pts(bm) : '');
+      spy.setAttribute('points', bm.length > 1 ? bmPts : '');
       fill.setAttribute('points', '0,220 ' + stratPts + ' 600,220');
 
       document.getElementById('equityHi').textContent = usd0(max);
@@ -511,10 +527,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         toggle.addEventListener('click', function(e){
           var b = e.target.closest('button[data-days]');
           if (!b) return;
-          toggle.querySelectorAll('button[data-days]').forEach(function(x){
-            x.classList.remove('is-active');
-          });
-          b.classList.add('is-active');
           render(Number(b.dataset.days));
         });
 
@@ -524,6 +536,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         document.getElementById('equityDismiss').addEventListener('click', function(){
           panel.hidden = true; setOthers(false);
         });
+
+        // Render once, eagerly, regardless of a click: below 768px the CSS
+        // override (`#equity[hidden]{display:flex}`) shows the panel with no
+        // toggle to open it, so the chart must already hold real data by the
+        // time it becomes visible. Harmless on desktop -- the panel itself
+        // stays under [hidden] until #viewResults is clicked.
+        render(60);
 
         btn.hidden = false;
       })
