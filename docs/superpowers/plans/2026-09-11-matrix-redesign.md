@@ -78,8 +78,8 @@ The export is a Claude Design canvas document. `<x-dc>`, `<sc-if>`, `<sc-for>`, 
 | `--dim-4` | `#2f7a4a` |
 | `--amber` | `#ffd75e` |
 | `--blue` | `#4aa8d8` |
-| `--line` | `rgba(0,255,65,0.25)` |
-| `--line-strong` | `rgba(0,255,65,0.5)` |
+| `--line` | `rgba(var(--green-rgb),0.25)` |
+| `--line-strong` | `rgba(var(--green-rgb),0.5)` |
 
 **Fonts:** one Google Fonts request for `VT323`, `Share Tech Mono`, `IBM Plex Mono:wght@400;500;600`, keeping the existing `preconnect` pair. Body font is `'IBM Plex Mono', monospace`.
 
@@ -90,6 +90,8 @@ The export is a Claude Design canvas document. `<x-dc>`, `<sc-if>`, `<sc-for>`, 
 **CSS class vocabulary** — introduced in the task that first needs them, reused thereafter:
 
 `.rain` `.vignette` `.scanlines` `.wrap` `.boot` `.boot-cursor` `.section` `.hero` `.hero-left` `.hero-right` `.name` `.name-line` `.role` `.nav` `.nav-btn` `.panel` `.panel-head` `.trace-frame` `.prompt` `.prompt-user` `.prompt-path` `.subtitle` `.proj-grid` `.proj` `.proj-head` `.proj-idx` `.proj-name` `.proj-badge` `.proj-badge--live` `.proj-badge--beta` `.proj-desc` `.proj-note` `.proj-stack` `.chip` `.proj-links` `.proj-link` `.equity` `.equity-head` `.equity-title` `.equity-range` `.range-btn` `.range-btn.is-active` `.equity-legend` `.equity-plot` `.equity-hi` `.equity-lo` `.equity-dates` `.equity-stats` `.equity-caption` `.equity-holding` `.equity-empty` `.gal` `.gframe` `.gframe-img` `.gframe-cap` `.contact-grid` `.clink` `.clink-k` `.clink-v`
+
+**No raw palette literals in CSS.** The design export is inline-styled, so it repeats `rgba(0,255,65,…)` at a dozen different alpha values and scatters one-off hexes like `#031208`. Translated verbatim that would leave ~42 untokenized colors across the finished page, defeating the token layer and the repo's own stated styling idiom. Instead: `--green-rgb: 0,255,65` on `:root`, and every translucent green written `rgba(var(--green-rgb), α)`. Solid one-offs get their own token (`--nav-bg`, `--nav-bg-hover`). The single exception is the rain canvas's `ctx.fillStyle` string — that is JS, not CSS, so it stays literal with a comment saying why.
 
 **Never assert `toBeHidden()` alone.** Playwright treats a locator matching **zero** elements as hidden, so `await expect(page.locator('#x')).toBeHidden()` passes against a page where `#x` was deleted entirely — the assertion cannot fail for the reason you care about. Everywhere this plan expects an element to exist but be invisible, pair it: `toBeAttached()` first, then `toBeHidden()`. Use a bare `toBeHidden()` only when the element's *absence* is genuinely an acceptable outcome.
 
@@ -294,11 +296,15 @@ Read the export's `<helmet>` and outer wrapper for exact values. Produce this st
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root{
+    /* Channel triplet, so every translucent green is rgba(var(--green-rgb), a)
+       instead of a fresh literal per alpha value. */
+    --green-rgb:0,255,65;
     --bg:#020803; --panel:rgba(0,18,7,0.75); --panel-solid:#001207;
     --green:#00ff41; --ink:#b6ffc9;
     --dim-1:#8affa8; --dim-2:#5ec97b; --dim-3:#3fa05c; --dim-4:#2f7a4a;
     --amber:#ffd75e; --blue:#4aa8d8;
-    --line:rgba(0,255,65,0.25); --line-strong:rgba(0,255,65,0.5);
+    --nav-bg:#031208; --nav-bg-hover:#06240f;
+    --line:rgba(var(--green-rgb),0.25); --line-strong:rgba(var(--green-rgb),0.5);
   }
   *,*::before,*::after{box-sizing:border-box}
   html{overflow-x:hidden}
@@ -494,10 +500,10 @@ Append inside the existing `<style>`:
   .boot{position:fixed;inset:0;z-index:60;background:#000;display:flex;align-items:flex-start;
         padding:48px;cursor:pointer;transition:opacity .9s ease;
         font-size:clamp(18px,3vw,30px);color:#22ff55;
-        text-shadow:0 0 8px rgba(0,255,65,.8),0 0 24px rgba(0,255,65,.4)}
+        text-shadow:0 0 8px rgba(var(--green-rgb),.8),0 0 24px rgba(var(--green-rgb),.4)}
   .boot-cursor{display:inline-block;width:.55em;height:1.1em;background:#22ff55;
         vertical-align:text-bottom;margin-left:2px;animation:blink 1s infinite;
-        box-shadow:0 0 8px rgba(0,255,65,.8)}
+        box-shadow:0 0 8px rgba(var(--green-rgb),.8)}
   @media (prefers-reduced-motion:reduce){ .boot-cursor{animation:none} }
 ```
 
@@ -676,21 +682,21 @@ Read the export's hero inline styles for exact values; translate to:
   .hero-right{flex:1 1 320px;max-width:440px;min-width:280px}
   .name{font-family:'Share Tech Mono',monospace;font-size:clamp(44px,8vw,96px);line-height:1;
         margin:0;color:var(--green);letter-spacing:.01em;
-        text-shadow:0 0 24px rgba(0,255,65,.55),0 0 90px rgba(0,255,65,.25)}
+        text-shadow:0 0 24px rgba(var(--green-rgb),.55),0 0 90px rgba(var(--green-rgb),.25)}
   .name-line{display:block;white-space:nowrap}
   .role{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
         font-size:13px;letter-spacing:.14em;color:var(--dim-1)}
   .role-sep{color:var(--dim-4)}
   .nav{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:13px}
-  .nav-btn{background:#031208;border:1px solid rgba(0,255,65,.2);padding:10px 18px;
+  .nav-btn{background:var(--nav-bg);border:1px solid rgba(var(--green-rgb),.2);padding:10px 18px;
            color:var(--dim-1);letter-spacing:.1em}
-  .nav-btn:hover{background:#06240f;border-color:rgba(0,255,65,.6);color:var(--green);
-           box-shadow:0 0 18px rgba(0,255,65,.35);text-decoration:none}
+  .nav-btn:hover{background:var(--nav-bg-hover);border-color:rgba(var(--green-rgb),.6);color:var(--green);
+           box-shadow:0 0 18px rgba(var(--green-rgb),.35);text-decoration:none}
   .nav-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-  .panel{border:1px solid rgba(0,255,65,.3);background:var(--panel);backdrop-filter:blur(3px);
-         box-shadow:0 0 32px rgba(0,255,65,.12)}
+  .panel{border:1px solid rgba(var(--green-rgb),.3);background:var(--panel);backdrop-filter:blur(3px);
+         box-shadow:0 0 32px rgba(var(--green-rgb),.12)}
   .panel-head{display:flex;justify-content:space-between;padding:8px 12px;
-         border-bottom:1px solid rgba(0,255,65,.2);
+         border-bottom:1px solid rgba(var(--green-rgb),.2);
          font-size:10px;letter-spacing:.14em;color:var(--dim-3)}
   .trace-frame{position:relative;aspect-ratio:4/3;overflow:hidden;max-width:100%}
 ```
@@ -891,11 +897,11 @@ Note `/blackjack-coach/` is same-origin, so it correctly has no `target`/`rel`. 
              grid-auto-rows:var(--proj-row,minmax(480px,auto));gap:16px;align-items:stretch}
   .proj{border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(3px);
         padding:22px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
-  .proj:hover{border-color:rgba(0,255,65,.7);box-shadow:0 0 32px rgba(0,255,65,.15)}
+  .proj:hover{border-color:rgba(var(--green-rgb),.7);box-shadow:0 0 32px rgba(var(--green-rgb),.15)}
   .proj-head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   .proj-idx{color:var(--dim-4);font-size:12px}
   .proj-name{font-family:'VT323',monospace;font-size:26px;color:var(--green)}
-  .proj-badge{border:1px solid rgba(0,255,65,.35);padding:2px 8px;font-size:10px;
+  .proj-badge{border:1px solid rgba(var(--green-rgb),.35);padding:2px 8px;font-size:10px;
               color:var(--dim-1);letter-spacing:.1em}
   .proj-badge--live{color:var(--green)}
   .proj-badge--beta{border-color:rgba(255,196,0,.5);color:var(--amber)}
@@ -906,10 +912,10 @@ Note `/blackjack-coach/` is same-origin, so it correctly has no `target`/`rel`. 
   .proj-note--beta .lede{letter-spacing:.1em}
   .proj-note--beta .rest{color:var(--dim-1)}
   .proj-stack{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
-  .chip{background:rgba(0,255,65,.08);padding:3px 9px;font-size:10px;
+  .chip{background:rgba(var(--green-rgb),.08);padding:3px 9px;font-size:10px;
         color:var(--dim-2);letter-spacing:.08em}
   .proj-links{display:flex;flex-direction:column;gap:6px;font-size:12px;align-items:flex-start;
-              border-top:1px solid rgba(0,255,65,.15);padding-top:12px}
+              border-top:1px solid rgba(var(--green-rgb),.15);padding-top:12px}
   .proj-toggle{display:var(--vr-disp,block);background:none;border:none;padding:0;
                font-family:inherit;font-size:12px;color:var(--green);cursor:pointer;text-align:left}
   /* A class rule setting `display` beats the UA stylesheet's [hidden]{display:none},
@@ -1080,7 +1086,7 @@ Insert into `.proj-grid` immediately after the bot-trader card (replacing the Ta
   <div class="equity-plot">
     <svg id="equitySvg" viewBox="0 0 600 220" preserveAspectRatio="none" aria-hidden="true">
       <line x1="0" y1="10" x2="600" y2="10" stroke="rgba(160,180,165,0.5)" stroke-width="1.5" stroke-dasharray="7 6"></line>
-      <polygon id="equityFill" points="" fill="rgba(0,255,65,0.07)"></polygon>
+      <polygon id="equityFill" points="" fill="rgba(var(--green-rgb),0.07)"></polygon>
       <polyline id="equitySpy" points="" fill="none" stroke="#4aa8d8" stroke-width="2" stroke-dasharray="6 5"></polyline>
       <polyline id="equityStrat" points="" fill="none" stroke="#3dff6e" stroke-width="2.5"></polyline>
     </svg>
@@ -1103,18 +1109,18 @@ Insert into `.proj-grid` immediately after the bot-trader card (replacing the Ta
 ```css
   .equity{grid-column:var(--graph-col,2 / -1);grid-row:var(--graph-row,1);z-index:3;
           border:1px solid var(--line-strong);background:#020a04;
-          box-shadow:0 0 40px rgba(0,255,65,.2);
+          box-shadow:0 0 40px rgba(var(--green-rgb),.2);
           flex-direction:column;gap:10px;padding:20px 22px;min-width:0}
   .equity:not([hidden]){display:flex}
   .equity-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
   .equity-title{font-size:12px;letter-spacing:.18em;color:var(--green)}
   .equity-range{display:flex;gap:6px;align-items:center}
-  .range-btn{background:rgba(0,18,7,.9);color:var(--dim-1);border:1px solid rgba(0,255,65,.4);
+  .range-btn{background:rgba(0,18,7,.9);color:var(--dim-1);border:1px solid rgba(var(--green-rgb),.4);
              font-family:inherit;font-size:11px;font-weight:600;padding:4px 10px;
              cursor:pointer;letter-spacing:.08em}
   .range-btn.is-active{background:var(--green);color:var(--bg)}
   .range-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-  .equity-close{margin-left:6px;border-color:rgba(0,255,65,.3)}
+  .equity-close{margin-left:6px;border-color:rgba(var(--green-rgb),.3)}
   .equity-strategy{font-family:'Share Tech Mono',monospace;font-size:20px;color:#d8ffe4}
   .equity-legend{display:flex;gap:18px;font-size:12px}
   .lg-strat{color:#3dff6e} .lg-spy{color:var(--blue)}
@@ -1124,13 +1130,13 @@ Insert into `.proj-grid` immediately after the bot-trader card (replacing the Ta
              background:rgba(2,10,4,.8);padding:0 4px}
   .equity-hi{top:2px} .equity-lo{bottom:2px}
   .equity-dates{display:flex;justify-content:space-between;font-size:12px;color:var(--ink)}
-  .equity-stats{border-top:1px solid rgba(0,255,65,.2);padding-top:10px;font-size:12px;
+  .equity-stats{border-top:1px solid rgba(var(--green-rgb),.2);padding-top:10px;font-size:12px;
              color:var(--dim-1);display:flex;flex-direction:column;gap:5px}
   .equity-stats .lbl{color:var(--dim-3)}
   .equity-stats #equityClose{color:#4ad8ff}
   .equity-stats #equityOpen{color:var(--green)}
   .equity-caption{color:var(--dim-2)}
-  .equity-holding{border-top:1px solid rgba(0,255,65,.2);padding-top:10px;font-size:12px;
+  .equity-holding{border-top:1px solid rgba(var(--green-rgb),.2);padding-top:10px;font-size:12px;
              letter-spacing:.1em;color:var(--amber);display:flex;flex-wrap:wrap;gap:10px}
   .equity-holding .lbl{color:#c9a227}
   .equity-empty{font-size:12px;color:var(--dim-3);padding:24px 0;text-align:center}
@@ -1532,7 +1538,7 @@ Expected: FAIL — no `#contact`.
   .clink{border:1px solid var(--line);background:var(--panel-solid);padding:16px 18px;
          display:flex;flex-direction:column;gap:4px;text-align:left;
          font-family:inherit;font-size:13px;cursor:pointer;color:inherit}
-  .clink:hover{border-color:var(--green);box-shadow:0 0 20px rgba(0,255,65,.2);text-decoration:none}
+  .clink:hover{border-color:var(--green);box-shadow:0 0 20px rgba(var(--green-rgb),.2);text-decoration:none}
   .clink:focus-visible{outline:2px solid var(--green);outline-offset:2px}
   .clink-k{font-size:11px;letter-spacing:.14em;color:var(--dim-3)}
   .clink-v{color:#d8ffe4}
