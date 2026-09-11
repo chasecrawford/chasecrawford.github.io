@@ -45,6 +45,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   @media (prefers-reduced-motion:reduce){
     .scanlines{animation:none}
   }
+
+  .boot{position:fixed;inset:0;z-index:60;background:#000;display:flex;align-items:flex-start;
+        padding:48px;cursor:pointer;transition:opacity .9s ease;
+        font-size:clamp(18px,3vw,30px);color:#22ff55;
+        text-shadow:0 0 8px rgba(0,255,65,.8),0 0 24px rgba(0,255,65,.4)}
+  .boot-cursor{display:inline-block;width:.55em;height:1.1em;background:#22ff55;
+        vertical-align:text-bottom;margin-left:2px;animation:blink 1s infinite;
+        box-shadow:0 0 8px rgba(0,255,65,.8)}
+  @media (prefers-reduced-motion:reduce){ .boot-cursor{animation:none} }
 </style>
 </head>
 <body>
@@ -53,6 +62,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
+<div id="boot" class="boot"><div><span id="bootLine"></span><span class="boot-cursor"></span></div></div>
 <canvas id="rain" class="rain" aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
 <div class="scanlines" aria-hidden="true"></div>
@@ -101,7 +111,45 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     })(0);
   })();
 
-  window.__bootReady = true;   // replaced by the real boot flag in Task 2
+  // ===== BOOT =====
+  var BOOT_LINE = 'The Matrix has you...';
+  (function boot(){
+    var el = document.getElementById('boot');
+    var line = document.getElementById('bootLine');
+    if (!el || !line) { window.__endBoot = function(){}; window.__bootReady = true; return; }
+
+    var done = false, timer = null;
+    document.documentElement.style.overflowY = 'hidden';
+
+    function endBoot(){
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      document.documentElement.style.overflowY = '';
+      el.style.opacity = '0';
+      setTimeout(function(){ el.style.display = 'none'; }, 950);
+      document.dispatchEvent(new CustomEvent('boot:end'));
+    }
+    window.__endBoot = endBoot;
+
+    el.addEventListener('click', endBoot);
+    window.addEventListener('keydown', endBoot);
+    window.__bootReady = true;
+
+    if (reduced) { line.textContent = BOOT_LINE; endBoot(); return; }
+
+    var i = 0;
+    function type(){
+      if (done) return;
+      if (i <= BOOT_LINE.length) {
+        line.textContent = BOOT_LINE.slice(0, i++);
+        timer = setTimeout(type, 70 + Math.random() * 90);
+      } else {
+        timer = setTimeout(endBoot, 1800);
+      }
+    }
+    timer = setTimeout(type, 2600);
+  })();
 })();
 </script>
 </body>
