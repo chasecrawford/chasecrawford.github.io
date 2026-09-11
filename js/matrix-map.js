@@ -29,7 +29,15 @@
     async build() {
       // Detail layer: Leaflet already parked on Louisville, hidden until the trace completes
       const mapEl = document.createElement('div');
-      mapEl.style.cssText = 'position:absolute;inset:0;background:#020803;filter:invert(1) sepia(1) hue-rotate(65deg) saturate(3.2) brightness(0.85) contrast(1.15);opacity:0;transition:opacity 1.2s ease';
+      // The backdrop is WHITE on purpose, not the page's near-black. It sits *inside* the
+      // filter chain below, which starts with invert(1) -- so white renders as black, while
+      // a dark value here would render as near-white and then get pushed to neon green by
+      // the sepia/hue-rotate/saturate. That matters because Leaflet's tile rows meet on a
+      // sub-pixel boundary: whatever is behind them bleeds through as a hairline. With a
+      // dark backdrop that hairline was a bright green line across the map; with white it
+      // disappears into the map's own dark areas. Same reason un-loaded tile area stays dark
+      // instead of flashing green. Do not "fix" this back to #020803.
+      mapEl.style.cssText = 'position:absolute;inset:0;background:#fff;filter:invert(1) sepia(1) hue-rotate(65deg) saturate(3.2) brightness(0.85) contrast(1.15);opacity:0;transition:opacity 1.2s ease';
       this.appendChild(mapEl);
       const map = L.map(mapEl, {
         center: LOU_LL, zoom: 12, zoomControl: false, attributionControl: false,
