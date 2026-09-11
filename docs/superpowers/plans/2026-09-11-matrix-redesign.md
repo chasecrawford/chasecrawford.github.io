@@ -80,6 +80,15 @@ The export is a Claude Design canvas document. `<x-dc>`, `<sc-if>`, `<sc-for>`, 
 | `--blue` | `#4aa8d8` |
 | `--line` | `rgba(var(--green-rgb),0.25)` |
 | `--line-strong` | `rgba(var(--green-rgb),0.5)` |
+| `--green-hover` | `#b3ffc9` |
+| `--ink-bright` | `#d8ffe4` |
+| `--nav-bg` | `#031208` |
+| `--nav-bg-hover` | `#06240f` |
+| `--panel-deep` | `#020a04` |
+| `--amber-line` | `rgba(255,196,0,.5)` |
+| `--amber-dim` | `#c9a227` |
+| `--chart-strat` | `#3dff6e` |
+| `--chart-close` | `#4ad8ff` |
 
 **Fonts:** one Google Fonts request for `VT323`, `Share Tech Mono`, `IBM Plex Mono:wght@400;500;600`, keeping the existing `preconnect` pair. Body font is `'IBM Plex Mono', monospace`.
 
@@ -91,7 +100,12 @@ The export is a Claude Design canvas document. `<x-dc>`, `<sc-if>`, `<sc-for>`, 
 
 `.rain` `.vignette` `.scanlines` `.wrap` `.boot` `.boot-cursor` `.section` `.hero` `.hero-left` `.hero-right` `.name` `.name-line` `.role` `.nav` `.nav-btn` `.panel` `.panel-head` `.trace-frame` `.prompt` `.prompt-user` `.prompt-path` `.subtitle` `.proj-grid` `.proj` `.proj-head` `.proj-idx` `.proj-name` `.proj-badge` `.proj-badge--live` `.proj-badge--beta` `.proj-desc` `.proj-note` `.proj-stack` `.chip` `.proj-links` `.proj-link` `.equity` `.equity-head` `.equity-title` `.equity-range` `.range-btn` `.range-btn.is-active` `.equity-legend` `.equity-plot` `.equity-hi` `.equity-lo` `.equity-dates` `.equity-stats` `.equity-caption` `.equity-holding` `.equity-empty` `.gal` `.gframe` `.gframe-img` `.gframe-cap` `.contact-grid` `.clink` `.clink-k` `.clink-v`
 
-**No raw palette literals in CSS.** The design export is inline-styled, so it repeats `rgba(0,255,65,…)` at a dozen different alpha values and scatters one-off hexes like `#031208`. Translated verbatim that would leave ~42 untokenized colors across the finished page, defeating the token layer and the repo's own stated styling idiom. Instead: `--green-rgb: 0,255,65` on `:root`, and every translucent green written `rgba(var(--green-rgb), α)`. Solid one-offs get their own token (`--nav-bg`, `--nav-bg-hover`). The single exception is the rain canvas's `ctx.fillStyle` string — that is JS, not CSS, so it stays literal with a comment saying why.
+**No raw palette literals in CSS.** The design export is inline-styled, so it repeats `rgba(0,255,65,…)` at a dozen different alpha values and scatters one-off hexes like `#031208`. Translated verbatim that would leave ~42 untokenized colors across the finished page, defeating the token layer and the repo's own stated styling idiom. Instead: `--green-rgb: 0,255,65` on `:root`, and every translucent green written `rgba(var(--green-rgb), α)`. Every other palette colour gets its own semantic token — see the table above.
+
+Two categories stay literal on purpose, and are **not** findings:
+
+- **The rain canvas's `ctx.fillStyle` strings.** That is JS, not CSS; `var()` cannot resolve there. Leave them with a comment saying why.
+- **Scrims and neutral chrome** — `rgba(0,0,0,.22)` (scanlines), `rgba(0,5,2,.6)` (vignette), `rgba(2,8,3,.8)` / `rgba(2,10,4,.8)` / `rgba(0,8,3,.85)` / `rgba(0,18,7,.9)` (label and control backdrops), `rgba(160,180,165,0.5)` (the chart's neutral reference line), and `.boot`'s `#000` / `#22ff55`. These are surface and overlay values, not brand identity; tokenising single-use scrims would be indirection without a second consumer.
 
 **Never assert `toBeHidden()` alone.** Playwright treats a locator matching **zero** elements as hidden, so `await expect(page.locator('#x')).toBeHidden()` passes against a page where `#x` was deleted entirely — the assertion cannot fail for the reason you care about. Everywhere this plan expects an element to exist but be invisible, pair it: `toBeAttached()` first, then `toBeHidden()`. Use a bare `toBeHidden()` only when the element's *absence* is genuinely an acceptable outcome.
 
@@ -311,7 +325,7 @@ Read the export's `<helmet>` and outer wrapper for exact values. Produce this st
   body{margin:0;background:var(--bg);color:var(--ink);
        font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6}
   a{color:var(--green);text-decoration:none}
-  a:hover{color:#b3ffc9;text-decoration:underline}
+  a:hover{color:var(--green-hover);text-decoration:underline}
   ::selection{background:var(--green);color:var(--bg)}
   @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
   @keyframes flicker{0%,91%{opacity:1}92%{opacity:.82}93%{opacity:1}96%{opacity:.9}97%,100%{opacity:1}}
@@ -904,7 +918,7 @@ Note `/blackjack-coach/` is same-origin, so it correctly has no `target`/`rel`. 
   .proj-badge{border:1px solid rgba(var(--green-rgb),.35);padding:2px 8px;font-size:10px;
               color:var(--dim-1);letter-spacing:.1em}
   .proj-badge--live{color:var(--green)}
-  .proj-badge--beta{border-color:rgba(255,196,0,.5);color:var(--amber)}
+  .proj-badge--beta{border-color:var(--amber-line);color:var(--amber)}
   .proj-desc{margin:0;font-size:13px;line-height:1.6;color:var(--ink);text-wrap:pretty}
   .proj-note{margin:0;font-size:12px;line-height:1.6;color:var(--dim-1)}
   .proj-note .lbl{color:var(--dim-3)}
@@ -922,7 +936,7 @@ Note `/blackjack-coach/` is same-origin, so it correctly has no `target`/`rel`. 
      so the hidden attribute Task 5 uses needs an explicit override or the button
      shows before its data has loaded. */
   .proj-toggle[hidden]{display:none}
-  .proj-toggle:hover{color:#b3ffc9;text-decoration:underline}
+  .proj-toggle:hover{color:var(--green-hover);text-decoration:underline}
   .proj--other{display:var(--others-disp,flex)}
 
   @media (max-width:768px){
@@ -1087,8 +1101,8 @@ Insert into `.proj-grid` immediately after the bot-trader card (replacing the Ta
     <svg id="equitySvg" viewBox="0 0 600 220" preserveAspectRatio="none" aria-hidden="true">
       <line x1="0" y1="10" x2="600" y2="10" stroke="rgba(160,180,165,0.5)" stroke-width="1.5" stroke-dasharray="7 6"></line>
       <polygon id="equityFill" points="" fill="rgba(var(--green-rgb),0.07)"></polygon>
-      <polyline id="equitySpy" points="" fill="none" stroke="#4aa8d8" stroke-width="2" stroke-dasharray="6 5"></polyline>
-      <polyline id="equityStrat" points="" fill="none" stroke="#3dff6e" stroke-width="2.5"></polyline>
+      <polyline id="equitySpy" points="" fill="none" stroke="var(--blue)" stroke-width="2" stroke-dasharray="6 5"></polyline>
+      <polyline id="equityStrat" points="" fill="none" stroke="var(--chart-strat)" stroke-width="2.5"></polyline>
     </svg>
     <span id="equityHi" class="equity-hi">—</span>
     <span id="equityLo" class="equity-lo">—</span>
@@ -1108,7 +1122,7 @@ Insert into `.proj-grid` immediately after the bot-trader card (replacing the Ta
 
 ```css
   .equity{grid-column:var(--graph-col,2 / -1);grid-row:var(--graph-row,1);z-index:3;
-          border:1px solid var(--line-strong);background:#020a04;
+          border:1px solid var(--line-strong);background:var(--panel-deep);
           box-shadow:0 0 40px rgba(var(--green-rgb),.2);
           flex-direction:column;gap:10px;padding:20px 22px;min-width:0}
   .equity:not([hidden]){display:flex}
@@ -1121,9 +1135,9 @@ Insert into `.proj-grid` immediately after the bot-trader card (replacing the Ta
   .range-btn.is-active{background:var(--green);color:var(--bg)}
   .range-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
   .equity-close{margin-left:6px;border-color:rgba(var(--green-rgb),.3)}
-  .equity-strategy{font-family:'Share Tech Mono',monospace;font-size:20px;color:#d8ffe4}
+  .equity-strategy{font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--ink-bright)}
   .equity-legend{display:flex;gap:18px;font-size:12px}
-  .lg-strat{color:#3dff6e} .lg-spy{color:var(--blue)}
+  .lg-strat{color:var(--chart-strat)} .lg-spy{color:var(--blue)}
   .equity-plot{position:relative;flex:1;min-height:180px}
   .equity-plot svg{position:absolute;inset:0;width:100%;height:100%;display:block}
   .equity-hi,.equity-lo{position:absolute;left:6px;font-size:11px;color:var(--dim-1);
@@ -1133,12 +1147,12 @@ Insert into `.proj-grid` immediately after the bot-trader card (replacing the Ta
   .equity-stats{border-top:1px solid rgba(var(--green-rgb),.2);padding-top:10px;font-size:12px;
              color:var(--dim-1);display:flex;flex-direction:column;gap:5px}
   .equity-stats .lbl{color:var(--dim-3)}
-  .equity-stats #equityClose{color:#4ad8ff}
+  .equity-stats #equityClose{color:var(--chart-close)}
   .equity-stats #equityOpen{color:var(--green)}
   .equity-caption{color:var(--dim-2)}
   .equity-holding{border-top:1px solid rgba(var(--green-rgb),.2);padding-top:10px;font-size:12px;
              letter-spacing:.1em;color:var(--amber);display:flex;flex-wrap:wrap;gap:10px}
-  .equity-holding .lbl{color:#c9a227}
+  .equity-holding .lbl{color:var(--amber-dim)}
   .equity-empty{font-size:12px;color:var(--dim-3);padding:24px 0;text-align:center}
 ```
 
@@ -1541,7 +1555,7 @@ Expected: FAIL — no `#contact`.
   .clink:hover{border-color:var(--green);box-shadow:0 0 20px rgba(var(--green-rgb),.2);text-decoration:none}
   .clink:focus-visible{outline:2px solid var(--green);outline-offset:2px}
   .clink-k{font-size:11px;letter-spacing:.14em;color:var(--dim-3)}
-  .clink-v{color:#d8ffe4}
+  .clink-v{color:var(--ink-bright)}
 ```
 
 - [ ] **Step 5: Add the Discord copy JS**
