@@ -167,6 +167,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       filter:grayscale(1) sepia(1) hue-rotate(65deg) saturate(1.6) brightness(.95)}
   .gframe-cap{font-size:11px;color:var(--dim-3);letter-spacing:.12em;margin-top:8px}
 
+  .contact-section{display:flex;flex-direction:column;justify-content:center;padding:48px 0}
+  .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+                gap:12px;font-size:13px;margin-top:18px}
+  .clink{border:1px solid var(--line);background:var(--panel-solid);padding:16px 18px;
+         display:flex;flex-direction:column;gap:4px;text-align:left;
+         font-family:inherit;font-size:13px;cursor:pointer;color:inherit}
+  .clink:hover{border-color:var(--green);box-shadow:0 0 20px rgba(var(--green-rgb),.2);text-decoration:none}
+  .clink:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .clink-k{font-size:11px;letter-spacing:.14em;color:var(--dim-3)}
+  .clink-v{color:var(--ink-bright)}
+
   @media (max-width:768px){
     html{scroll-snap-type:none}
     :root{--proj-row:auto;--graph-col:auto;--graph-row:auto;--vr-disp:none}
@@ -311,6 +322,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="gframe-box"><img class="gframe-img" src="images/nox-25.jpg" alt="Nox 2025" loading="lazy" decoding="async"></div>
       <figcaption class="gframe-cap">05 · NOX '25</figcaption>
     </figure>
+  </div>
+</section>
+
+<section id="contact" class="section contact-section" data-screen-label="contact">
+  <div class="prompt"><span class="prompt-user">chase@localhost</span><span class="prompt-path">:~</span> ❯ <span>contact --all</span></div>
+  <div class="subtitle">7 endpoints · reply time ~24h</div>
+  <div class="contact-grid">
+    <a class="clink" href="mailto:chase@ch4ze.com"><span class="clink-k">EMAIL</span><span class="clink-v">chase@ch4ze.com</span></a>
+    <a class="clink" href="tel:+15024388129"><span class="clink-k">PHONE</span><span class="clink-v">502-438-8129</span></a>
+    <a class="clink" href="https://www.linkedin.com/in/chasecrawford" target="_blank" rel="noopener"><span class="clink-k">LINKEDIN</span><span class="clink-v">/in/chasecrawford</span></a>
+    <a class="clink" href="https://bsky.app/profile/chasecrawford.dev" target="_blank" rel="noopener"><span class="clink-k">BLUESKY</span><span class="clink-v">@chasecrawford.dev</span></a>
+    <a class="clink" href="https://steamcommunity.com/id/ch4ze/" target="_blank" rel="noopener"><span class="clink-k">STEAM</span><span class="clink-v">/id/ch4ze</span></a>
+    <a class="clink" href="https://www.xbox.com/en-US/play/user/Adalius" target="_blank" rel="noopener"><span class="clink-k">XBOX</span><span class="clink-v">Adalius</span></a>
+    <button type="button" class="clink" id="discordLink" data-handle="chase_22" title="Click to copy"><span class="clink-k">DISCORD</span><span class="clink-v">chase_22</span></button>
   </div>
 </section>
 
@@ -583,6 +608,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         panel.remove();
         btn.hidden = true;
       });
+  })();
+
+  // ===== DISCORD CLICK-TO-COPY =====
+  (function discord(){
+    var btn = document.getElementById('discordLink');
+    if (!btn) return;
+    var val = btn.querySelector('.clink-v');
+    btn.addEventListener('click', function(){
+      var handle = btn.dataset.handle;
+      var restore = function(){
+        val.textContent = 'copied!';
+        setTimeout(function(){ val.textContent = handle; }, 1200);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(handle).then(restore, function(){});
+      }
+    });
   })();
 })();
 </script>
