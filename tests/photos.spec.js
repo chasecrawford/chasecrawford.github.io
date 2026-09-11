@@ -9,7 +9,10 @@ test.describe('photos', () => {
 
   test('captions are numbered and approved', async ({ page }) => {
     const caps = await page.locator('#photos .gframe-cap').allTextContents();
-    expect(caps).toEqual(["02 · XMAS '25", "03 · HALLOWEEN '25", "04 · LILO '25", "05 · NOX '25"]);
+    expect(caps).toEqual([
+      "01 · LAS VEGAS '26", "02 · XMAS '25", "03 · HALLOWEEN '25",
+      "04 · LILO '25", "05 · NOX '25",
+    ]);
   });
 
   test('every frame has real alt text', async ({ page }) => {
