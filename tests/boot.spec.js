@@ -7,6 +7,7 @@ test.describe('boot overlay', () => {
     await page.goto('/index.html');
     await expect(page.locator('#boot')).toBeVisible();
     await expect(page.locator('#bootLine')).toHaveText('The Matrix has you...', { timeout: 15000 });
+    await expect(page.locator('#boot')).toBeAttached();
     await expect(page.locator('#boot')).toBeHidden({ timeout: 15000 });
   });
 
@@ -15,6 +16,7 @@ test.describe('boot overlay', () => {
     await page.waitForFunction(READY);
     expect(await page.evaluate(() => document.documentElement.style.overflowY)).toBe('hidden');
     await page.keyboard.press('Escape');
+    await expect(page.locator('#boot')).toBeAttached();
     await expect(page.locator('#boot')).toBeHidden();
     expect(await page.evaluate(() => document.documentElement.style.overflowY)).toBe('');
   });
@@ -23,6 +25,7 @@ test.describe('boot overlay', () => {
     await page.goto('/index.html');
     await page.waitForFunction(READY);
     await page.locator('#boot').click();
+    await expect(page.locator('#boot')).toBeAttached();
     await expect(page.locator('#boot')).toBeHidden({ timeout: 5000 });
   });
 
@@ -30,6 +33,7 @@ test.describe('boot overlay', () => {
     await page.goto('/index.html');
     await page.waitForFunction(READY);
     await page.keyboard.press('a');
+    await expect(page.locator('#boot')).toBeAttached();
     await expect(page.locator('#boot')).toBeHidden({ timeout: 5000 });
   });
 
@@ -37,6 +41,7 @@ test.describe('boot overlay', () => {
     await page.goto('/index.html');
     await page.waitForFunction(READY);
     await page.evaluate(() => { window.__endBoot(); window.__endBoot(); window.__endBoot(); });
+    await expect(page.locator('#boot')).toBeAttached();
     await expect(page.locator('#boot')).toBeHidden();
     expect(await page.evaluate(() => document.documentElement.style.overflowY)).toBe('');
   });
@@ -47,6 +52,7 @@ test.describe('boot overlay with reduced motion', () => {
 
   test('resolves immediately instead of typing', async ({ page }) => {
     await page.goto('/index.html');
+    await expect(page.locator('#boot')).toBeAttached();
     await expect(page.locator('#boot')).toBeHidden({ timeout: 3000 });
   });
 });
