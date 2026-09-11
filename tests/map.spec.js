@@ -117,3 +117,41 @@ test.describe('trace map with reduced motion', () => {
     await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 10000 });
   });
 });
+
+test.describe('trace replay control', () => {
+  test('header button restarts the trace', async ({ page }) => {
+    await page.goto('/index.html');
+    await dismissBoot(page);
+    await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 45000 });
+
+    const btn = page.locator('#traceReplay');
+    await expect(btn).toBeVisible();
+    await btn.click();
+
+    // Back to acquiring, with the label agreeing, then locking again on its own.
+    await page.waitForFunction(() => window.__mapState === 'acquiring', null, { timeout: 5000 });
+    await expect(page.locator('#trace .map-label-status')).toContainText('ACQUIRING SIGNAL');
+    await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 45000 });
+  });
+
+  test('button is keyboard reachable and labelled', async ({ page }) => {
+    await page.goto('/index.html');
+    await dismissBoot(page);
+    const btn = page.locator('#traceReplay');
+    expect(await btn.evaluate((e) => e.tagName)).toBe('BUTTON');
+    expect(await btn.getAttribute('aria-label')).toBeTruthy();
+    await btn.focus();
+    expect(await page.evaluate(() => document.activeElement.id)).toBe('traceReplay');
+  });
+});
+
+test.describe('trace replay with reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' });
+
+  test('replay control is hidden — there is no animation to replay', async ({ page }) => {
+    await page.goto('/index.html');
+    await dismissBoot(page);
+    await expect(page.locator('#traceReplay')).toBeAttached();
+    await expect(page.locator('#traceReplay')).toBeHidden();
+  });
+});

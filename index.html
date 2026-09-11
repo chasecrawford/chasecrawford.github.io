@@ -84,9 +84,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .nav-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
   .panel{border:1px solid rgba(var(--green-rgb),.3);background:var(--panel);backdrop-filter:blur(3px);
          box-shadow:0 0 32px rgba(var(--green-rgb),.12)}
-  .panel-head{display:flex;justify-content:space-between;padding:8px 12px;
+  .panel-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;
          border-bottom:1px solid rgba(var(--green-rgb),.2);
          font-size:10px;letter-spacing:.14em;color:var(--dim-3)}
+  .trace-replay{display:inline-flex;align-items:center;justify-content:center;
+         width:16px;height:16px;margin:-3px 0;padding:0;line-height:0;
+         background:none;border:0;color:var(--dim-3);cursor:pointer;
+         transition:color .15s,transform .3s}
+  .trace-replay svg{width:12px;height:12px;display:block}
+  .trace-replay:hover{color:var(--green)}
+  .trace-replay:active{transform:rotate(180deg)}
+  .trace-replay:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  /* Nothing to replay when the trace never animates. */
+  @media (prefers-reduced-motion:reduce){ .trace-replay{display:none} }
   .trace-frame{position:relative;aspect-ratio:4/3;overflow:hidden;max-width:100%}
   #trace matrix-map{position:absolute;inset:0}
   .map-label{position:absolute;left:0;right:0;bottom:0;z-index:500;
@@ -232,7 +242,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div class="hero-right">
     <div class="panel">
-      <div class="panel-head"><span>TRACE PROGRAM</span></div>
+      <div class="panel-head"><span>TRACE PROGRAM</span><button type="button" id="traceReplay" class="trace-replay" title="Replay trace" aria-label="Replay trace animation"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.5A5.5 5.5 0 1 0 13.5 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 0.6 L8 4.4 L11 2.5 Z" fill="currentColor"/></svg></button></div>
       <div id="trace" class="trace-frame"><matrix-map></matrix-map></div>
     </div>
   </div>
@@ -640,6 +650,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         panel.remove();
         btn.hidden = true;
       });
+  })();
+
+  // ===== TRACE REPLAY BUTTON =====
+  // The map element is click-to-replay, but that is mouse-only. This gives the
+  // same action a real button, so it is reachable by keyboard and announced.
+  (function traceReplay(){
+    var btn = document.getElementById('traceReplay');
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      var el = document.querySelector('#trace matrix-map');
+      // replay() only exists once <matrix-map> has finished building, which
+      // waits on a ~840KB atlas fetch. A click before then has nothing to
+      // replay -- the trace the user would be restarting has not run yet.
+      if (el && typeof el.replay === 'function') el.replay();
+    });
   })();
 
   // ===== DISCORD CLICK-TO-COPY =====

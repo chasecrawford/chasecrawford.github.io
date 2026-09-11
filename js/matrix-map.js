@@ -109,6 +109,10 @@
         mapEl.style.opacity = '1';
         status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY · 38.2527°N 85.7585°W';
         window.__mapState = 'locked';
+        // No trace ran, so there is nothing to replay. Defined anyway so callers
+        // never have to branch; the header's replay button is hidden at this
+        // setting regardless.
+        this.replay = function () {};
         return;
       }
 
@@ -151,6 +155,10 @@
       this.style.cursor = 'pointer';
       this.title = 'replay';
       this.addEventListener('click', reset);
+      // Public handle so the panel header's replay button can restart the trace.
+      // Only exists once build() has finished, so callers must guard: a click
+      // during "ACQUIRING SIGNAL..." has nothing to replay yet.
+      this.replay = reset;
     }
   }
   if (!customElements.get('matrix-map')) customElements.define('matrix-map', MatrixMap);
