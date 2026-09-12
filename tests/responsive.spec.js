@@ -134,3 +134,27 @@ test.describe('hero stacking on phones', () => {
     });
   }
 });
+
+test.describe('hero tagline on phones', () => {
+  for (const width of [360, 393, 412]) {
+    test(`at ${width}px the wrapped tagline stays tight`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 915 });
+      await page.goto('/index.html');
+      await dismissBoot(page);
+
+      const m = await page.evaluate(() => {
+        const role = document.querySelector('.role');
+        const tops = [...new Set([...role.children].map((s) =>
+          Math.round(s.getBoundingClientRect().top)))].sort((a, b) => a - b);
+        return { rows: tops.length, delta: tops.length > 1 ? tops[1] - tops[0] : 0 };
+      });
+
+      // The tagline wraps to two rows at phone widths. It inherits the body's
+      // 1.6 line-height and the flex `gap` applies to rows as well as columns,
+      // which together pushed the two halves ~31px apart for 13px text.
+      if (m.rows > 1) {
+        expect(m.delta, `tagline rows were ${m.delta}px apart`).toBeLessThanOrEqual(24);
+      }
+    });
+  }
+});
