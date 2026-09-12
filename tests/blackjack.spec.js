@@ -178,3 +178,17 @@ test.describe('blackjack-coach with reduced motion', () => {
     expect(scanAnim === 'none' || scanAnim === '').toBe(true);
   });
 });
+
+test.describe('tap targets', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test('the three action buttons clear the 44px touch guidance', async ({ page }) => {
+    // This page's entire function is three tap-throughs on a phone.
+    await page.goto('/blackjack-coach/');
+    const boxes = await page.locator('a.btn').evaluateAll((els) =>
+      els.map((e) => ({ t: e.textContent.trim().slice(0, 24), h: e.getBoundingClientRect().height })));
+    expect(boxes.length).toBe(3);
+    const short = boxes.filter((b) => b.h < 44);
+    expect(short, JSON.stringify(boxes)).toEqual([]);
+  });
+});

@@ -134,7 +134,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
      only fragments on the narrowest phones, and never mid-line by default. */
   .step-aside code{display:block;margin-top:4px;color:var(--dim-2);font-size:12px;overflow-wrap:break-word}
 
-  .btn{display:inline-flex;align-items:center;gap:8px;
+  /* min-height, not extra padding, so the pill looks exactly as designed while
+     the hit area clears the 44px touch-target guidance. The design's padding
+     alone lands at 43px, and this page exists to be tapped through on a phone. */
+  .btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;
     background:var(--nav-bg);border:1px solid var(--line-strong);
     padding:10px 18px;color:var(--green);font-family:inherit;font-size:13px;
     letter-spacing:.1em;text-decoration:none;transition:all .15s}
