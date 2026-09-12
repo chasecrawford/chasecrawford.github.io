@@ -387,7 +387,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   (function boot(){
     var el = document.getElementById('boot');
     var line = document.getElementById('bootLine');
-    if (!el || !line) { window.__endBoot = function(){}; window.__bootReady = true; return; }
+    if (!el || !line) {
+      // No overlay to clear, so anything gated on boot ending may proceed at once.
+      window.__endBoot = function(){}; window.__bootDone = true; window.__bootReady = true; return;
+    }
 
     var done = false, timer = null;
     document.documentElement.style.overflowY = 'hidden';
@@ -399,6 +402,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.documentElement.style.overflowY = '';
       el.style.opacity = '0';
       setTimeout(function(){ el.style.display = 'none'; }, 950);
+      // Durable flag alongside the event: anything that loads *after* boot has
+      // already ended would otherwise wait forever for an event that will never
+      // fire again. The map's trace is gated on exactly this.
+      window.__bootDone = true;
       document.dispatchEvent(new CustomEvent('boot:end'));
     }
     window.__endBoot = endBoot;

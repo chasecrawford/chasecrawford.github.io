@@ -7,8 +7,8 @@ test.describe('trace map', () => {
     await dismissBoot(page);
     await expect(page.locator('#trace matrix-map')).toHaveCount(1);
     await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 45000 });
-    await expect(page.locator('#trace .map-label')).toContainText('SIGNAL LOCKED');
     await expect(page.locator('#trace .map-label')).toContainText('LOUISVILLE, KY');
+    await expect(page.locator('#trace .map-label')).toContainText('38.2527°N');
   });
 
   test('fills its frame — actual layout, not just DOM/state', async ({ page }) => {
@@ -153,5 +153,24 @@ test.describe('trace replay with reduced motion', () => {
     await dismissBoot(page);
     await expect(page.locator('#traceReplay')).toBeAttached();
     await expect(page.locator('#traceReplay')).toBeHidden();
+  });
+});
+
+test.describe('trace timing', () => {
+  test('the zoom waits for the boot overlay instead of running behind it', async ({ page }) => {
+    await page.goto('/index.html');
+
+    // Let boot run its full natural course -- do NOT skip it. Skipping ends boot
+    // at roughly the moment the trace would start anyway, which hides the bug.
+    // The real visitor watches ~7s of boot while the zoom runs behind it.
+    await page.locator('#boot').waitFor({ state: 'hidden', timeout: 20000 });
+
+    // The zoom is a 900ms hold plus an 11s tween, so a healthy run cannot lock
+    // in much under 11s measured from the moment the overlay clears. Anything
+    // far shorter means it ran behind the overlay and the visitor missed it.
+    const t0 = Date.now();
+    await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 45000 });
+    const elapsed = Date.now() - t0;
+    expect(elapsed, `locked ${elapsed}ms after boot ended`).toBeGreaterThan(10000);
   });
 });

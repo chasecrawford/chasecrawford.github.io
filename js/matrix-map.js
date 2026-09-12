@@ -1,6 +1,11 @@
 // <matrix-map> — vector US map (d3) zooms crisply to Louisville, then crossfades to detailed street tiles (Leaflet).
 // Requires d3, topojson, L globals (loaded in the page's helmet).
 (function () {
+  // Non-breaking space, built from its code point rather than typed as a literal
+  // so it stays visible in source and a reformat cannot silently turn it back
+  // into an ordinary space. It keeps the lat/lon pair on one line, so the label
+  // wraps after "KY" instead of splitting the coordinates across two lines.
+  const NBSP = String.fromCharCode(160);
   const LOU_LL = [38.2527, -85.7655];
   const LOU = [-85.7655, 38.2527];
   class MatrixMap extends HTMLElement {
@@ -107,7 +112,7 @@
       if (reduced) {
         svgWrap.style.opacity = '0';
         mapEl.style.opacity = '1';
-        status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY 38.2527°N 85.7585°W';
+        status.textContent = 'LOUISVILLE, KY 38.2527°N' + NBSP + '85.7585°W';
         window.__mapState = 'locked';
         // No trace ran, so there is nothing to replay. Defined anyway so callers
         // never have to branch; the header's replay button is hidden at this
@@ -137,7 +142,7 @@
           .on('end', () => {
             svgWrap.style.opacity = '0';
             mapEl.style.opacity = '1';
-            status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY 38.2527°N 85.7585°W';
+            status.textContent = 'LOUISVILLE, KY 38.2527°N' + NBSP + '85.7585°W';
             window.__mapState = 'locked';
           });
       };
@@ -151,7 +156,14 @@
         setTimeout(zoomTo, 900);
       };
       window.__mapState = 'acquiring';
-      setTimeout(zoomTo, 900);
+      // Hold the zoom until the boot overlay clears. build() finishes as soon as
+      // the atlas fetch resolves -- typically a second or so in, while boot still
+      // has ~6s to run -- so starting here meant the 11s trace was most of the way
+      // through before anyone could see it. The flag covers the reverse case: a
+      // slow fetch that finishes after boot already ended, where waiting on the
+      // event alone would wait forever.
+      if (window.__bootDone) setTimeout(zoomTo, 900);
+      else document.addEventListener('boot:end', function(){ setTimeout(zoomTo, 900); }, { once: true });
       this.style.cursor = 'pointer';
       this.title = 'replay';
       this.addEventListener('click', reset);
