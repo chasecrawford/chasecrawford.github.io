@@ -158,6 +158,9 @@ test.describe('trace replay with reduced motion', () => {
 
 test.describe('trace timing', () => {
   test('the zoom waits for the boot overlay instead of running behind it', async ({ page }) => {
+    // The intro ships off; force it on so this test still measures the thing it
+    // claims to. With boot skipped the assertion passes trivially.
+    await page.addInitScript(() => { window.__bootForce = true; });
     await page.goto('/index.html');
 
     // Let boot run its full natural course -- do NOT skip it. Skipping ends boot

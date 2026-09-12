@@ -388,14 +388,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   // rain, which -- in the reduced-motion path -- calls draw() synchronously
   // and would throw before this ever ran if it were downstream). Dismissal
   // must never depend on decorative code succeeding.
+  //
+  // The intro is currently TURNED OFF. Flip BOOT_ENABLED to true to bring it
+  // back -- nothing else needs changing. The overlay markup, its styles, the
+  // typing, the skip handling and the once-per-session logic are all still
+  // here and still covered by tests, which force it on to exercise them.
+  var BOOT_ENABLED = false;
   var BOOT_LINE = 'The Matrix has you...';
   (function boot(){
     var el = document.getElementById('boot');
     var line = document.getElementById('bootLine');
-    if (!el || !line) {
-      // No overlay to clear, so anything gated on boot ending may proceed at once.
-      window.__endBoot = function(){}; window.__bootDone = true; window.__bootReady = true; return;
+
+    // Release everything gated on boot without ever showing the overlay.
+    function skipBoot(){
+      window.__endBoot = function(){};
+      window.__bootDone = true;
+      window.__bootReady = true;
+      // Deferred by a tick so listeners registered later in this same script --
+      // the name scramble, the map's trace gate -- are attached in time to hear it.
+      setTimeout(function(){ document.dispatchEvent(new CustomEvent('boot:end')); }, 0);
     }
+
+    if (!el || !line) return skipBoot();
+
+    // Tests set __bootForce before load to exercise the intro while it is off
+    // for visitors, so disabling the feature does not also disable its coverage.
+    var enabled = BOOT_ENABLED;
+    try { if (window.__bootForce === true) enabled = true; } catch (_) {}
+    if (!enabled) return skipBoot();
 
     // The intro is a first-impression, not a toll gate. Play it once per tab
     // session; on a return trip -- back from /blackjack-coach/, or a reload --
@@ -404,16 +424,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     // windows and when a browser blocks site data.
     var seen = false;
     try { seen = sessionStorage.getItem('cc.bootSeen') === '1'; } catch (_) {}
-
-    if (seen) {
-      window.__endBoot = function(){};
-      window.__bootDone = true;
-      window.__bootReady = true;
-      // Deferred by a tick so listeners registered later in this same script --
-      // the name scramble, the map's trace gate -- are attached in time to hear it.
-      setTimeout(function(){ document.dispatchEvent(new CustomEvent('boot:end')); }, 0);
-      return;
-    }
+    if (seen) return skipBoot();
     try { sessionStorage.setItem('cc.bootSeen', '1'); } catch (_) {}
 
     var done = false, timer = null;
