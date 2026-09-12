@@ -192,3 +192,22 @@ test.describe('tap targets', () => {
     expect(short, JSON.stringify(boxes)).toEqual([]);
   });
 });
+
+test.describe('readability over the rain', () => {
+  test('every text panel sits on an opaque surface', async ({ page }) => {
+    await page.goto('/blackjack-coach/');
+    // The digital-rain canvas runs behind the whole page, so any block of body
+    // copy on a transparent or translucent surface has moving glyphs showing
+    // through it. Every prose panel must be fully opaque.
+    const sheer = await page.evaluate(() =>
+      ['.stuck-item', '.info-tile', '.step', '.callout', '.note'].flatMap((sel) =>
+        [...document.querySelectorAll(sel)].map((el) => {
+          const bg = getComputedStyle(el).backgroundColor;
+          const m = bg.match(/rgba?\(([^)]+)\)/);
+          const parts = m ? m[1].split(',').map((n) => parseFloat(n)) : [];
+          const alpha = parts.length === 4 ? parts[3] : 1;
+          return { sel, bg, alpha, opaque: bg !== 'transparent' && alpha === 1 };
+        })).filter((x) => !x.opaque));
+    expect(sheer, JSON.stringify(sheer, null, 1)).toEqual([]);
+  });
+});

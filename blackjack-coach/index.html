@@ -157,7 +157,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .stuck{display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.7}
   .stuck h2{margin:0;font-size:12px;letter-spacing:.12em;color:var(--green);
     text-transform:uppercase;font-weight:400}
-  .stuck-item{border-left:1px solid var(--line);padding-left:16px;color:var(--ink)}
+  /* Opaque fill, not just a left rule: the rain canvas runs behind the whole
+     page, and these two blocks are the longest prose on it. Kept the accent
+     border so they still read as asides rather than full tiles. */
+  .stuck-item{border-left:2px solid var(--line-strong);background:var(--panel-solid);
+    padding:14px 18px;color:var(--ink)}
   .stuck-item .q{color:var(--dim-1)}
 
   /* ============ footer ============ */
