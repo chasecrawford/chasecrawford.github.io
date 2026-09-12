@@ -112,3 +112,25 @@ test.describe('page health', () => {
     expect(failures, JSON.stringify(ratios, null, 2)).toEqual([]);
   });
 });
+
+test.describe('hero stacking on phones', () => {
+  for (const width of [360, 393, 412]) {
+    test(`at ${width}px the nav and the trace panel are not pushed apart`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/index.html');
+      await dismissBoot(page);
+
+      const gap = await page.evaluate(() => {
+        const nav = document.querySelector('.nav').getBoundingClientRect();
+        const panel = document.querySelector('.hero-right').getBoundingClientRect();
+        return Math.round(panel.top - nav.bottom);
+      });
+
+      // The hero is min-height:100vh and wraps to one column at this width. If
+      // align-content is left at its default, the leftover vertical space is
+      // dealt out *between* the wrapped flex lines and the designed 48px gap
+      // balloons past 150px. Allow some slack, but nothing like that.
+      expect(gap, `nav-bottom to panel-top was ${gap}px`).toBeLessThanOrEqual(64);
+    });
+  }
+});

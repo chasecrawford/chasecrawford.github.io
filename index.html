@@ -71,7 +71,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   @media (prefers-reduced-motion:reduce){ .boot-cursor{animation:none} }
 
   .section{min-height:100vh;box-sizing:border-box;scroll-snap-align:start}
-  .hero{display:flex;flex-wrap:wrap;align-items:center;gap:48px;padding:32px 0}
+  /* align-content matters once this wraps to one column on a phone. The section
+     is min-height:100vh but the stacked hero is much shorter, and the default
+     (stretch) deals that leftover height out *between* the wrapped flex lines --
+     turning the 48px gap into 150px+ between the nav and the trace panel.
+     Centring the lines keeps the gap the size it was designed to be. */
+  .hero{display:flex;flex-wrap:wrap;align-items:center;align-content:center;gap:48px;padding:32px 0}
   .hero-left{flex:1 1 480px;min-width:0;display:flex;flex-direction:column;gap:20px}
   .hero-right{flex:1 1 320px;max-width:440px;min-width:280px}
   .name{font-family:'Share Tech Mono',monospace;font-size:clamp(44px,8vw,96px);line-height:1;
