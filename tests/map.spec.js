@@ -160,20 +160,29 @@ test.describe('trace timing', () => {
   test('the zoom waits for the boot overlay instead of running behind it', async ({ page }) => {
     // The intro ships off; force it on so this test still measures the thing it
     // claims to. With boot skipped the assertion passes trivially.
-    await page.addInitScript(() => { window.__bootForce = true; });
+    // Both timestamps are taken *inside* the page: measuring from the overlay's
+    // visibility instead would start the clock 950ms late (boot:end fires when
+    // the fade starts, display:none lands after it) and add cross-process
+    // polling slop on top, which made this flake under parallel load.
+    await page.addInitScript(() => {
+      window.__bootForce = true;
+      document.addEventListener('boot:end', () => { window.__tBootEnd = performance.now(); }, { once: true });
+    });
     await page.goto('/index.html');
 
     // Let boot run its full natural course -- do NOT skip it. Skipping ends boot
     // at roughly the moment the trace would start anyway, which hides the bug.
-    // The real visitor watches ~7s of boot while the zoom runs behind it.
-    await page.locator('#boot').waitFor({ state: 'hidden', timeout: 20000 });
+    await page.waitForFunction(() => {
+      if (window.__mapState !== 'locked') return false;
+      window.__tLocked = window.__tLocked || performance.now();
+      return true;
+    }, null, { timeout: 60000 });
 
-    // The zoom is a 900ms hold plus an 11s tween, so a healthy run cannot lock
-    // in much under 11s measured from the moment the overlay clears. Anything
-    // far shorter means it ran behind the overlay and the visitor missed it.
-    const t0 = Date.now();
-    await page.waitForFunction(() => window.__mapState === 'locked', null, { timeout: 45000 });
-    const elapsed = Date.now() - t0;
-    expect(elapsed, `locked ${elapsed}ms after boot ended`).toBeGreaterThan(10000);
+    const ms = await page.evaluate(() => Math.round(window.__tLocked - window.__tBootEnd));
+
+    // A healthy run is a 900ms hold plus an 11s tween == ~11.9s of zoom after
+    // boot ends. If the trace ran behind the overlay it is already finished, or
+    // nearly so, and this lands near zero. 9s separates the two cleanly.
+    expect(ms, `trace locked ${ms}ms after boot:end`).toBeGreaterThan(9000);
   });
 });
