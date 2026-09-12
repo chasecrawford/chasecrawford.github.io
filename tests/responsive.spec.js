@@ -144,17 +144,28 @@ test.describe('hero tagline on phones', () => {
 
       const m = await page.evaluate(() => {
         const role = document.querySelector('.role');
-        const tops = [...new Set([...role.children].map((s) =>
+        // Only count what is actually rendered; the separator is hidden here.
+        const shown = [...role.children].filter((s) => s.offsetParent !== null);
+        const tops = [...new Set(shown.map((s) =>
           Math.round(s.getBoundingClientRect().top)))].sort((a, b) => a - b);
         return { rows: tops.length, delta: tops.length > 1 ? tops[1] - tops[0] : 0 };
       });
 
-      // The tagline wraps to two rows at phone widths. It inherits the body's
-      // 1.6 line-height and the flex `gap` applies to rows as well as columns,
+      // Exactly two rows: role, then employer. Without the separator the two
+      // phrases fit one line again and read as a run-on, so the stack is
+      // forced rather than left to wrapping.
+      expect(m.rows, 'tagline should be two stacked rows').toBe(2);
+
+      // The tagline wraps to two rows at phone widths. It inherited the body's
+      // 1.6 line-height, and the flex `gap` applies to rows as well as columns,
       // which together pushed the two halves ~31px apart for 13px text.
-      if (m.rows > 1) {
-        expect(m.delta, `tagline rows were ${m.delta}px apart`).toBeLessThanOrEqual(24);
-      }
+      expect(m.delta, `tagline rows were ${m.delta}px apart`).toBeLessThanOrEqual(18);
+
+      // The "//" only separates the two phrases while they share a line. Once
+      // they stack it is a dangling mark at the end of the first row, so it is
+      // hidden below the width where the tagline still fits on one line.
+      await expect(page.locator('.role-sep')).toBeAttached();
+      await expect(page.locator('.role-sep')).toBeHidden();
     });
   }
 });
