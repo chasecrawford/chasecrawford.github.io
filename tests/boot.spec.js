@@ -72,3 +72,37 @@ test.describe('boot overlay with JavaScript disabled', () => {
     await expect(page.locator('#name')).toBeVisible();
   });
 });
+
+test.describe('boot runs once per tab session', () => {
+  test('coming back from another page does not replay the intro', async ({ page }) => {
+    // First arrival in this tab: the intro plays.
+    await page.goto('/index.html');
+    await expect(page.locator('#boot')).toBeVisible();
+    await page.waitForFunction(() => window.__bootReady === true);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#boot')).toBeHidden();
+
+    // Navigate to the beta page and back, same tab.
+    await page.goto('/blackjack-coach/');
+    await page.goto('/index.html');
+
+    // The overlay must not stand between the visitor and the page again.
+    await expect(page.locator('#boot')).toBeAttached();
+    await expect(page.locator('#boot')).toBeHidden();
+    expect(await page.evaluate(() => document.documentElement.style.overflowY)).toBe('');
+
+    // And everything gated on boot ending must still be released.
+    await page.waitForFunction(() => window.__bootDone === true, null, { timeout: 5000 });
+    await expect(page.locator('#name .name-line').nth(1)).toHaveText('CRAWFORD', { timeout: 8000 });
+  });
+
+  test('a session with no record of it still gets the intro', async ({ page }) => {
+    // Exercise the mechanism directly rather than the browser's tab model:
+    // wipe the flag and reload, which is what a genuinely new visit looks like.
+    await page.goto('/index.html');
+    await page.evaluate(() => { try { sessionStorage.clear(); } catch (_) {} });
+    await page.reload();
+    await expect(page.locator('#boot')).toBeVisible();
+    await expect(page.locator('#bootLine')).toHaveText('The Matrix has you...', { timeout: 15000 });
+  });
+});

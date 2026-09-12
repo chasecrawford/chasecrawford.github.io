@@ -56,7 +56,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .scanlines{animation:none}
   }
 
-  .boot{position:fixed;inset:0;z-index:60;background:#000;display:flex;align-items:flex-start;
+  /* Hidden by default and switched on by script, rather than the reverse. A
+     returning visitor must never see even a frame of black before JS decides
+     to skip the intro -- and with no JS at all the overlay simply never
+     appears, which is the behaviour we want anyway. */
+  .boot{display:none}
+  .boot.is-on{position:fixed;inset:0;z-index:60;background:#000;display:flex;align-items:flex-start;
         padding:48px;cursor:pointer;transition:opacity .9s ease;
         font-size:clamp(18px,3vw,30px);color:#22ff55;
         text-shadow:0 0 8px rgba(var(--green-rgb),.8),0 0 24px rgba(var(--green-rgb),.4)}
@@ -392,7 +397,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       window.__endBoot = function(){}; window.__bootDone = true; window.__bootReady = true; return;
     }
 
+    // The intro is a first-impression, not a toll gate. Play it once per tab
+    // session; on a return trip -- back from /blackjack-coach/, or a reload --
+    // skip straight to the page. sessionStorage (not localStorage) so a genuinely
+    // new visit still gets it, and wrapped because storage throws in private
+    // windows and when a browser blocks site data.
+    var seen = false;
+    try { seen = sessionStorage.getItem('cc.bootSeen') === '1'; } catch (_) {}
+
+    if (seen) {
+      window.__endBoot = function(){};
+      window.__bootDone = true;
+      window.__bootReady = true;
+      // Deferred by a tick so listeners registered later in this same script --
+      // the name scramble, the map's trace gate -- are attached in time to hear it.
+      setTimeout(function(){ document.dispatchEvent(new CustomEvent('boot:end')); }, 0);
+      return;
+    }
+    try { sessionStorage.setItem('cc.bootSeen', '1'); } catch (_) {}
+
     var done = false, timer = null;
+    el.classList.add('is-on');
     document.documentElement.style.overflowY = 'hidden';
 
     function endBoot(){
