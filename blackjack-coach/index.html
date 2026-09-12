@@ -12,7 +12,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <title>Join the Blackjack Coach beta — chasecrawford.dev</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="description" content="Blackjack Coach is in closed testing on Google Play. Three steps, about two minutes: join the testers group, opt in, install.">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#020803">
 <link rel="canonical" href="https://chasecrawford.dev/blackjack-coach/">
 <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
 
@@ -32,194 +32,147 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0a;
-    --bg2:#0f0f0f;
-    --ink:#d8e4d8;
-    --ink2:#8a9d8a;
-    --line:#1d2a1d;
-    --green:#00ff88;
-    --cyan:#00d4ff;
-    --yellow:#ffd60a;
-    --red:#ff5c5c;
+    /* Channel triplet, so every translucent green is rgba(var(--green-rgb), a)
+       instead of a fresh literal per alpha value. */
+    --green-rgb:0,255,65;
+    --bg:#020803; --panel:rgba(0,18,7,0.75); --panel-solid:#001207;
+    --green:#00ff41; --ink:#b6ffc9;
+    --dim-1:#8affa8; --dim-2:#5ec97b; --dim-3:#3fa05c; --dim-4:#378d53;
+    --amber:#ffd75e;
+    --nav-bg:#031208; --nav-bg-hover:#06240f;
+    --line:rgba(var(--green-rgb),0.25); --line-strong:rgba(var(--green-rgb),0.5);
+    --green-hover:#b3ffc9; --ink-bright:#d8ffe4;
+    --amber-line:rgba(255,196,0,.5); --amber-dim:#c9a227;
+    /* One-off surface for the amber callout box — the design's #141000 has
+       no home among the shared tokens above, so it gets its own. */
+    --amber-bg:#141000;
   }
   *,*::before,*::after{box-sizing:border-box}
-  html,body{
-    margin:0;padding:0;background:var(--bg);color:var(--ink);
-    font-family:'JetBrains Mono',ui-monospace,monospace;
-    font-size:14px;line-height:1.65;overflow-x:hidden;
-    -webkit-text-size-adjust:100%;
-  }
-  a{color:var(--cyan);text-decoration:none;border-bottom:1px dashed transparent}
-  a:hover{border-bottom-color:var(--cyan)}
-  ::selection{background:var(--green);color:#000}
+  html{overflow-x:hidden}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6}
+  a{color:var(--green);text-decoration:none}
+  a:hover{color:var(--green-hover);text-decoration:underline}
+  ::selection{background:var(--green);color:var(--bg)}
   img{max-width:100%;height:auto;display:block}
+  @keyframes flicker{0%,91%{opacity:1}92%{opacity:.82}93%{opacity:1}96%{opacity:.9}97%,100%{opacity:1}}
 
-  /* ============ CRT shell + window chrome (frame only) ============ */
-  .shell{
-    min-height:100vh;padding:12px;
-    background:
-      linear-gradient(180deg, transparent 50%, rgba(0,255,136,.015) 50%),
-      var(--bg);
-    background-size:100% 4px, 100% 100%;
+  .rain{position:fixed;inset:0;z-index:0}
+  .vignette{position:fixed;inset:0;z-index:5;pointer-events:none;
+    background:radial-gradient(ellipse at center,transparent 55%,rgba(0,5,2,.6) 100%)}
+  .scanlines{position:fixed;inset:0;z-index:6;pointer-events:none;animation:flicker 7s infinite;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0,rgba(0,0,0,.22) 1px,transparent 1px,transparent 3px)}
+  @media (prefers-reduced-motion:reduce){
+    .scanlines{animation:none}
   }
-  .window{
-    border:1px solid var(--line);background:var(--bg2);
-    box-shadow:0 0 0 1px #000 inset, 0 40px 80px -40px rgba(0,255,136,.08);
-    max-width:760px;margin-inline:auto;width:100%;
-    display:flex;flex-direction:column;
-  }
-  /* Mirrors the homepage titlebar, except the window controls are replaced by a
-     real way back to the site — this page is a leaf that people arrive at from a
-     shared link, so an escape hatch is worth more here than fake chrome. */
-  .titlebar{
-    display:flex;align-items:center;gap:12px;
-    /* padding lives on .tb-left, not here — an asymmetric padding on the bar
-       shifts its content box, which drags the centered label off true centre. */
-    padding:0;border-bottom:1px solid var(--line);
-    background:#060606;min-height:32px;
-    font-size:12px;letter-spacing:.15em;color:var(--ink2);text-transform:uppercase;
-  }
-  /* tb-left and tb-right take an equal flex basis so tb-center is centered
-     against the whole bar. With flex:1 on the center instead, it would center
-     within the leftover space and drift toward whichever side is narrower. */
-  .tb-left{display:flex;gap:14px;align-items:center;flex:1 1 0;min-width:0;padding-left:14px}
-  .tb-center{flex:0 1 auto;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  /* Left and right carry matching 14px padding on purpose: with box-sizing
-     border-box, flex-basis:0 clamps to the item's padding, so unequal padding
-     here makes the two sides unequal and drags the centred label off centre. */
-  .tb-right{display:flex;justify-content:flex-end;align-items:center;flex:1 1 0;min-width:0;padding-right:14px}
-  .tb-home{
-    display:flex;align-items:center;gap:8px;
-    color:var(--ink2);font-size:12px;letter-spacing:.15em;text-transform:uppercase;
-    white-space:nowrap;border-bottom:0;
-    transition:color .12s;
-  }
-  .tb-home:hover{color:var(--green);border-bottom:0}
-  .tb-home-short{display:none}
 
-  .body{padding:24px 20px 28px}
+  /* One continuously flowing page: no boot overlay, no scroll-snap, no
+     min-height:100vh sections — those are the homepage's, not this leaf's. */
+  .wrap{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:48px 24px 80px}
+  .page{display:flex;flex-direction:column;gap:40px}
+  .wrap :focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+  /* ============ back link (top) ============ */
+  .backrow{font-size:13px}
+  .backrow a{color:var(--dim-1)}
+  .backrow a:hover{color:var(--green)}
 
   /* ============ hero ============ */
-  .hero{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-  .hero img{
-    width:72px;height:72px;flex:0 0 auto;
-    border:1px solid var(--line);border-radius:14px;
-  }
-  .hero h1{
-    margin:0;font-size:24px;line-height:1.2;font-weight:800;
-    color:var(--ink);letter-spacing:.01em;
-  }
-  .hero .kicker{
-    margin:6px 0 0;color:var(--green);font-size:11px;
-    letter-spacing:.22em;text-transform:uppercase;
-  }
-  .lede{color:var(--ink2);margin:0 0 20px;font-size:14px}
-  .lede b{color:var(--ink);font-weight:700}
+  .hero{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+  .hero img{width:88px;height:88px;flex:none;border:1px solid var(--line);
+    filter:grayscale(1) sepia(1) hue-rotate(65deg) saturate(1.6) brightness(.95)}
+  .hero-info{display:flex;flex-direction:column;gap:8px;min-width:0}
+  .prompt{font-size:14px;color:var(--green)}
+  .prompt-user{color:var(--dim-2)} .prompt-path{color:var(--dim-4)}
+  .name{font-family:'Share Tech Mono',monospace;font-size:clamp(32px,6vw,56px);line-height:1;
+    margin:0;color:var(--green);letter-spacing:.01em;text-transform:uppercase;
+    text-shadow:0 0 24px rgba(var(--green-rgb),.55)}
+  .kicker{margin:0;font-size:12px;letter-spacing:.14em;color:var(--dim-1);text-transform:uppercase}
+  .kicker .beta{color:var(--amber)}
+
+  .lede{margin:0;font-size:15px;line-height:1.8;color:var(--ink);text-wrap:pretty}
+  .lede b{color:var(--green);font-weight:600}
 
   /* ============ screenshots ============ */
-  .shots{display:flex;gap:12px;margin:0 0 24px}
-  .shots figure{margin:0;flex:1;min-width:0}
-  .shots img{border:1px solid var(--line);width:100%}
-  .shots figcaption{
-    margin-top:8px;color:var(--ink2);font-size:11px;
-    letter-spacing:.12em;text-transform:uppercase;text-align:center;
-  }
+  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .shot{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+  .shot .frame{border:1px solid var(--line);overflow:hidden}
+  .shot img{width:100%;filter:grayscale(1) sepia(1) hue-rotate(65deg) saturate(1.6) brightness(.95)}
+  .shot figcaption{font-size:11px;color:var(--dim-3);letter-spacing:.12em;text-transform:uppercase}
 
   /* ============ callouts ============ */
-  .callout{
-    border:1px solid var(--line);border-left:2px solid var(--yellow);
-    background:rgba(255,214,10,.04);
-    padding:14px 16px;margin:0 0 24px;font-size:13px;line-height:1.6;
-  }
-  .callout .label{
-    color:var(--yellow);font-size:11px;letter-spacing:.18em;
-    text-transform:uppercase;margin-bottom:6px;display:block;
-  }
-  .callout b{color:var(--ink);font-weight:700}
-  .callout.ask{border-left-color:var(--green);background:rgba(0,255,136,.04)}
-  .callout.ask .label{color:var(--green)}
-  .callout .asks{margin:10px 0;padding-left:18px;display:flex;flex-direction:column;gap:8px}
-  .callout .asks li::marker{color:var(--green)}
+  .callout{border:1px solid var(--amber-line);background:var(--amber-bg);
+    padding:18px 20px;font-size:13px;line-height:1.7}
+  .callout .label{color:var(--amber);font-size:12px;letter-spacing:.12em;
+    text-transform:uppercase;margin-bottom:6px;display:block}
+  .callout b{color:var(--amber);font-weight:600}
+
+  .callout.ask{border-color:var(--line);background:var(--panel-solid);display:flex;flex-direction:column;gap:10px}
+  .callout.ask .label{color:var(--green);margin-bottom:0}
+  .callout.ask p{margin:0}
+  .asks{list-style:none;counter-reset:ask;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;color:var(--dim-1)}
+  .asks li{counter-increment:ask}
+  .asks li::before{content:"[" counter(ask) "] ";color:var(--dim-4)}
+  .ask-note{margin:0;color:var(--dim-3);font-size:12px}
 
   /* ============ steps ============ */
-  .steps{list-style:none;margin:0 0 24px;padding:0;display:flex;flex-direction:column;gap:14px}
-  .step{border:1px solid var(--line);background:rgba(0,255,136,.02);padding:18px 16px}
-  .step .num{
-    color:var(--cyan);font-size:11px;letter-spacing:.22em;
-    text-transform:uppercase;display:block;margin-bottom:6px;
-  }
-  .step h2{margin:0 0 8px;font-size:17px;font-weight:700;color:var(--ink);line-height:1.3}
-  .step p{margin:0 0 14px;color:var(--ink2);font-size:13px}
-  .step p b{color:var(--ink);font-weight:700}
-  .step .aside{margin:12px 0 0;font-size:12px;opacity:.85}
+  .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+  .step{border:1px solid var(--line);background:var(--panel-solid);padding:22px;
+    display:flex;flex-direction:column;gap:10px}
+  .step-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+  .step-num{color:var(--dim-4);font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+  .step-title{margin:0;font-family:'VT323',monospace;font-size:26px;color:var(--green);font-weight:400}
+  .step p{margin:0;font-size:13px;line-height:1.7;color:var(--ink)}
+  .step p b{color:var(--green);font-weight:600}
+  .step-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:13px}
+  .step-aside{margin:0;font-size:12px;color:var(--dim-3)}
   /* Own line so the address doesn't start mid-sentence and split across two;
      it fits unbroken from ~340px up. break-word rather than break-all so it
      only fragments on the narrowest phones, and never mid-line by default. */
-  .step .aside code{
-    display:block;margin-top:4px;
-    color:var(--cyan);font-size:12px;
-    overflow-wrap:break-word;
-  }
+  .step-aside code{display:block;margin-top:4px;color:var(--dim-2);font-size:12px;overflow-wrap:break-word}
 
-  .btn{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    width:100%;min-height:52px;padding:14px 18px;
-    border:1px solid var(--green);background:rgba(0,255,136,.08);
-    color:var(--green);font-family:inherit;font-size:13px;font-weight:700;
-    letter-spacing:.16em;text-transform:uppercase;
-    transition:all .15s;
-  }
-  .btn:hover{background:var(--green);color:#000;box-shadow:0 0 16px rgba(0,255,136,.35);border-bottom-color:var(--green)}
-  .btn .arr{font-size:16px}
+  /* min-height, not extra padding, so the pill looks exactly as designed while
+     the hit area clears the 44px touch-target guidance. The design's padding
+     alone lands at 43px, and this page exists to be tapped through on a phone. */
+  .btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;
+    background:var(--nav-bg);border:1px solid var(--line-strong);
+    padding:10px 18px;color:var(--green);font-family:inherit;font-size:13px;
+    letter-spacing:.1em;text-decoration:none;transition:all .15s}
+  .btn:hover{background:var(--nav-bg-hover);color:var(--green);
+    box-shadow:0 0 18px rgba(var(--green-rgb),.35);text-decoration:none}
+  .btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 
-  /* ============ generic block + faq ============ */
-  .block{margin:0 0 24px}
-  .block h2, .faq h2{
-    margin:0 0 8px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;
-    color:var(--ink2);font-weight:400;
-  }
-  .block p{margin:0;color:var(--ink2);font-size:13px}
-  .block p b{color:var(--ink);font-weight:700}
+  /* ============ info tiles + stuck ============ */
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .info-tile{border:1px solid var(--line);background:var(--panel-solid);padding:18px 20px;
+    font-size:13px;line-height:1.7}
+  .info-tile h2{margin:0 0 8px;font-size:12px;letter-spacing:.12em;color:var(--green);
+    text-transform:uppercase;font-weight:400}
+  .info-tile p{margin:0;color:var(--ink)}
+  .info-tile b{color:var(--green);font-weight:600}
 
-  .faq{margin:0 0 8px}
-  .faq details{border-top:1px dashed var(--line);padding:12px 0}
-  .faq details:last-of-type{border-bottom:1px dashed var(--line)}
-  .faq summary{
-    cursor:pointer;color:var(--ink);font-size:13px;font-weight:700;
-    list-style:none;display:flex;justify-content:space-between;gap:12px;
-  }
-  .faq summary::-webkit-details-marker{display:none}
-  .faq summary::after{content:'+';color:var(--cyan);font-weight:400}
-  .faq details[open] summary::after{content:'−'}
-  .faq details p{margin:10px 0 0;color:var(--ink2);font-size:13px}
+  .stuck{display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.7}
+  .stuck h2{margin:0;font-size:12px;letter-spacing:.12em;color:var(--green);
+    text-transform:uppercase;font-weight:400}
+  /* Opaque fill, not just a left rule: the rain canvas runs behind the whole
+     page, and these two blocks are the longest prose on it. Kept the accent
+     border so they still read as asides rather than full tiles. */
+  .stuck-item{border-left:2px solid var(--line-strong);background:var(--panel-solid);
+    padding:14px 18px;color:var(--ink)}
+  .stuck-item .q{color:var(--dim-1)}
 
-  /* ============ statusbar ============ */
-  .statusbar{
-    border-top:1px solid var(--line);background:#060606;
-    padding:10px 14px;display:flex;justify-content:space-between;gap:12px;
-    font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);
-  }
-  .statusbar a{color:var(--ink2)}
-  .statusbar a:hover{color:var(--green);border-bottom-color:transparent}
+  /* ============ footer ============ */
+  .pagefoot{display:flex;flex-wrap:wrap;gap:18px;font-size:12px;
+    border-top:1px solid var(--line);padding-top:18px}
+  .pagefoot a{color:var(--dim-1)}
+  .pagefoot a:hover{color:var(--green)}
 
   @media (max-width:520px){
-    /* Shortening the return link keeps the bar one line tall on the phones
-       most testers use. */
-    .tb-home-full{display:none}
-    .tb-home-short{display:inline}
-    .tb-home{gap:6px}
-    .tb-left{padding-left:12px}
-    .tb-right{padding-right:12px}
-    .body{padding:20px 14px 24px}
-    .hero{gap:12px}
-    .hero img{width:60px;height:60px}
-    .hero h1{font-size:20px}
-    .shots{flex-direction:column;gap:16px;max-width:280px;margin-inline:auto}
-    .btn{font-size:12px;letter-spacing:.12em;padding:14px}
-    .statusbar{letter-spacing:.06em}
+    .hero{gap:16px}
+    .hero img{width:64px;height:64px}
   }
 </style>
 </head>
@@ -228,120 +181,158 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TMFW9FK"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-<div class="shell">
-  <div class="window">
+<canvas id="rain" class="rain" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
 
-    <div class="titlebar">
-      <div class="tb-left">
-        <span style="color:var(--green)">● LIVE</span>
-      </div>
-      <div class="tb-center">blackjack coach</div>
-      <div class="tb-right">
-        <a class="tb-home" href="/">
-          <span aria-hidden="true">&larr;</span>
-          <span class="tb-home-full">chasecrawford.dev</span>
-          <span class="tb-home-short">home</span>
+<div class="wrap">
+<div class="page">
+
+  <div class="backrow">
+    <a href="/">&larr; cd ~ (chasecrawford.dev)</a>
+  </div>
+
+  <header class="hero">
+    <img src="/images/bjc-icon.png" alt="Blackjack Coach app icon" width="192" height="192">
+    <div class="hero-info">
+      <div class="prompt"><span class="prompt-user">chase@localhost</span><span class="prompt-path">:~/blackjack-coach</span> ❯ <span>cat README.md</span></div>
+      <h1 class="name">Blackjack Coach</h1>
+      <p class="kicker">Android · <span class="beta">closed beta</span></p>
+    </div>
+  </header>
+
+  <p class="lede">A free blackjack trainer. Realistic 6-deck table, and after every hand a coach tells you whether your play matched basic strategy. <b>No real money, no ads, no purchases, works offline.</b></p>
+
+  <div class="shots">
+    <figure class="shot">
+      <div class="frame"><img src="/images/bjc-play.png" alt="Blackjack Coach table screen: dealer showing a 5, player holding 4 and 10 for 14, with Hit, Stand and Double buttons." width="470" height="932" loading="lazy"></div>
+      <figcaption>01 · Play a hand</figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="frame"><img src="/images/bjc-coach.png" alt="Coach Review panel reading: you hit — basic strategy says stand 14 vs dealer 5." width="470" height="932" loading="lazy"></div>
+      <figcaption>02 · Coach reviews it</figcaption>
+    </figure>
+  </div>
+
+  <section class="callout">
+    <span class="label">Before you start</span>
+    You'll need an <b>Android phone</b> and a <b>Gmail address</b>. Use the <b>same</b> Gmail that's signed into the Play Store on that phone — this is the #1 reason people get stuck at step 3.
+  </section>
+
+  <ol class="steps">
+    <li class="step">
+      <div class="step-head"><span class="step-num">Step 01</span><h2 class="step-title">Join the testers group</h2></div>
+      <p>Sign in with your Gmail and join. It's a plain Google Group; I use it only as the tester list.</p>
+      <div class="step-actions">
+        <a class="btn" href="https://groups.google.com/g/blackjack-coach-testers" target="_blank" rel="noopener">
+          <span aria-hidden="true">&rarr;</span><span>Join the group</span>
         </a>
       </div>
-    </div>
+      <p class="step-aside">Link not working? Search Google Groups for this address:<code>blackjack-coach-testers@googlegroups.com</code></p>
+    </li>
 
-    <main class="body">
-
-      <header class="hero">
-        <img src="/images/bjc-icon.png" alt="Blackjack Coach app icon" width="192" height="192">
-        <div>
-          <h1>Blackjack Coach</h1>
-          <p class="kicker">Android · closed beta</p>
-        </div>
-      </header>
-
-      <p class="lede">A free blackjack trainer. Realistic 6-deck table, and after every hand a coach tells you whether your play matched basic strategy. <b>No real money, no ads, no purchases, works offline.</b></p>
-
-      <div class="shots">
-        <figure>
-          <img src="/images/bjc-play.png" alt="Blackjack Coach table screen: dealer showing a 5, player holding 4 and 10 for 14, with Hit, Stand and Double buttons." width="470" height="932" loading="lazy">
-          <figcaption>Play a hand</figcaption>
-        </figure>
-        <figure>
-          <img src="/images/bjc-coach.png" alt="Coach Review panel reading: you hit — basic strategy says stand 14 vs dealer 5." width="470" height="932" loading="lazy">
-          <figcaption>Coach reviews it</figcaption>
-        </figure>
+    <li class="step">
+      <div class="step-head"><span class="step-num">Step 02</span><h2 class="step-title">Opt in to the test</h2></div>
+      <p>Open this on the phone you'll install on and tap <b>Become a tester</b>. You have to do this before Google will show you the app at all.</p>
+      <div class="step-actions">
+        <a class="btn" href="https://play.google.com/apps/testing/dev.chasecrawford.blackjack.twa" target="_blank" rel="noopener">
+          <span aria-hidden="true">&rarr;</span><span>Opt in on Google Play</span>
+        </a>
       </div>
+    </li>
 
-      <section class="callout">
-        <span class="label">Before you start</span>
-        You'll need an <b>Android phone</b> and a <b>Gmail address</b>. Use the <b>same</b> Gmail that's signed into the Play Store on that phone — this is the #1 reason people get stuck at step 3.
-      </section>
+    <li class="step">
+      <div class="step-head"><span class="step-num">Step 03</span><h2 class="step-title">Install it</h2></div>
+      <p>Once you're a tester, the Play Store page works normally. Tap Install.</p>
+      <div class="step-actions">
+        <a class="btn" href="https://play.google.com/store/apps/details?id=dev.chasecrawford.blackjack.twa" target="_blank" rel="noopener">
+          <span aria-hidden="true">&rarr;</span><span>Open in Play Store</span>
+        </a>
+      </div>
+    </li>
+  </ol>
 
-      <ol class="steps">
-        <li class="step">
-          <span class="num">Step 01</span>
-          <h2>Join the testers group</h2>
-          <p>Sign in with your Gmail and join. It's a plain Google Group; I use it only as the tester list.</p>
-          <a class="btn" href="https://groups.google.com/g/blackjack-coach-testers" target="_blank" rel="noopener">
-            <span>Join the group</span><span class="arr">&rarr;</span>
-          </a>
-          <p class="aside">Link not working? Search Google Groups for this address:<code>blackjack-coach-testers@googlegroups.com</code></p>
-        </li>
+  <section class="callout ask">
+    <span class="label">Then: play it now and then</span>
+    <p>Google counts 12 testers who stay opted in for <b>14 straight days</b> — and when I apply to launch, they ask how much testers actually used the app. So two asks:</p>
+    <ul class="asks">
+      <li>Leave it installed the full two weeks. Uninstalling or leaving the group resets the clock for everyone.</li>
+      <li>Open it every couple of days and play a few hands. If you can, poke at all four tabs at least once — Table, Chart, Stats, and Settings.</li>
+    </ul>
+    <p class="ask-note">Ten minutes total across two weeks covers it.</p>
+  </section>
 
-        <li class="step">
-          <span class="num">Step 02</span>
-          <h2>Opt in to the test</h2>
-          <p>Open this on the phone you'll install on and tap <b>Become a tester</b>. You have to do this before Google will show you the app at all.</p>
-          <a class="btn" href="https://play.google.com/apps/testing/dev.chasecrawford.blackjack.twa" target="_blank" rel="noopener">
-            <span>Opt in on Google Play</span><span class="arr">&rarr;</span>
-          </a>
-        </li>
-
-        <li class="step">
-          <span class="num">Step 03</span>
-          <h2>Install it</h2>
-          <p>Once you're a tester, the Play Store page works normally. Tap Install.</p>
-          <a class="btn" href="https://play.google.com/store/apps/details?id=dev.chasecrawford.blackjack.twa" target="_blank" rel="noopener">
-            <span>Open in Play Store</span><span class="arr">&rarr;</span>
-          </a>
-        </li>
-      </ol>
-
-      <section class="callout ask">
-        <span class="label">Then: play it now and then</span>
-        Google counts 12 testers who stay opted in for <b>14 straight days</b> — and when I apply to launch, they ask how much testers actually used the app. So two asks:
-        <ul class="asks">
-          <li>Leave it installed the full two weeks. Uninstalling or leaving the group resets the clock for everyone.</li>
-          <li>Open it every couple of days and play a few hands. If you can, poke at all four tabs at least once — Table, Chart, Stats, and Settings.</li>
-        </ul>
-        Ten minutes total across two weeks covers it.
-      </section>
-
-      <section class="block">
-        <h2>Found a bug?</h2>
-        <p>Settings tab → <b>Send feedback</b>. It comes straight to me.</p>
-      </section>
-
-      <section class="faq">
-        <h2>Stuck?</h2>
-        <details>
-          <summary>Play says the app isn't available</summary>
-          <p>Almost always the wrong Google account, or the opt-in hasn't propagated yet. Check that the Play Store on your phone is signed in with the same Gmail you used in step 1, then wait a few minutes and retry.</p>
-        </details>
-        <details>
-          <summary>There's never an update to install</summary>
-          <p>That's expected. Most updates ship silently and are live the next time you open the app — there's usually no Play Store update prompt.</p>
-        </details>
-        <details>
-          <summary>I'm on an iPhone</summary>
-          <p>Then you can't test the Android build, unfortunately. The browser version works on any phone though: <a href="https://blackjack.chasecrawford.dev" target="_blank" rel="noopener">blackjack.chasecrawford.dev</a></p>
-        </details>
-      </section>
-
-    </main>
-
-    <div class="statusbar">
-      <a href="/">&larr; chasecrawford.dev</a>
-      <a href="https://blackjack.chasecrawford.dev/privacy" target="_blank" rel="noopener">Privacy</a>
-    </div>
-
+  <div class="info-grid">
+    <section class="info-tile">
+      <h2>Found a bug?</h2>
+      <p>Settings tab → <b>Send feedback</b>. It comes straight to me.</p>
+    </section>
+    <section class="info-tile">
+      <h2>I'm on an iPhone</h2>
+      <p>Then you can't test the Android build, unfortunately. The browser version works on any phone though: <a href="https://blackjack.chasecrawford.dev" target="_blank" rel="noopener">blackjack.chasecrawford.dev</a></p>
+    </section>
   </div>
+
+  <section class="stuck">
+    <h2>Stuck?</h2>
+    <div class="stuck-item"><span class="q">Play says the app isn't available.</span> Almost always the wrong Google account, or the opt-in hasn't propagated yet. Check that the Play Store on your phone is signed in with the same Gmail you used in step 1, then wait a few minutes and retry.</div>
+    <div class="stuck-item"><span class="q">There's never an update to install.</span> That's expected. Most updates ship silently and are live the next time you open the app — there's usually no Play Store update prompt.</div>
+  </section>
+
+  <div class="pagefoot">
+    <a href="/">&larr; chasecrawford.dev</a>
+    <a href="https://blackjack.chasecrawford.dev/privacy" target="_blank" rel="noopener">Privacy</a>
+  </div>
+
 </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ===== DIGITAL RAIN =====
+  var GLYPHS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ZXCVBNM$+*#';
+  var PITCH = 18, OPACITY = 0.3, FPS = 24;
+  (function rain(){
+    var c = document.getElementById('rain');
+    if (!c) return;
+    var ctx = c.getContext('2d'), drops = [];
+    function size(){
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      var cols = Math.floor(c.width / PITCH);
+      drops = Array.from({length: cols}, function(){ return Math.random() * -c.height / PITCH; });
+    }
+    function draw(){
+      ctx.fillStyle = 'rgba(2,8,3,0.12)';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.font = '15px monospace';
+      for (var i = 0; i < drops.length; i++){
+        var x = i * PITCH, y = drops[i] * PITCH;
+        ctx.fillStyle = 'rgba(180,255,200,' + OPACITY + ')';
+        ctx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], x, y);
+        // JS string, not CSS — var(--green-rgb) would not resolve here, so this literal stays.
+        ctx.fillStyle = 'rgba(0,255,65,' + (OPACITY * 0.55) + ')';
+        ctx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], x, y - PITCH);
+        drops[i] = (y > c.height && Math.random() > 0.975) ? 0 : drops[i] + 1;
+      }
+    }
+    size();
+    // Reduced motion draws exactly one static frame via the initial call
+    // below, and never runs the rAF loop that would otherwise redraw it --
+    // so a resize (which clears the canvas via size()'s width/height
+    // reassignment) must explicitly redraw that frame or it is lost for good.
+    window.addEventListener('resize', function(){ size(); if (reduced) draw(); });
+    if (reduced) { draw(); return; }   // one static frame, no animation loop
+    var last = 0;
+    (function step(t){
+      requestAnimationFrame(step);
+      if (t - last < 1000 / FPS) return;
+      last = t; draw();
+    })(0);
+  })();
+})();
+</script>
 </body>
 </html>
