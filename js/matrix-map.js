@@ -107,7 +107,7 @@
       if (reduced) {
         svgWrap.style.opacity = '0';
         mapEl.style.opacity = '1';
-        status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY · 38.2527°N 85.7585°W';
+        status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY 38.2527°N 85.7585°W';
         window.__mapState = 'locked';
         // No trace ran, so there is nothing to replay. Defined anyway so callers
         // never have to branch; the header's replay button is hidden at this
@@ -137,7 +137,7 @@
           .on('end', () => {
             svgWrap.style.opacity = '0';
             mapEl.style.opacity = '1';
-            status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY · 38.2527°N 85.7585°W';
+            status.textContent = 'SIGNAL LOCKED > LOUISVILLE, KY 38.2527°N 85.7585°W';
             window.__mapState = 'locked';
           });
       };
