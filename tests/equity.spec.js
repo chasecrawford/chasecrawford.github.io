@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { dismissBoot, equityWindow, usd2 } = require('./helpers');
+const { dismissBoot, equityWindow, usd2, FULL } = require('./helpers');
 
 async function openResults(page) {
   await page.locator('#viewResults').click();
@@ -38,11 +38,11 @@ test.describe('equity panel', () => {
 
   test('each range button re-windows against the newest snapshot', async ({ page }) => {
     await openResults(page);
-    // 7, 30, 7 (not 7, 30, 60) -- openResults() already leaves __equityDays at
-    // 60 from the initial render, so ending back on 60 here would pass even if
-    // the button click did nothing at all. Ending on a re-click of 7 proves
-    // each click actually re-renders.
-    for (const days of [7, 30, 7]) {
+    // FULL, 30, FULL (not FULL, 30, 60) -- openResults() already leaves
+    // __equityDays at 60 from the initial render, so ending back on 60 here
+    // would pass even if the button click did nothing at all. Ending on a
+    // re-click of FULL proves each click actually re-renders.
+    for (const days of [FULL, 30, FULL]) {
       await page.evaluate(() => { window.__equityDays = undefined; });
       await page.locator(`#equityToggle button[data-days="${days}"]`).click();
       await page.waitForFunction((d) => window.__equityDays === d, days);
@@ -53,11 +53,46 @@ test.describe('equity panel', () => {
     }
   });
 
+  test('the range toggle offers 30D, 60D and FULL, with no 7D window', async ({ page }) => {
+    await openResults(page);
+    const labels = await page.locator('#equityToggle button[data-days]').allTextContents();
+    expect(labels).toEqual(['30D', '60D', 'FULL']);
+  });
+
+  test('FULL reaches snapshots older than the widest fixed window', async ({ page }) => {
+    // The first snapshot sits ~13 months behind the last, so every fixed
+    // window clips it and only FULL can bring it back. Stubbed response --
+    // json/paper-equity.json is untouched.
+    const payload = {
+      start_date: '2025-01-01',
+      as_of: '2026-02-10T00:00:00+00:00',
+      snapshots: [
+        { date: '2025-01-01', equity: 5000, spy_equity: 5000 },
+        { date: '2026-02-09', equity: 5400, spy_equity: 5300 },
+        { date: '2026-02-10', equity: 5500, spy_equity: 5350 },
+      ],
+      positions: [],
+    };
+    await page.route('**/json/paper-equity.json', (r) => r.fulfill({ json: payload }));
+    await page.goto('/index.html');
+    await dismissBoot(page);
+    await openResults(page); // 60D — the 2025 point is outside the cutoff
+    await expect(page.locator('#equityOpen')).toHaveText(usd2(5400));
+
+    await page.locator(`#equityToggle button[data-days="${FULL}"]`).click();
+    await page.waitForFunction((d) => window.__equityDays === d, FULL);
+
+    await expect(page.locator('#equityOpen')).toHaveText(usd2(5000));
+    await expect(page.locator('#equityLo')).toHaveText('$5,000');
+    const points = (await page.locator('#equityStrat').getAttribute('points')).trim().split(' ');
+    expect(points).toHaveLength(3);
+  });
+
   test('dismissing and reopening resets the active range button to 60D', async ({ page }) => {
     await openResults(page);
-    await page.locator('#equityToggle button[data-days="7"]').click();
-    await page.waitForFunction(() => window.__equityDays === 7);
-    await expect(page.locator('#equityToggle button[data-days="7"]')).toHaveClass(/is-active/);
+    await page.locator(`#equityToggle button[data-days="${FULL}"]`).click();
+    await page.waitForFunction((d) => window.__equityDays === d, FULL);
+    await expect(page.locator(`#equityToggle button[data-days="${FULL}"]`)).toHaveClass(/is-active/);
     await expect(page.locator('#equityToggle button[data-days="60"]')).not.toHaveClass(/is-active/);
 
     await page.locator('#equityDismiss').click();
@@ -66,7 +101,7 @@ test.describe('equity panel', () => {
     await page.waitForFunction(() => window.__equityDays === 60);
 
     await expect(page.locator('#equityToggle button[data-days="60"]')).toHaveClass(/is-active/);
-    await expect(page.locator('#equityToggle button[data-days="7"]')).not.toHaveClass(/is-active/);
+    await expect(page.locator(`#equityToggle button[data-days="${FULL}"]`)).not.toHaveClass(/is-active/);
   });
 
   test('caption dates come from the JSON, never hardcoded', async ({ page }) => {
@@ -148,7 +183,7 @@ test.describe('equity panel', () => {
 
   test('switching to a too-small window clears hi/lo labels left over from a larger one', async ({ page }) => {
     // Two snapshots 40 days apart: both are inside the 60D cutoff (>=2
-    // points, chart renders) but only the newest is inside the 7D cutoff
+    // points, chart renders) but only the newest is inside the 30D cutoff
     // (<2 points, empty-state branch).
     const payload = {
       start_date: '2026-01-01',
@@ -167,8 +202,8 @@ test.describe('equity panel', () => {
     await expect(page.locator('#equityHi')).toHaveText('$5,500');
     await expect(page.locator('#equityLo')).toHaveText('$5,000');
 
-    await page.locator('#equityToggle button[data-days="7"]').click();
-    await page.waitForFunction(() => window.__equityDays === 7);
+    await page.locator('#equityToggle button[data-days="30"]').click();
+    await page.waitForFunction(() => window.__equityDays === 30);
 
     await expect(page.locator('.equity-empty')).toHaveText(
       'awaiting second snapshot · curve renders at 2 points'

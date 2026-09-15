@@ -67,7 +67,7 @@ test.describe('page health', () => {
     await expect(page.locator('#viewResults')).toHaveAttribute('aria-expanded', 'true');
     const pressed = await page.locator('#equityToggle button[data-days]').evaluateAll((els) =>
       els.map((e) => e.getAttribute('aria-pressed')));
-    expect(pressed).toEqual(['false', 'false', 'true']);   // 7D, 30D, 60D — 60D is the default
+    expect(pressed).toEqual(['false', 'true', 'false']);   // 30D, 60D, FULL — 60D is the default
   });
 
   test('interactive controls are keyboard reachable', async ({ page }) => {

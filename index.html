@@ -303,9 +303,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="equity-head">
         <span class="equity-title">PAPER TRADING TRIAL NO. 2</span>
         <div class="equity-range" id="equityToggle" role="group" aria-label="Chart window">
-          <button type="button" class="range-btn" data-days="7" aria-pressed="false">7D</button>
           <button type="button" class="range-btn" data-days="30" aria-pressed="false">30D</button>
           <button type="button" class="range-btn is-active" data-days="60" aria-pressed="true">60D</button>
+          <button type="button" class="range-btn" data-days="0" aria-pressed="false">FULL</button>
           <button type="button" id="equityDismiss" class="range-btn equity-close" aria-label="Close results">✕</button>
         </div>
       </div>
@@ -579,8 +579,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     var snaps = [];
 
+    // data-days="0" is the FULL button: no day window, every snapshot we have.
+    var FULL = 0;
+
     function sliceByDays(days){
-      if (!snaps.length) return snaps;
+      if (!snaps.length || days === FULL) return snaps;
       var last = snaps[snaps.length - 1].date.split('-').map(Number);
       var cutoff = Date.UTC(last[0], last[1] - 1, last[2] - (days - 1));
       return snaps.filter(function(s){

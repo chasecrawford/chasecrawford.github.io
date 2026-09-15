@@ -11,12 +11,16 @@ async function dismissBoot(page) {
   }
 }
 
-/** Snapshots within `days` calendar days of the NEWEST snapshot. */
+/** The `data-days` value of the FULL button: no day window, every snapshot. */
+const FULL = 0;
+
+/** Snapshots within `days` calendar days of the NEWEST snapshot (FULL = all). */
 function equityWindow(days) {
   const file = path.join(__dirname, '..', 'json', 'paper-equity.json');
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   const snaps = (data.snapshots || []).filter((s) => typeof s.equity === 'number');
   if (!snaps.length) return { data, snaps: [] };
+  if (days === FULL) return { data, snaps };
   const [ly, lm, ld] = snaps[snaps.length - 1].date.split('-').map(Number);
   const cutoff = Date.UTC(ly, lm - 1, ld - (days - 1));
   const win = snaps.filter((s) => {
@@ -29,4 +33,4 @@ function equityWindow(days) {
 const usd2 = (v) =>
   '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-module.exports = { dismissBoot, equityWindow, usd2 };
+module.exports = { dismissBoot, equityWindow, usd2, FULL };
