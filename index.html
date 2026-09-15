@@ -304,8 +304,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="equity-title">PAPER TRADING TRIAL NO. 2</span>
         <div class="equity-range" id="equityToggle" role="group" aria-label="Chart window">
           <button type="button" class="range-btn" data-days="30" aria-pressed="false">30D</button>
-          <button type="button" class="range-btn is-active" data-days="60" aria-pressed="true">60D</button>
-          <button type="button" class="range-btn" data-days="0" aria-pressed="false">FULL</button>
+          <button type="button" class="range-btn" data-days="60" aria-pressed="false">60D</button>
+          <button type="button" class="range-btn is-active" data-days="0" aria-pressed="true">FULL</button>
           <button type="button" id="equityDismiss" class="range-btn equity-close" aria-label="Close results">✕</button>
         </div>
       </div>
@@ -581,6 +581,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     // data-days="0" is the FULL button: no day window, every snapshot we have.
     var FULL = 0;
+    // The window the panel opens on, and returns to after a dismiss. FULL,
+    // so the curve opens showing the whole account rather than a slice of it
+    // -- must stay in step with is-active/aria-pressed in the markup above.
+    var DEFAULT_DAYS = FULL;
 
     function sliceByDays(days){
       if (!snaps.length || days === FULL) return snaps;
@@ -699,7 +703,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         });
 
         btn.addEventListener('click', function(){
-          panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); setOthers(true); render(60);
+          panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); setOthers(true); render(DEFAULT_DAYS);
         });
         document.getElementById('equityDismiss').addEventListener('click', function(){
           panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); setOthers(false);
@@ -710,7 +714,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         // toggle to open it, so the chart must already hold real data by the
         // time it becomes visible. Harmless on desktop -- the panel itself
         // stays under [hidden] until #viewResults is clicked.
-        render(60);
+        render(DEFAULT_DAYS);
 
         btn.hidden = false;
       })

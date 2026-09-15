@@ -30,7 +30,7 @@ test.describe('equity panel', () => {
 
   test('renders REAL data from paper-equity.json, not the export mock', async ({ page }) => {
     await openResults(page);
-    const { snaps } = equityWindow(60);            // 60D is the default window
+    const { snaps } = equityWindow(FULL);          // FULL is the default window
     expect(snaps.length).toBeGreaterThan(1);
     await expect(page.locator('#equityOpen')).toHaveText(usd2(snaps[0].equity));
     await expect(page.locator('#equityClose')).toHaveText(usd2(snaps[snaps.length - 1].equity));
@@ -38,11 +38,11 @@ test.describe('equity panel', () => {
 
   test('each range button re-windows against the newest snapshot', async ({ page }) => {
     await openResults(page);
-    // FULL, 30, FULL (not FULL, 30, 60) -- openResults() already leaves
-    // __equityDays at 60 from the initial render, so ending back on 60 here
-    // would pass even if the button click did nothing at all. Ending on a
-    // re-click of FULL proves each click actually re-renders.
-    for (const days of [FULL, 30, FULL]) {
+    // 30, 60, 30 -- openResults() already leaves __equityDays at FULL from
+    // the initial render, so ending back on FULL here would pass even if the
+    // button click did nothing at all. Ending on a re-click of 30 proves each
+    // click actually re-renders.
+    for (const days of [30, 60, 30]) {
       await page.evaluate(() => { window.__equityDays = undefined; });
       await page.locator(`#equityToggle button[data-days="${days}"]`).click();
       await page.waitForFunction((d) => window.__equityDays === d, days);
@@ -59,7 +59,7 @@ test.describe('equity panel', () => {
     expect(labels).toEqual(['30D', '60D', 'FULL']);
   });
 
-  test('FULL reaches snapshots older than the widest fixed window', async ({ page }) => {
+  test('opens on FULL, so the oldest snapshot is visible without touching the controls', async ({ page }) => {
     // The first snapshot sits ~13 months behind the last, so every fixed
     // window clips it and only FULL can bring it back. Stubbed response --
     // json/paper-equity.json is untouched.
@@ -76,37 +76,39 @@ test.describe('equity panel', () => {
     await page.route('**/json/paper-equity.json', (r) => r.fulfill({ json: payload }));
     await page.goto('/index.html');
     await dismissBoot(page);
-    await openResults(page); // 60D — the 2025 point is outside the cutoff
-    await expect(page.locator('#equityOpen')).toHaveText(usd2(5400));
-
-    await page.locator(`#equityToggle button[data-days="${FULL}"]`).click();
+    await openResults(page); // defaults to FULL — the 2025 point is included
     await page.waitForFunction((d) => window.__equityDays === d, FULL);
-
+    await expect(page.locator(`#equityToggle button[data-days="${FULL}"]`)).toHaveClass(/is-active/);
     await expect(page.locator('#equityOpen')).toHaveText(usd2(5000));
     await expect(page.locator('#equityLo')).toHaveText('$5,000');
     const points = (await page.locator('#equityStrat').getAttribute('points')).trim().split(' ');
     expect(points).toHaveLength(3);
+
+    // and a fixed window still clips it, which is what FULL exists to avoid
+    await page.locator('#equityToggle button[data-days="60"]').click();
+    await page.waitForFunction(() => window.__equityDays === 60);
+    await expect(page.locator('#equityOpen')).toHaveText(usd2(5400));
   });
 
-  test('dismissing and reopening resets the active range button to 60D', async ({ page }) => {
+  test('dismissing and reopening resets the active range button to FULL', async ({ page }) => {
     await openResults(page);
-    await page.locator(`#equityToggle button[data-days="${FULL}"]`).click();
-    await page.waitForFunction((d) => window.__equityDays === d, FULL);
-    await expect(page.locator(`#equityToggle button[data-days="${FULL}"]`)).toHaveClass(/is-active/);
-    await expect(page.locator('#equityToggle button[data-days="60"]')).not.toHaveClass(/is-active/);
+    await page.locator('#equityToggle button[data-days="30"]').click();
+    await page.waitForFunction(() => window.__equityDays === 30);
+    await expect(page.locator('#equityToggle button[data-days="30"]')).toHaveClass(/is-active/);
+    await expect(page.locator(`#equityToggle button[data-days="${FULL}"]`)).not.toHaveClass(/is-active/);
 
     await page.locator('#equityDismiss').click();
     await page.evaluate(() => { window.__equityDays = undefined; });
     await page.locator('#viewResults').click();
-    await page.waitForFunction(() => window.__equityDays === 60);
+    await page.waitForFunction((d) => window.__equityDays === d, FULL);
 
-    await expect(page.locator('#equityToggle button[data-days="60"]')).toHaveClass(/is-active/);
-    await expect(page.locator(`#equityToggle button[data-days="${FULL}"]`)).not.toHaveClass(/is-active/);
+    await expect(page.locator(`#equityToggle button[data-days="${FULL}"]`)).toHaveClass(/is-active/);
+    await expect(page.locator('#equityToggle button[data-days="30"]')).not.toHaveClass(/is-active/);
   });
 
   test('caption dates come from the JSON, never hardcoded', async ({ page }) => {
     await openResults(page);
-    const { data, snaps } = equityWindow(60);
+    const { data, snaps } = equityWindow(FULL);
     const caption = await page.locator('#equityCaption').textContent();
     expect(caption).toContain(data.start_date);
     expect(caption).toContain('data through');
@@ -119,7 +121,7 @@ test.describe('equity panel', () => {
 
   test('holdings come from the positions array', async ({ page }) => {
     await openResults(page);
-    const { data } = equityWindow(60);
+    const { data } = equityWindow(FULL);
     const shown = await page.locator('#equityHolding span.sym').allTextContents();
     expect(shown).toEqual(data.positions || []);
   });
@@ -130,9 +132,9 @@ test.describe('equity panel', () => {
     expect((await page.locator('#equitySpy').getAttribute('points')).length).toBeGreaterThan(10);
   });
 
-  test('the strategy polyline is numerically correct for the 60D window', async ({ page }) => {
+  test('the strategy polyline is numerically correct for the FULL window', async ({ page }) => {
     await openResults(page);
-    const { snaps } = equityWindow(60);
+    const { snaps } = equityWindow(FULL);
     const points = (await page.locator('#equityStrat').getAttribute('points')).trim().split(' ');
     expect(points).toHaveLength(snaps.length);
 
