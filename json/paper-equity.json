@@ -1,32 +1,7 @@
 {
   "start_date": "2026-04-22",
-  "as_of": "2026-09-18T00:00:00+00:00",
+  "as_of": "2026-09-25T00:00:00+00:00",
   "snapshots": [
-    {
-      "date": "2026-06-26",
-      "equity": 7047.0,
-      "spy_equity": 5138.2
-    },
-    {
-      "date": "2026-06-29",
-      "equity": 6715.63,
-      "spy_equity": 5222.85
-    },
-    {
-      "date": "2026-06-30",
-      "equity": 7052.24,
-      "spy_equity": 5263.52
-    },
-    {
-      "date": "2026-07-01",
-      "equity": 7329.88,
-      "spy_equity": 5256.4
-    },
-    {
-      "date": "2026-07-02",
-      "equity": 6754.96,
-      "spy_equity": 5249.5
-    },
     {
       "date": "2026-07-03",
       "equity": 6319.23,
@@ -300,19 +275,44 @@
     {
       "date": "2026-09-18",
       "equity": 6100.97,
-      "spy_equity": 5368.68
+      "spy_equity": 5382.02
+    },
+    {
+      "date": "2026-09-21",
+      "equity": 6222.74,
+      "spy_equity": 5465.46
+    },
+    {
+      "date": "2026-09-22",
+      "equity": 6120.22,
+      "spy_equity": 5464.62
+    },
+    {
+      "date": "2026-09-23",
+      "equity": 6093.24,
+      "spy_equity": 5425.26
+    },
+    {
+      "date": "2026-09-24",
+      "equity": 6106.6,
+      "spy_equity": 5420.81
+    },
+    {
+      "date": "2026-09-25",
+      "equity": 6206.21,
+      "spy_equity": 5450.27
     }
   ],
   "positions": [
     "AMD",
     "DELL",
     "HPE",
+    "HUM",
     "ILMN",
+    "INTC",
     "MPC",
     "MU",
     "NTAP",
-    "PSX",
-    "ROKU",
     "VLO"
   ]
 }
