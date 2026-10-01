@@ -97,7 +97,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .lede b{color:var(--green);font-weight:600}
 
   /* ============ screenshots ============ */
-  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  /* The app is landscape-only, so the shots are 16:9: two columns from ~664px
+     up, one below. min() keeps the 300px track from overflowing a 320px phone. */
+  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px}
   .shot{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
   .shot .frame{border:1px solid var(--line);overflow:hidden}
   .shot img{width:100%;filter:grayscale(1) sepia(1) hue-rotate(65deg) saturate(1.6) brightness(.95)}
@@ -203,14 +205,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <p class="lede">A free blackjack trainer. Realistic 6-deck table, and after every hand a coach tells you whether your play matched basic strategy. <b>No real money, no ads, no purchases, works offline.</b></p>
 
+  <!-- sizes: one column is the viewport minus the 24px gutters; two columns
+       (from 664px) cap at (812 - 16) / 2 = 398px inside the 860px wrap. -->
   <div class="shots">
     <figure class="shot">
-      <div class="frame"><img src="/images/bjc-play.png" alt="Blackjack Coach table screen: dealer showing a 5, player holding 4 and 10 for 14, with Hit, Stand and Double buttons." width="470" height="932" loading="lazy"></div>
-      <figcaption>01 · Play a hand</figcaption>
+      <div class="frame"><picture>
+        <source type="image/webp" srcset="/images/bjc-splash-landscape-960.webp 960w, /images/bjc-splash-landscape-1920.webp 1920w" sizes="(min-width: 664px) 398px, calc(100vw - 48px)">
+        <img src="/images/bjc-splash-landscape-960.png" alt="Blackjack Coach splash screen: the Blackjack Coach title beside an ace and jack of spades, a gold Tap to start button, and the line Practice only · No real money." width="960" height="540">
+      </picture></div>
+      <figcaption>01 · Tap to start</figcaption>
     </figure>
     <figure class="shot">
-      <div class="frame"><img src="/images/bjc-coach.png" alt="Coach Review panel reading: you hit — basic strategy says stand 14 vs dealer 5." width="470" height="932" loading="lazy"></div>
-      <figcaption>02 · Coach reviews it</figcaption>
+      <div class="frame"><picture>
+        <source type="image/webp" srcset="/images/bjc-play-landscape-960.webp 960w, /images/bjc-play-landscape-1920.webp 1920w" sizes="(min-width: 664px) 398px, calc(100vw - 48px)">
+        <img src="/images/bjc-play-landscape-960.png" alt="Blackjack Coach table mid-hand: the dealer shows a 10 with one card face down, you hold a pair of 8s for 16, with Hit, Stand, Double and Split buttons and a dealer statistics panel on the left." width="960" height="540" loading="lazy">
+      </picture></div>
+      <figcaption>02 · Play a hand</figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="frame"><picture>
+        <source type="image/webp" srcset="/images/bjc-coach-landscape-960.webp 960w, /images/bjc-coach-landscape-1920.webp 1920w" sizes="(min-width: 664px) 398px, calc(100vw - 48px)">
+        <img src="/images/bjc-coach-landscape-960.png" alt="Coach Review panel over the table after you stood on 9 and 7 against a dealer king: you stand — basic strategy says hit 16 vs dealer K." width="960" height="540" loading="lazy">
+      </picture></div>
+      <figcaption>03 · Coach reviews it</figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="frame"><picture>
+        <source type="image/webp" srcset="/images/bjc-chart-landscape-960.webp 960w, /images/bjc-chart-landscape-1920.webp 1920w" sizes="(min-width: 664px) 398px, calc(100vw - 48px)">
+        <img src="/images/bjc-chart-landscape-960.png" alt="Basic strategy chart on its Soft tab: a colour-coded grid of hit, double and stand calls for soft hands A,2 through A,9 against dealer 2 through ace." width="960" height="540" loading="lazy">
+      </picture></div>
+      <figcaption>04 · Check the chart</figcaption>
     </figure>
   </div>
 

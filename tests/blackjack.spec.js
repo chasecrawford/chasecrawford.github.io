@@ -47,32 +47,56 @@ test.describe('blackjack-coach navigation', () => {
   });
 });
 
+// Landscape app screenshots, in page order. Each is a <picture> with 960w/1920w
+// WebP sources and a 960w PNG fallback in the <img src>.
+const SHOTS = ['splash', 'play', 'coach', 'chart'];
+const shotImg = (page, name) => page.locator(`img[src="/images/bjc-${name}-landscape-960.png"]`);
+
 test.describe('blackjack-coach images', () => {
   test.beforeEach(async ({ page }) => { await page.goto(PAGE); });
 
-  test('icon, play, and coach screenshots all load', async ({ page }) => {
+  test('the icon loads', async ({ page }) => {
     const icon = page.locator('img[src="/images/bjc-icon.png"]');
     await expect(icon).toHaveCount(1);
     expect(await icon.evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+  });
 
-    const play = page.locator('img[src="/images/bjc-play.png"]');
-    const coach = page.locator('img[src="/images/bjc-coach.png"]');
-    await expect(play).toHaveCount(1);
-    await expect(coach).toHaveCount(1);
+  test('every landscape screenshot loads, as WebP', async ({ page }) => {
+    await expect(page.locator('.shots .shot')).toHaveCount(SHOTS.length);
+    for (const name of SHOTS) {
+      const img = shotImg(page, name);
+      await expect(img).toHaveCount(1);
+      // Below-the-fold lazy images need to be scrolled into view before
+      // complete/naturalWidth mean anything.
+      await img.scrollIntoViewIfNeeded();
+      await expect.poll(() => img.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
+      expect(await img.evaluate((el) => el.currentSrc)).toMatch(
+        new RegExp(`/images/bjc-${name}-landscape-(960|1920)\\.webp$`));
+    }
+  });
 
-    // Below-the-fold lazy images need to be scrolled into view before
-    // complete/naturalWidth mean anything.
-    await play.scrollIntoViewIfNeeded();
-    await coach.scrollIntoViewIfNeeded();
-    await expect.poll(() => play.evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
-    await expect.poll(() => coach.evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+  test('screenshots reserve a 16:9 box and only the first loads eagerly', async ({ page }) => {
+    for (const [i, name] of SHOTS.entries()) {
+      const img = shotImg(page, name);
+      await expect(img).toHaveAttribute('width', '960');
+      await expect(img).toHaveAttribute('height', '540');
+      if (i === 0) await expect(img).not.toHaveAttribute('loading', 'lazy');
+      else await expect(img).toHaveAttribute('loading', 'lazy');
+    }
   });
 
   test('images carry real alt text', async ({ page }) => {
-    for (const src of ['/images/bjc-icon.png', '/images/bjc-play.png', '/images/bjc-coach.png']) {
-      const alt = await page.locator(`img[src="${src}"]`).getAttribute('alt');
+    const imgs = [page.locator('img[src="/images/bjc-icon.png"]'), ...SHOTS.map((n) => shotImg(page, n))];
+    for (const img of imgs) {
+      const alt = await img.getAttribute('alt');
       expect(alt && alt.length).toBeGreaterThan(10);
     }
+  });
+
+  test('the old portrait screenshots are gone', async ({ page }) => {
+    const html = await page.content();
+    expect(html).not.toContain('/images/bjc-play.png');
+    expect(html).not.toContain('/images/bjc-coach.png');
   });
 });
 
@@ -147,7 +171,7 @@ test.describe('blackjack-coach page health', () => {
   });
 });
 
-const WIDTHS = [390, 1440];
+const WIDTHS = [320, 390, 1440];
 for (const width of WIDTHS) {
   test.describe(`blackjack-coach responsive at ${width}px`, () => {
     test.use({ viewport: { width, height: 900 } });
