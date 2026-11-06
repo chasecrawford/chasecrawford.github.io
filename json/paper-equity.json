@@ -1,32 +1,7 @@
 {
   "start_date": "2026-04-22",
-  "as_of": "2026-10-30T00:00:00+00:00",
+  "as_of": "2026-11-06T01:00:00+00:00",
   "snapshots": [
-    {
-      "date": "2026-08-07",
-      "equity": 5476.84,
-      "spy_equity": 5450.23
-    },
-    {
-      "date": "2026-08-10",
-      "equity": 5539.72,
-      "spy_equity": 5448.61
-    },
-    {
-      "date": "2026-08-11",
-      "equity": 5514.13,
-      "spy_equity": 5431.2
-    },
-    {
-      "date": "2026-08-12",
-      "equity": 5493.78,
-      "spy_equity": 5444.81
-    },
-    {
-      "date": "2026-08-13",
-      "equity": 5644.31,
-      "spy_equity": 5482.8
-    },
     {
       "date": "2026-08-14",
       "equity": 5656.39,
@@ -301,18 +276,43 @@
       "date": "2026-10-30",
       "equity": 5995.12,
       "spy_equity": 5339.83
+    },
+    {
+      "date": "2026-11-02",
+      "equity": 5693.68,
+      "spy_equity": 5314.25
+    },
+    {
+      "date": "2026-11-03",
+      "equity": 5582.2,
+      "spy_equity": 5330.15
+    },
+    {
+      "date": "2026-11-04",
+      "equity": 5636.03,
+      "spy_equity": 5418.19
+    },
+    {
+      "date": "2026-11-05",
+      "equity": 5601.45,
+      "spy_equity": 5179.29
+    },
+    {
+      "date": "2026-11-06",
+      "equity": 5474.81,
+      "spy_equity": 5195.48
     }
   ],
   "positions": [
-    "AMD",
+    "ABBV",
+    "ACN",
+    "ADP",
+    "AMGN",
     "BBY",
-    "DD",
-    "DELL",
-    "HPE",
+    "BDX",
     "HUM",
     "LLY",
-    "NTAP",
-    "PSX",
-    "VLO"
+    "SAP",
+    "TMO"
   ]
 }
