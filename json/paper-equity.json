@@ -1,32 +1,7 @@
 {
   "start_date": "2026-04-22",
-  "as_of": "2026-11-13T01:00:00+00:00",
+  "as_of": "2026-11-20T01:00:00+00:00",
   "snapshots": [
-    {
-      "date": "2026-08-21",
-      "equity": 5445.46,
-      "spy_equity": 5397.09
-    },
-    {
-      "date": "2026-08-24",
-      "equity": 5434.74,
-      "spy_equity": 5381.23
-    },
-    {
-      "date": "2026-08-25",
-      "equity": 5411.62,
-      "spy_equity": 5398.43
-    },
-    {
-      "date": "2026-08-26",
-      "equity": 5458.15,
-      "spy_equity": 5399.63
-    },
-    {
-      "date": "2026-08-27",
-      "equity": 5523.3,
-      "spy_equity": 5435.01
-    },
     {
       "date": "2026-08-28",
       "equity": 5494.28,
@@ -301,18 +276,43 @@
       "date": "2026-11-13",
       "equity": 5559.97,
       "spy_equity": 5330.29
+    },
+    {
+      "date": "2026-11-16",
+      "equity": 5634.32,
+      "spy_equity": 5228.4
+    },
+    {
+      "date": "2026-11-17",
+      "equity": 5564.48,
+      "spy_equity": 5175.34
+    },
+    {
+      "date": "2026-11-18",
+      "equity": 5469.46,
+      "spy_equity": 5159.51
+    },
+    {
+      "date": "2026-11-19",
+      "equity": 5361.57,
+      "spy_equity": 5058.26
+    },
+    {
+      "date": "2026-11-20",
+      "equity": 5278.73,
+      "spy_equity": 4874.12
     }
   ],
   "positions": [
-    "ABBV",
-    "ACN",
     "ADP",
-    "AMGN",
     "BBY",
-    "BDX",
+    "BIIB",
     "DD",
-    "HUM",
+    "DHR",
     "LLY",
+    "MDT",
+    "REGN",
+    "TGT",
     "TMO"
   ]
 }
